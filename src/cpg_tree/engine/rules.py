@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Rule evaluation for the deterministic engine.
 
 A rule is evaluated in a fixed order: applicability, condition, exceptions.
@@ -98,8 +97,10 @@ def evaluate_rule(
 
     condition_result = evaluate_operand(rule.condition, case, variables)
     if condition_result is not TruthValue.TRUE:
-        outcome = RuleOutcome.NOT_MATCHED if condition_result is TruthValue.FALSE else (
-            RuleOutcome.INDETERMINATE
+        outcome = (
+            RuleOutcome.NOT_MATCHED
+            if condition_result is TruthValue.FALSE
+            else (RuleOutcome.INDETERMINATE)
         )
         return RuleEvaluation(
             rule_id=rule.id,

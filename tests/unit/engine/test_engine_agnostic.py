@@ -35,9 +35,7 @@ def test_engine_source_contains_no_protocol_specific_strings() -> None:
 def test_engine_never_imports_the_validation_layer() -> None:
     for source_file in ENGINE_PACKAGE.rglob("*.py"):
         content = source_file.read_text(encoding="utf-8")
-        assert "cpg_tree.validation" not in content, (
-            f"{source_file} imports the validation layer"
-        )
+        assert "cpg_tree.validation" not in content, f"{source_file} imports the validation layer"
 
 
 def test_third_protocol_evaluates_with_generic_engine(

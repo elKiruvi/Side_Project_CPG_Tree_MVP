@@ -77,7 +77,9 @@ def test_comparison_operator_boundaries(
     value: int,
     expected: TruthValue,
 ) -> None:
-    assert evaluate_condition(_comparison(operator), Case.from_inputs({"count_x": value})) is expected
+    assert (
+        evaluate_condition(_comparison(operator), Case.from_inputs({"count_x": value})) is expected
+    )
 
 
 def test_comparison_accepts_float_values() -> None:
@@ -93,7 +95,9 @@ def test_comparison_accepts_float_values() -> None:
 @pytest.mark.parametrize("bad_value", [True, False, "high"])
 def test_comparison_rejects_non_numeric_values(bad_value: object) -> None:
     with pytest.raises(EngineInputError, match="numeric"):
-        evaluate_condition(_comparison(ComparisonOperator.GT), Case.from_inputs({"count_x": bad_value}))  # type: ignore[arg-type]
+        evaluate_condition(
+            _comparison(ComparisonOperator.GT), Case.from_inputs({"count_x": bad_value})
+        )  # type: ignore[arg-type]
 
 
 def test_comparison_missing_variable_is_unknown() -> None:
@@ -101,7 +105,10 @@ def test_comparison_missing_variable_is_unknown() -> None:
 
 
 def test_comparison_explicit_unknown_is_unknown() -> None:
-    assert evaluate_condition(_comparison(ComparisonOperator.GT), Case.from_inputs({"count_x": None})) is U
+    assert (
+        evaluate_condition(_comparison(ComparisonOperator.GT), Case.from_inputs({"count_x": None}))
+        is U
+    )
 
 
 def test_comparison_accepts_duration_variable() -> None:
@@ -149,11 +156,17 @@ def test_comparison_rejects_categorical_variable() -> None:
 
 
 def test_membership_in_values() -> None:
-    assert evaluate_condition(_membership("alpha", "beta"), Case.from_inputs({"category_z": "alpha"})) is T
+    assert (
+        evaluate_condition(_membership("alpha", "beta"), Case.from_inputs({"category_z": "alpha"}))
+        is T
+    )
 
 
 def test_membership_outside_values() -> None:
-    assert evaluate_condition(_membership("alpha", "beta"), Case.from_inputs({"category_z": "gamma"})) is F
+    assert (
+        evaluate_condition(_membership("alpha", "beta"), Case.from_inputs({"category_z": "gamma"}))
+        is F
+    )
 
 
 def test_membership_duplicate_values_do_not_alter_semantics() -> None:
@@ -172,7 +185,9 @@ def test_membership_value_outside_allowed_values_is_evaluated() -> None:
         )
     }
     assert (
-        evaluate_condition(_membership("alpha", "beta"), Case.from_inputs({"category_z": "delta"}), variables)
+        evaluate_condition(
+            _membership("alpha", "beta"), Case.from_inputs({"category_z": "delta"}), variables
+        )
         is F
     )
 
@@ -264,7 +279,9 @@ def test_temporal_negative_duration_is_configuration_error() -> None:
 
 
 def test_temporal_unit_mismatch_is_configuration_error() -> None:
-    variables = {"span_t": Variable(id="span_t", label="Span T", type=VariableType.DURATION, unit="hours")}
+    variables = {
+        "span_t": Variable(id="span_t", label="Span T", type=VariableType.DURATION, unit="hours")
+    }
     condition = _temporal(TemporalOperator.WITHIN_LAST, 48, unit="days")
     with pytest.raises(EngineConfigurationError, match="does not match"):
         evaluate_condition(condition, Case.from_inputs({"span_t": 24}), variables)
@@ -277,7 +294,9 @@ def test_temporal_variable_without_unit_is_accepted() -> None:
 
 
 def test_temporal_matching_units_are_accepted() -> None:
-    variables = {"span_t": Variable(id="span_t", label="Span T", type=VariableType.DURATION, unit="hours")}
+    variables = {
+        "span_t": Variable(id="span_t", label="Span T", type=VariableType.DURATION, unit="hours")
+    }
     condition = _temporal(TemporalOperator.WITHIN_LAST, 48, unit="hours")
     assert evaluate_condition(condition, Case.from_inputs({"span_t": 24}), variables) is T
 
@@ -285,15 +304,24 @@ def test_temporal_matching_units_are_accepted() -> None:
 @pytest.mark.parametrize("bad_value", [True, False, "long"])
 def test_temporal_rejects_non_numeric_values(bad_value: object) -> None:
     with pytest.raises(EngineInputError, match="numeric"):
-        evaluate_condition(_temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({"span_t": bad_value}))  # type: ignore[arg-type]
+        evaluate_condition(
+            _temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({"span_t": bad_value})
+        )  # type: ignore[arg-type]
 
 
 def test_temporal_missing_variable_is_unknown() -> None:
-    assert evaluate_condition(_temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({})) is U
+    assert (
+        evaluate_condition(_temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({})) is U
+    )
 
 
 def test_temporal_explicit_unknown_is_unknown() -> None:
-    assert evaluate_condition(_temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({"span_t": None})) is U
+    assert (
+        evaluate_condition(
+            _temporal(TemporalOperator.WITHIN_LAST, 48), Case.from_inputs({"span_t": None})
+        )
+        is U
+    )
 
 
 def test_temporal_rejects_numeric_variable() -> None:

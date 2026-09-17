@@ -44,7 +44,10 @@ def test_nested_and_or_not_with_unknown() -> None:
     )
     outer = LogicalExpression(
         operator=LogicalOperator.AND,
-        operands=(inner, LogicalExpression(operator=LogicalOperator.NOT, operands=(_flag("flag_c"),))),
+        operands=(
+            inner,
+            LogicalExpression(operator=LogicalOperator.NOT, operands=(_flag("flag_c"),)),
+        ),
     )
     case = Case.from_inputs({"flag_a": False, "flag_b": None, "flag_c": False})
     assert evaluate_operand(outer, case) is U
@@ -57,9 +60,7 @@ def test_nested_at_least_n_inside_and() -> None:
         operands=(_comparison(), _flag("flag_y"), _flag("flag_b")),
     )
     outer = LogicalExpression(operator=LogicalOperator.AND, operands=(inner, _flag("flag_c")))
-    case = Case.from_inputs(
-        {"count_x": 101, "flag_y": True, "flag_b": False, "flag_c": True}
-    )
+    case = Case.from_inputs({"count_x": 101, "flag_y": True, "flag_b": False, "flag_c": True})
     assert evaluate_operand(outer, case) is T
 
 
@@ -69,15 +70,24 @@ def test_at_least_n_with_mixed_unknowns() -> None:
         threshold=2,
         operands=(_comparison(), _flag("flag_y"), _flag("flag_b")),
     )
-    assert evaluate_operand(
-        expression, Case.from_inputs({"count_x": 101, "flag_y": True, "flag_b": False})
-    ) is T
-    assert evaluate_operand(
-        expression, Case.from_inputs({"count_x": 101, "flag_y": None, "flag_b": False})
-    ) is U
-    assert evaluate_operand(
-        expression, Case.from_inputs({"count_x": 50, "flag_y": None, "flag_b": False})
-    ) is F
+    assert (
+        evaluate_operand(
+            expression, Case.from_inputs({"count_x": 101, "flag_y": True, "flag_b": False})
+        )
+        is T
+    )
+    assert (
+        evaluate_operand(
+            expression, Case.from_inputs({"count_x": 101, "flag_y": None, "flag_b": False})
+        )
+        is U
+    )
+    assert (
+        evaluate_operand(
+            expression, Case.from_inputs({"count_x": 50, "flag_y": None, "flag_b": False})
+        )
+        is F
+    )
 
 
 def test_nested_expression_evaluation_is_deterministic() -> None:

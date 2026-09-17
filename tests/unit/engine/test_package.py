@@ -16,9 +16,14 @@ from cpg_tree.knowledge import (
     dump_package,
 )
 
+COUNT_X_VALUE = 101
+SPAN_T_VALUE = 48
+
 
 def _full_case() -> Case:
-    return Case.from_inputs({"count_x": 101, "flag_y": True, "category_z": "alpha", "span_t": 48})
+    return Case.from_inputs(
+        {"count_x": COUNT_X_VALUE, "flag_y": True, "category_z": "alpha", "span_t": SPAN_T_VALUE}
+    )
 
 
 def test_package_results_are_sorted_by_rule_id(synthetic_package: ProtocolVersion) -> None:
@@ -61,7 +66,7 @@ def test_package_evaluation_does_not_mutate_package(synthetic_package: ProtocolV
 def test_package_evaluation_does_not_mutate_case(synthetic_package: ProtocolVersion) -> None:
     case = _full_case()
     evaluate_package(synthetic_package, case)
-    assert case.values["count_x"].value == 101
+    assert case.values["count_x"].value == COUNT_X_VALUE
     assert case.values["flag_y"].value is True
     assert set(case.values) == {"count_x", "flag_y", "category_z", "span_t"}
 
@@ -73,7 +78,9 @@ def test_unknown_action_ref_raises_configuration_error(synthetic_package: Protoc
         evaluate_package(package, _full_case())
 
 
-def test_unknown_variable_ref_raises_configuration_error(synthetic_package: ProtocolVersion) -> None:
+def test_unknown_variable_ref_raises_configuration_error(
+    synthetic_package: ProtocolVersion,
+) -> None:
     condition = Condition(kind=ConditionKind.FLAG, variable_ref="missing_v", expected=True)
     rule = replace(synthetic_package.rules["rule_flag"], condition=condition)
     package = replace(synthetic_package, rules={**synthetic_package.rules, "rule_flag": rule})

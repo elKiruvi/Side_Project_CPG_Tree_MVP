@@ -19,7 +19,6 @@ from cpg_tree.knowledge import (
     ConditionKind,
     DerivationState,
     LogicalExpression,
-    LogicalOperator,
     Provenance,
     Rule,
     TruthValue,
@@ -42,7 +41,6 @@ def _rule(
     action_refs: tuple[str, ...] = ("act_decide",),
     applies_to: Condition | LogicalExpression | None = None,
     exceptions: tuple[Condition | LogicalExpression, ...] = (),
-    validation_status: ValidationStatus = ValidationStatus.DRAFT,
     derivation: DerivationState = DerivationState.SOURCE_STATED,
 ) -> Rule:
     return Rule(
@@ -52,7 +50,6 @@ def _rule(
         provenance=Provenance(derivation=derivation),
         applies_to=applies_to,
         exceptions=exceptions,
-        validation_status=validation_status,
     )
 
 
@@ -166,10 +163,8 @@ def test_exceptions_not_evaluated_when_condition_false() -> None:
 
 def test_validation_status_never_gates_evaluation() -> None:
     for status in ValidationStatus:
-        result = evaluate_rule(
-            _rule(validation_status=status),
-            Case.from_inputs({"flag_y": True}),
-        )
+        rule = replace(_rule(), validation_status=status)
+        result = evaluate_rule(rule, Case.from_inputs({"flag_y": True}))
         assert result.outcome is RuleOutcome.MATCHED
         assert result.validation_status is status
 
@@ -204,7 +199,9 @@ def test_incompatible_input_raises_engine_input_error() -> None:
 def test_unknown_variable_reference_raises_configuration_error() -> None:
     variables = {"flag_y": Variable(id="flag_y", label="Y", type=VariableType.BOOLEAN)}
     with pytest.raises(EngineConfigurationError, match="does not resolve"):
-        evaluate_rule(_rule(), Case.from_inputs({"flag_y": True}), variables={"other": variables["flag_y"]})
+        evaluate_rule(
+            _rule(), Case.from_inputs({"flag_y": True}), variables={"other": variables["flag_y"]}
+        )
 
 
 def test_provenance_not_used_as_condition() -> None:

@@ -116,7 +116,9 @@ def test_run_test_cases_is_deterministic(synthetic_package: ProtocolVersion) -> 
     assert first == second
 
 
-def test_unknown_expected_rule_raises_configuration_error(synthetic_package: ProtocolVersion) -> None:
+def test_unknown_expected_rule_raises_configuration_error(
+    synthetic_package: ProtocolVersion,
+) -> None:
     bad = TestCase(
         id="tc_bad",
         inputs={},

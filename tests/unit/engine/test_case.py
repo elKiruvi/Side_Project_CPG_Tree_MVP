@@ -10,6 +10,9 @@ import pytest
 from cpg_tree.engine import Case, CaseError, CaseValue, CaseValueState
 
 SCALAR_SAMPLES = ("alpha", 42, 3.5, True)
+SAMPLE_INT = 7
+SAMPLE_INT_SMALL = 3
+SAMPLE_FLOAT = 2.5
 
 
 def test_known_scalar_values_accepted() -> None:
@@ -89,17 +92,17 @@ def test_extraneous_keys_are_allowed() -> None:
 
 
 def test_from_inputs_maps_none_to_unknown() -> None:
-    case = Case.from_inputs({"flag_y": None, "count_x": 7})
+    case = Case.from_inputs({"flag_y": None, "count_x": SAMPLE_INT})
     assert case.values["flag_y"].state is CaseValueState.UNKNOWN
     assert case.values["count_x"].state is CaseValueState.KNOWN
-    assert case.values["count_x"].value == 7
+    assert case.values["count_x"].value == SAMPLE_INT
 
 
 def test_from_inputs_accepts_all_scalar_kinds() -> None:
-    case = Case.from_inputs({"s": "alpha", "i": 3, "f": 2.5, "b": False})
+    case = Case.from_inputs({"s": "alpha", "i": SAMPLE_INT_SMALL, "f": SAMPLE_FLOAT, "b": False})
     assert case.values["s"].value == "alpha"
-    assert case.values["i"].value == 3
-    assert case.values["f"].value == 2.5
+    assert case.values["i"].value == SAMPLE_INT_SMALL
+    assert case.values["f"].value == SAMPLE_FLOAT
     assert case.values["b"].value is False
 
 

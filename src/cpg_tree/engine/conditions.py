@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Atomic condition and operand evaluation for the deterministic engine.
 
 Every condition evaluates against a ``Case`` to a ``TruthValue``. The engine
@@ -182,8 +181,7 @@ def _evaluate_flag(
     variable = _require_variable(variables, condition.variable_ref)
     if variable is not None and variable.type is not VariableType.BOOLEAN:
         raise EngineConfigurationError(
-            f"FLAG requires a BOOLEAN variable; "
-            f"{condition.variable_ref!r} is {variable.type.value}"
+            f"FLAG requires a BOOLEAN variable; {condition.variable_ref!r} is {variable.type.value}"
         )
     value = _resolve_value(case, condition.variable_ref)
     if value is None:

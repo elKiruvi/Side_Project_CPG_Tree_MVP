@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Test-case harness built on top of the deterministic engine.
 
 ``run_test_cases`` is testing tooling, not part of the runtime engine: the
