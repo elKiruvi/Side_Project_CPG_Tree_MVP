@@ -53,6 +53,14 @@ def test_inspect_shows_nac_metadata_and_counts(
     assert "validation_items: 8" in out
     assert "valid: yes" in out
     assert "info: 2" in out
+    assert "rules with source evidence: 42/42" in out
+    assert "variables with source evidence: 66/66" in out
+    assert "actions with source evidence: 26/26" in out
+    assert "fragments with document: 35" in out
+    assert "fragments with verbatim text: 35" in out
+    assert "derivation: INFERRED=1, NORMALIZED=21, SOURCE_STATED=19, UNRESOLVED=1" in out
+    assert "derivation (variables): NORMALIZED=18, SOURCE_STATED=47, UNRESOLVED=1" in out
+    assert "validation items: OPEN=8" in out
 
 
 def test_rule_detail_shows_evaluation_order(

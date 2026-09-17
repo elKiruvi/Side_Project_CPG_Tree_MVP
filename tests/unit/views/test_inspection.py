@@ -38,9 +38,16 @@ def test_summary_exposes_only_package_facts(synthetic_package: ProtocolVersion) 
     }
     assert summary.rules_with_evidence == EXPECTED_RULES_WITH_EVIDENCE
     assert summary.rules_without_evidence == 0
+    assert summary.variables_with_evidence == 1
+    assert summary.actions_with_evidence == 0
     assert summary.fragments_with_page == 1
+    assert summary.fragments_with_document == 1
+    assert summary.fragments_with_text == 1
     assert summary.derivation_counts == {"NORMALIZED": 1, "SOURCE_STATED": 1}
     assert summary.status_counts == {"EXTRACTED": 2}
+    assert summary.variable_derivation_counts == {"SOURCE_STATED": 1}
+    assert summary.action_derivation_counts == {}
+    assert summary.validation_item_status_counts == {"OPEN": 1}
 
 
 def test_summary_without_report_marks_validation_as_not_run(
@@ -67,6 +74,19 @@ def test_render_summary_is_deterministic(synthetic_package: ProtocolVersion) -> 
     assert first == second
 
 
+def test_render_summary_shows_element_level_provenance_coverage(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    text = render_summary(build_summary(synthetic_package))
+    assert "rules with source evidence: 2/2" in text
+    assert "variables with source evidence: 1/4" in text
+    assert "actions with source evidence: 0/3" in text
+    assert "fragments with document: 1" in text
+    assert "fragments with verbatim text: 1" in text
+    assert "derivation (variables): SOURCE_STATED=1" in text
+    assert "validation items: OPEN=1" in text
+
+
 def test_summary_to_json_schema_is_stable(synthetic_package: ProtocolVersion) -> None:
     report = validate_package(synthetic_package)
     data = summary_to_json(build_summary(synthetic_package, report))
@@ -81,9 +101,16 @@ def test_summary_to_json_schema_is_stable(synthetic_package: ProtocolVersion) ->
         "counts",
         "rules_with_evidence",
         "rules_without_evidence",
+        "variables_with_evidence",
+        "actions_with_evidence",
         "fragments_with_page",
+        "fragments_with_document",
+        "fragments_with_text",
         "derivation_counts",
         "status_counts",
+        "variable_derivation_counts",
+        "action_derivation_counts",
+        "validation_item_status_counts",
         "validation",
     ]
     assert data["validation"] == {
