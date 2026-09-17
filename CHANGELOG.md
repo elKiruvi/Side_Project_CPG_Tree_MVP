@@ -36,6 +36,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pinning each documented outcome, and `docs/mvp-closure.md` separating
   technical completeness, source traceability, and clinical/source fidelity
   (not established; no element is clinically validated).
+- **Phase 9 — Clinical Knowledge / Decision View.** `visualize` now emits one
+  self-contained HTML document with two anchor-linked views: a Clinical
+  Knowledge View (deterministic static SVG map, no JavaScript, no graph
+  library, no external resources) and the existing Technical View. The map
+  derives entirely from `package.yaml`: one visual node per rule, section
+  grouping, static TRUE/FALSE/UNKNOWN engine outcome lanes (never a live
+  evaluation), declarative actions with alternatives never selected, and a
+  provenance line per node. The optional `visualization.yaml` gains a
+  `graph` key (`entry_points`, `edges` with `kind: reference`) for
+  presentation-only connectors; invalid ids, self-edges, duplicate edges,
+  and unknown kinds fail deterministically. The committed NAC and ITU
+  manifests declare zero edges: connectors are display references, never
+  clinical workflow.
 
 ### History backfill (Phases 0–6)
 
