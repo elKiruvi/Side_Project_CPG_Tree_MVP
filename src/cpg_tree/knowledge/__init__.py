@@ -6,6 +6,7 @@ specific clinical protocol. Clinical knowledge lives in protocol packages.
 """
 
 from cpg_tree.knowledge.conditions import Condition, LogicalExpression
+from cpg_tree.knowledge.documents import SourceDocument
 from cpg_tree.knowledge.enums import (
     ActionType,
     ComparisonOperator,
@@ -41,6 +42,7 @@ __all__ = [
     "Rule",
     "Scalar",
     "ScalarOperand",
+    "SourceDocument",
     "SourceFragment",
     "TemporalOperator",
     "TestCase",

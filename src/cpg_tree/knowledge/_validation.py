@@ -13,9 +13,7 @@ def validate_identifier(value: str, field_name: str) -> None:
     if not value:
         raise ValueError(f"{field_name} must not be empty")
     if _IDENTIFIER_PATTERN.fullmatch(value) is None:
-        raise ValueError(
-            f"{field_name} must match {_IDENTIFIER_PATTERN.pattern!r}; got {value!r}"
-        )
+        raise ValueError(f"{field_name} must match {_IDENTIFIER_PATTERN.pattern!r}; got {value!r}")
 
 
 def validate_iso_date(value: str, field_name: str) -> None:

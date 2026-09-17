@@ -1,4 +1,10 @@
-"""Atomic conditions and composite logical expressions."""
+# ruff: noqa: TRY004
+"""Atomic conditions and composite logical expressions.
+
+TRY004 is disabled for this module on purpose: structural validation of the
+canonical model raises ValueError by domain contract, and the test suite
+asserts ValueError explicitly.
+"""
 
 from __future__ import annotations
 
@@ -79,26 +85,31 @@ class Condition:
         required, forbidden = _FIELD_RULES[self.kind]
         for field_name in required:
             if getattr(self, field_name) is None:
-                raise ValueError(
-                    f"{self.kind.value} conditions require Condition.{field_name}"
-                )
+                raise ValueError(f"{self.kind.value} conditions require Condition.{field_name}")
         for field_name in forbidden:
             if getattr(self, field_name) is not None:
                 raise ValueError(
                     f"Condition.{field_name} is not valid for {self.kind.value} conditions"
                 )
+        self._validate_kind_fields()
+
+    def _validate_kind_fields(self) -> None:
         if self.kind is ConditionKind.COMPARISON:
-            if type(self.operand) not in (int, float):
-                raise ValueError("COMPARISON operands must be int or float")
-        if self.kind is ConditionKind.MEMBERSHIP and not self.values:
-            raise ValueError("MEMBERSHIP conditions require at least one value")
-        if self.kind is ConditionKind.TEMPORAL:
-            if type(self.duration_value) not in (int, float):
-                raise ValueError("TEMPORAL duration_value must be int or float")
-            if self.duration_value <= _MIN_DURATION:
+            self._require_number(self.operand, "COMPARISON operands")
+        elif self.kind is ConditionKind.MEMBERSHIP:
+            if not self.values:
+                raise ValueError("MEMBERSHIP conditions require at least one value")
+        elif self.kind is ConditionKind.TEMPORAL:
+            self._require_number(self.duration_value, "TEMPORAL duration_value")
+            if self.duration_value is None or self.duration_value <= _MIN_DURATION:
                 raise ValueError("TEMPORAL duration_value must be positive")
             if not self.duration_unit:
                 raise ValueError("TEMPORAL conditions require a non-empty duration_unit")
+
+    @staticmethod
+    def _require_number(value: object, label: str) -> None:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"{label} must be int or float")
 
 
 type LogicalOperand = Condition | LogicalExpression
@@ -133,10 +144,6 @@ class LogicalExpression:
             if isinstance(self.threshold, bool) or not isinstance(self.threshold, int):
                 raise ValueError("AT_LEAST_N threshold must be an integer")
             if not _MIN_THRESHOLD <= self.threshold <= len(self.operands):
-                raise ValueError(
-                    "AT_LEAST_N threshold must be between 1 and the operand count"
-                )
+                raise ValueError("AT_LEAST_N threshold must be between 1 and the operand count")
         elif self.threshold is not None:
-            raise ValueError(
-                f"{self.operator.value} expressions do not accept a threshold"
-            )
+            raise ValueError(f"{self.operator.value} expressions do not accept a threshold")

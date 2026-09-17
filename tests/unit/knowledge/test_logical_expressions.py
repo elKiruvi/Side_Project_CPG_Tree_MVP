@@ -14,6 +14,7 @@ from cpg_tree.knowledge import (
 )
 
 THRESHOLD_TWO = 2
+THREE_OPERANDS = 3
 
 
 def _comparison(variable_ref: str, operand: int = 100) -> Condition:
@@ -101,7 +102,7 @@ def test_at_least_n_expression(
         ),
     )
     assert expression.threshold == THRESHOLD_TWO
-    assert len(expression.operands) == 3
+    assert len(expression.operands) == THREE_OPERANDS
 
 
 def test_at_least_n_requires_threshold(flag_variable: Variable) -> None:

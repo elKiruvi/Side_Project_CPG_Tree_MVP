@@ -13,7 +13,6 @@ from cpg_tree.knowledge import (
     LogicalExpression,
     LogicalOperator,
     ProtocolVersion,
-    Variable,
     dump_package,
     from_dict,
     load_package,
@@ -101,9 +100,10 @@ def test_dump_is_readable_yaml(synthetic_package: ProtocolVersion) -> None:
 def test_package_round_trip_equality(synthetic_package: ProtocolVersion) -> None:
     loaded = load_package(dump_package(synthetic_package))
     assert loaded == synthetic_package
-    assert loaded.rules["rule_composite"].condition == synthetic_package.rules[
-        "rule_composite"
-    ].condition
+    assert (
+        loaded.rules["rule_composite"].condition
+        == synthetic_package.rules["rule_composite"].condition
+    )
 
 
 def test_load_rejects_unsafe_python_tags() -> None:
@@ -126,16 +126,12 @@ def test_load_rejects_missing_version_block() -> None:
         load_package("protocol: {id: TEST-PL-999, name: Synthetic}\n")
 
 
-_RULE_PACKAGE_HEADER = (
-    "protocol: {id: TEST-PL-999, name: Synthetic}\n"
-    "version: {version: v01}\n"
-)
+_RULE_PACKAGE_HEADER = "protocol: {id: TEST-PL-999, name: Synthetic}\nversion: {version: v01}\n"
 
 
 def test_load_rejects_rule_without_provenance() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
@@ -149,8 +145,7 @@ def test_load_rejects_rule_without_provenance() -> None:
 
 def test_load_rejects_rule_with_non_mapping_provenance() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
@@ -163,8 +158,7 @@ def test_load_rejects_rule_with_non_mapping_provenance() -> None:
 
 def test_load_rejects_provenance_without_derivation() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
@@ -177,8 +171,7 @@ def test_load_rejects_provenance_without_derivation() -> None:
 
 def test_load_rejects_expression_without_operands() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {operator: AND}\n"
@@ -191,8 +184,7 @@ def test_load_rejects_expression_without_operands() -> None:
 
 def test_load_rejects_non_list_operands() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {operator: AND, operands: single}\n"
@@ -205,8 +197,7 @@ def test_load_rejects_non_list_operands() -> None:
 
 def test_load_rejects_non_mapping_operand() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition:\n"
@@ -221,8 +212,7 @@ def test_load_rejects_non_mapping_operand() -> None:
 
 def test_load_rejects_non_integer_threshold() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition:\n"
@@ -238,22 +228,20 @@ def test_load_rejects_non_integer_threshold() -> None:
 
 def test_load_rejects_scalar_membership_values() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {kind: MEMBERSHIP, variable_ref: category_z, values: alpha}\n"
         "    action_refs: [act_decide]\n"
         "    provenance: {derivation: SOURCE_STATED}\n"
     )
-    with pytest.raises(ValueError, match="Condition.values must be a list"):
+    with pytest.raises(ValueError, match=r"Condition\.values must be a list"):
         load_package(text)
 
 
 def test_load_rejects_non_list_exceptions() -> None:
     text = (
-        _RULE_PACKAGE_HEADER
-        + "rules:\n"
+        _RULE_PACKAGE_HEADER + "rules:\n"
         "  rule_x:\n"
         "    id: rule_x\n"
         "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
@@ -261,7 +249,7 @@ def test_load_rejects_non_list_exceptions() -> None:
         "    provenance: {derivation: SOURCE_STATED}\n"
         "    exceptions: single\n"
     )
-    with pytest.raises(ValueError, match="Rule.exceptions must be a list"):
+    with pytest.raises(ValueError, match=r"Rule\.exceptions must be a list"):
         load_package(text)
 
 

@@ -28,7 +28,7 @@ def test_comparison_condition(numeric_variable: Variable) -> None:
 
 
 def test_comparison_requires_operator(numeric_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="require Condition.operator"):
+    with pytest.raises(ValueError, match=r"require Condition\.operator"):
         Condition(
             kind=ConditionKind.COMPARISON,
             variable_ref=numeric_variable.id,
@@ -37,7 +37,7 @@ def test_comparison_requires_operator(numeric_variable: Variable) -> None:
 
 
 def test_comparison_requires_operand(numeric_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="require Condition.operand"):
+    with pytest.raises(ValueError, match=r"require Condition\.operand"):
         Condition(
             kind=ConditionKind.COMPARISON,
             variable_ref=numeric_variable.id,
@@ -76,7 +76,7 @@ def test_membership_condition(categorical_variable: Variable) -> None:
 
 
 def test_membership_requires_values(categorical_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="require Condition.values"):
+    with pytest.raises(ValueError, match=r"require Condition\.values"):
         Condition(kind=ConditionKind.MEMBERSHIP, variable_ref=categorical_variable.id)
 
 
@@ -109,7 +109,7 @@ def test_flag_condition(flag_variable: Variable) -> None:
 
 
 def test_flag_requires_expected(flag_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="require Condition.expected"):
+    with pytest.raises(ValueError, match=r"require Condition\.expected"):
         Condition(kind=ConditionKind.FLAG, variable_ref=flag_variable.id)
 
 
@@ -137,21 +137,21 @@ def test_temporal_condition(duration_variable: Variable) -> None:
 
 
 def test_temporal_requires_operator_and_duration(duration_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="require Condition.temporal_operator"):
+    with pytest.raises(ValueError, match=r"require Condition\.temporal_operator"):
         Condition(
             kind=ConditionKind.TEMPORAL,
             variable_ref=duration_variable.id,
             duration_value=DURATION_DAYS,
             duration_unit="days",
         )
-    with pytest.raises(ValueError, match="require Condition.duration_value"):
+    with pytest.raises(ValueError, match=r"require Condition\.duration_value"):
         Condition(
             kind=ConditionKind.TEMPORAL,
             variable_ref=duration_variable.id,
             temporal_operator=TemporalOperator.WITHIN_LAST,
             duration_unit="days",
         )
-    with pytest.raises(ValueError, match="require Condition.duration_unit"):
+    with pytest.raises(ValueError, match=r"require Condition\.duration_unit"):
         Condition(
             kind=ConditionKind.TEMPORAL,
             variable_ref=duration_variable.id,

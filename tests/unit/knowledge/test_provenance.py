@@ -12,6 +12,8 @@ from cpg_tree.knowledge import (
     ValidationItemStatus,
 )
 
+FRAGMENT_PAGE = 3
+
 
 def test_provenance_construction() -> None:
     provenance = Provenance(
@@ -60,7 +62,7 @@ def test_source_fragment_construction() -> None:
         verbatim_text="some verbatim source text",
     )
     assert fragment.document_id == "doc_1"
-    assert fragment.page == 3
+    assert fragment.page == FRAGMENT_PAGE
     assert fragment.section == "Diagnosis"
     assert fragment.verbatim_text == "some verbatim source text"
 

@@ -178,7 +178,9 @@ def _build_synthetic_package() -> ProtocolVersion:
             id="rule_flag",
             condition=flag_true,
             action_refs=("act_request",),
-            provenance=Provenance(derivation=DerivationState.SOURCE_STATED, fragment_refs=("frag_1",)),
+            provenance=Provenance(
+                derivation=DerivationState.SOURCE_STATED, fragment_refs=("frag_1",)
+            ),
         ),
         "rule_membership": Rule(
             id="rule_membership",

@@ -31,8 +31,6 @@ class Variable:
             raise ValueError("Variable.label must not be empty")
         if self.allowed_values is not None:
             if self.type is not VariableType.CATEGORICAL:
-                raise ValueError(
-                    "Variable.allowed_values is only valid for CATEGORICAL variables"
-                )
+                raise ValueError("Variable.allowed_values is only valid for CATEGORICAL variables")
             if not self.allowed_values:
                 raise ValueError("Variable.allowed_values must not be empty when set")

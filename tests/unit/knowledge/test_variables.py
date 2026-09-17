@@ -47,7 +47,9 @@ def test_allowed_values_rejected_for_non_categorical() -> None:
 
 def test_empty_allowed_values_rejected() -> None:
     with pytest.raises(ValueError, match="must not be empty"):
-        Variable(id="category_z", label="Category Z", type=VariableType.CATEGORICAL, allowed_values=())
+        Variable(
+            id="category_z", label="Category Z", type=VariableType.CATEGORICAL, allowed_values=()
+        )
 
 
 def test_empty_identifier_rejected() -> None:

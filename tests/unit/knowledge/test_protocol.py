@@ -98,9 +98,7 @@ def test_protocol_version_accepts_iso_approval_date() -> None:
 
 def test_protocol_version_validates_collection_keys() -> None:
     protocol = Protocol(id="TEST-PL-999", name="Synthetic Protocol")
-    mismatched = {
-        "wrong_key": Variable(id="count_x", label="Count X", type=VariableType.NUMERIC)
-    }
+    mismatched = {"wrong_key": Variable(id="count_x", label="Count X", type=VariableType.NUMERIC)}
     with pytest.raises(ValueError, match="does not match entry id"):
         ProtocolVersion(protocol=protocol, version="v01", variables=mismatched)
 
@@ -110,9 +108,7 @@ def test_protocol_version_accepts_all_collection_types() -> None:
     version = ProtocolVersion(
         protocol=protocol,
         version="v01",
-        variables={
-            "count_x": Variable(id="count_x", label="Count X", type=VariableType.NUMERIC)
-        },
+        variables={"count_x": Variable(id="count_x", label="Count X", type=VariableType.NUMERIC)},
         rules={
             "rule_x": Rule(
                 id="rule_x",

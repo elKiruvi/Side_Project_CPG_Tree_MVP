@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Mapping, Protocol as TypingProtocol
+from typing import Protocol as TypingProtocol
 
 from cpg_tree.knowledge._validation import validate_identifier, validate_iso_date
 from cpg_tree.knowledge.provenance import SourceFragment, ValidationItem
@@ -67,6 +68,5 @@ class ProtocolVersion:
         for key, value in mapping.items():
             if value.id != key:
                 raise ValueError(
-                    f"ProtocolVersion.{field_name} key {key!r} "
-                    f"does not match entry id {value.id!r}"
+                    f"ProtocolVersion.{field_name} key {key!r} does not match entry id {value.id!r}"
                 )

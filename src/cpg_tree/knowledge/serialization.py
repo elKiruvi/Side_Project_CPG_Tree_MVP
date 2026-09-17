@@ -1,9 +1,14 @@
+# ruff: noqa: TRY004
 """Explicit, deterministic YAML serialization for the knowledge model.
 
 Serialization is kept separate from the domain classes. Only YAML-safe
 primitives are produced or consumed: str, int, float, bool, None, list, dict.
 Enums are serialized as their string values. No ``!!python/object`` tags and
 no unsafe loader mechanisms are used.
+
+TRY004 is disabled for this module on purpose: deserialization of malformed
+package documents raises ValueError by API contract (Phase 1 review), not
+TypeError, and the test suite asserts ValueError explicitly.
 """
 
 from __future__ import annotations
@@ -11,15 +16,15 @@ from __future__ import annotations
 import dataclasses
 from collections.abc import Callable, Mapping
 from enum import StrEnum
-from typing import Any, TypeVar
+from typing import Any
 
 import yaml
 
 from cpg_tree.knowledge.conditions import Condition, LogicalExpression
 from cpg_tree.knowledge.enums import (
     ActionType,
-    ConditionKind,
     ComparisonOperator,
+    ConditionKind,
     DerivationState,
     LogicalOperator,
     TemporalOperator,
@@ -34,9 +39,7 @@ from cpg_tree.knowledge.rules import Action, Rule
 from cpg_tree.knowledge.test_case import TestCase
 from cpg_tree.knowledge.variables import Variable
 
-_T = TypeVar("_T")
-
-_EntityBuilder = Callable[[Mapping[str, Any]], _T]
+type _EntityBuilder[T] = Callable[[Mapping[str, Any]], T]
 
 
 def to_dict(obj: object) -> dict[str, Any]:
@@ -61,7 +64,7 @@ def from_dict(data: object) -> Any:
 
 def dump_package(version: ProtocolVersion) -> str:
     """Serialize a ProtocolVersion into deterministic YAML text."""
-    return yaml.safe_dump(to_dict(version), sort_keys=False, allow_unicode=True)
+    return str(yaml.safe_dump(to_dict(version), sort_keys=False, allow_unicode=True))
 
 
 def load_package(text: str) -> ProtocolVersion:
@@ -91,7 +94,7 @@ def load_package(text: str) -> ProtocolVersion:
     )
 
 
-def _entity_to_dict(obj: object) -> dict[str, Any]:
+def _entity_to_dict(obj: Any) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for field in dataclasses.fields(obj):
         value = getattr(obj, field.name)
@@ -135,12 +138,12 @@ def _entity_map_to_dict(mapping: Mapping[str, object]) -> dict[str, Any]:
     return {key: _entity_to_dict(value) for key, value in mapping.items()}
 
 
-def _entity_map_from_dict(raw: object, builder: _EntityBuilder[_T]) -> dict[str, _T]:
+def _entity_map_from_dict[T](raw: object, builder: _EntityBuilder[T]) -> dict[str, T]:
     if raw is None:
         return {}
     if not isinstance(raw, Mapping):
         raise ValueError(f"expected a mapping of entries; got {type(raw).__name__}")
-    result: dict[str, _T] = {}
+    result: dict[str, T] = {}
     for key, entry in raw.items():
         if not isinstance(entry, Mapping):
             raise ValueError(f"entry {key!r} must be a mapping; got {type(entry).__name__}")
@@ -219,9 +222,7 @@ def _action_from_dict(data: Mapping[str, Any]) -> Action:
         type=ActionType(data.get("type")),
         label=data.get("label"),
         payload=dict(payload) if isinstance(payload, Mapping) else None,
-        provenance=_provenance_from_dict(provenance)
-        if isinstance(provenance, Mapping)
-        else None,
+        provenance=_provenance_from_dict(provenance) if isinstance(provenance, Mapping) else None,
     )
 
 
@@ -249,15 +250,11 @@ def _rule_from_dict(data: Mapping[str, Any]) -> Rule:
         raise ValueError("Rule requires a 'provenance' mapping")
     applies_to = data.get("applies_to")
     if applies_to is not None and not isinstance(applies_to, Mapping):
-        raise ValueError(
-            f"Rule.applies_to must be a mapping; got {type(applies_to).__name__}"
-        )
+        raise ValueError(f"Rule.applies_to must be a mapping; got {type(applies_to).__name__}")
     return Rule(
         id=data.get("id"),
         condition=from_dict(data.get("condition")),
-        action_refs=_as_tuple(action_refs, "Rule.action_refs")
-        if action_refs is not None
-        else (),
+        action_refs=_as_tuple(action_refs, "Rule.action_refs") if action_refs is not None else (),
         provenance=_provenance_from_dict(provenance),
         applies_to=from_dict(applies_to) if isinstance(applies_to, Mapping) else None,
         exceptions=tuple(
