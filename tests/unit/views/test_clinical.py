@@ -8,7 +8,11 @@ from pathlib import Path
 import pytest
 
 from cpg_tree.knowledge import (
+    Condition,
+    ConditionKind,
     DerivationState,
+    LogicalExpression,
+    LogicalOperator,
     ProtocolVersion,
     Provenance,
     Rule,
@@ -370,13 +374,6 @@ def test_membership_and_temporal_conditions_are_rendered(
 def test_not_and_at_least_n_expressions_are_rendered(
     synthetic_package: ProtocolVersion,
 ) -> None:
-    from cpg_tree.knowledge import (
-        Condition,
-        ConditionKind,
-        LogicalExpression,
-        LogicalOperator,
-    )
-
     flag_false = Condition(kind=ConditionKind.FLAG, variable_ref="flag_y", expected=False)
     not_expr = LogicalExpression(operator=LogicalOperator.NOT, operands=(flag_false,))
     at_least = LogicalExpression(
