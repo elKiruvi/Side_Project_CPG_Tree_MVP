@@ -38,6 +38,33 @@ uv run pytest         # run tests
 make check            # run the full quality gate (pre-commit)
 ```
 
+## CLI
+
+The MVP ships a local, deterministic command-line interface over the committed
+knowledge packages (no server, no database, no cloud):
+
+```bash
+uv run python -m cpg_tree --help
+uv run python -m cpg_tree list
+uv run python -m cpg_tree inspect CT-PL-197 v06
+uv run python -m cpg_tree rules CT-PL-197 v06 --rule rule_t1_itu_baja
+uv run python -m cpg_tree provenance CT-PL-197 v06 --rule rule_t1_itu_baja
+uv run python -m cpg_tree tree CT-PL-197 v06
+uv run python -m cpg_tree validate CT-PL-197 v06
+uv run python -m cpg_tree evaluate CT-PL-197 v06 case.json
+```
+
+- `case.json` maps variable ids to `string | number | boolean | null`; `null`
+  means explicitly missing information (evaluated as UNKNOWN, never FALSE).
+- Every data command accepts `--json` for deterministic machine-readable output.
+- Exit codes: `0` success, `1` operational/input failure, `2` usage error.
+- Protocol artifacts are discovered from `protocols/<id>/<version>/package.yaml`;
+  a new protocol becomes available by adding its versioned artifact directory.
+- All output is derived from the canonical packages and the deterministic rule
+  engine. Actions are declarative and are never executed; multiple `PRESCRIBE`
+  actions on one rule are source-declared alternatives, never a selection.
+  This is a research prototype, not clinical advice.
+
 ## Credits
 
 This repository originated from the

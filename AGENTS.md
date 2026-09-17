@@ -1208,3 +1208,31 @@ At the beginning of the MVP:
 
 The first implementation goal is to build the reusable foundation before
 encoding a large amount of protocol-specific clinical knowledge.
+
+## 36. CLI interface (Phase 7)
+
+The project has a local, deterministic CLI:
+
+```bash
+uv run python -m cpg_tree --help
+uv run python -m cpg_tree list
+uv run python -m cpg_tree inspect <PROTOCOL_ID> [VERSION]
+uv run python -m cpg_tree variables <PROTOCOL_ID> [VERSION]
+uv run python -m cpg_tree rules <PROTOCOL_ID> [VERSION] [--rule RULE_ID]
+uv run python -m cpg_tree provenance <PROTOCOL_ID> [VERSION] (--rule|--variable|--action|--fragment) ID
+uv run python -m cpg_tree tree <PROTOCOL_ID> [VERSION]
+uv run python -m cpg_tree validate <PROTOCOL_ID> [VERSION]
+uv run python -m cpg_tree evaluate <PROTOCOL_ID> case.json [VERSION]
+```
+
+Conventions:
+
+- Protocol discovery scans `protocols/<protocol_id>/<version>/package.yaml`;
+  the CLI never imports protocol builders and must stay protocol-agnostic.
+- Case files map variable ids to `string | number | boolean | null`; `null`
+  means explicitly missing information (UNKNOWN, never FALSE).
+- `--json` emits deterministic JSON on data commands; outputs are derived
+  views only, and the tree is a projection, never a source of truth.
+- Exit codes: `0` success, `1` operational/input failure, `2` usage error.
+- Views/CLI code lives in `src/cpg_tree/views/` and `src/cpg_tree/cli.py`;
+  it must never duplicate engine semantics or contain protocol knowledge.
