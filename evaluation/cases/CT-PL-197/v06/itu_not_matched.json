@@ -1,0 +1,8 @@
+{
+  "gestante": true,
+  "dolor": true,
+  "sospecha_litiasis": false,
+  "pielonefritis": false,
+  "mas_de_un_episodio_itu": false,
+  "hematuria": false
+}

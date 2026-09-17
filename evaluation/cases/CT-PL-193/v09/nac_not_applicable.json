@@ -1,0 +1,13 @@
+{
+  "descompensacion_enfermedad_base": false,
+  "inmunosuprimido": false,
+  "sospecha_germenes_resistentes": false,
+  "intolerancia_via_oral": false,
+  "sepsis_origen_pulmonar": false,
+  "choque_origen_pulmonar": false,
+  "compromiso_multilobar": false,
+  "derrame_pleural_rx": false,
+  "curb65_score": 0,
+  "factores_sociales": false,
+  "requerimiento_oxigeno_suplementario": false
+}

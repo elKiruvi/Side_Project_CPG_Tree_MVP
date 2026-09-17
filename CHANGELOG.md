@@ -26,6 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   groupings come from an optional `visualization.yaml` sidecar manifest;
   `package.yaml` remains the canonical source of truth. Output goes to
   `data/08_reporting/` (gitignored).
+- **Phase 8 — MVP closure and evaluation.** `inspect` extended with
+  element-level provenance coverage (rules/variables/actions with source
+  evidence, fragment page/document/text coverage, per-kind derivation
+  counts, validation-item status counts), a committed synthetic
+  outcome-demonstration case library under `evaluation/cases/` (one case per
+  engine outcome where reachable; EXCEPTED is not reachable on NAC knowledge
+  because the source declares no rule exceptions), protocol and CLI tests
+  pinning each documented outcome, and `docs/mvp-closure.md` separating
+  technical completeness, source traceability, and clinical/source fidelity
+  (not established; no element is clinically validated).
 
 ### History backfill (Phases 0–6)
 

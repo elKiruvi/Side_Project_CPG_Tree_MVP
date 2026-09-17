@@ -53,6 +53,14 @@ def test_inspect_shows_nac_metadata_and_counts(
     assert "validation_items: 8" in out
     assert "valid: yes" in out
     assert "info: 2" in out
+    assert "rules with source evidence: 42/42" in out
+    assert "variables with source evidence: 66/66" in out
+    assert "actions with source evidence: 26/26" in out
+    assert "fragments with document: 35" in out
+    assert "fragments with verbatim text: 35" in out
+    assert "derivation: INFERRED=1, NORMALIZED=21, SOURCE_STATED=19, UNRESOLVED=1" in out
+    assert "derivation (variables): NORMALIZED=18, SOURCE_STATED=47, UNRESOLVED=1" in out
+    assert "validation items: OPEN=8" in out
 
 
 def test_rule_detail_shows_evaluation_order(
@@ -163,3 +171,21 @@ def test_evaluate_json_is_deterministic(
     assert data["version"] == "v09"
     rule_ids = [entry["rule_id"] for entry in data["rule_results"]]
     assert rule_ids == sorted(rule_ids)
+
+
+def test_evaluate_committed_demo_case_reproduces_documented_outcome(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    case_path = (
+        Path(__file__).resolve().parents[3]
+        / "evaluation"
+        / "cases"
+        / "CT-PL-193"
+        / "v09"
+        / "nac_matched.json"
+    )
+    code, out, _ = _run(["evaluate", "CT-PL-193", str(case_path)], capsys)
+    assert code == EXIT_OK
+    assert "MATCHED" in out
+    assert "rule_hosp_criterio_curb65" in out
+    assert "mechanically evaluated; UNRESOLVED derivation" in out

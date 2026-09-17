@@ -44,9 +44,16 @@ class PackageSummary:
     documents: tuple[SourceDocument, ...]
     rules_with_evidence: int
     rules_without_evidence: int
+    variables_with_evidence: int
+    actions_with_evidence: int
     fragments_with_page: int
+    fragments_with_document: int
+    fragments_with_text: int
     derivation_counts: Mapping[str, int]
     status_counts: Mapping[str, int]
+    variable_derivation_counts: Mapping[str, int]
+    action_derivation_counts: Mapping[str, int]
+    validation_item_status_counts: Mapping[str, int]
     validation: ValidationReport | None
 
 
@@ -57,13 +64,39 @@ def build_summary(
     """Collect the summary facts of a package without evaluating anything."""
     rules = sorted(version.rules.values(), key=lambda rule: rule.id)
     with_evidence = sum(1 for rule in rules if rule.provenance.fragment_refs)
+    variables_with_evidence = sum(
+        1
+        for variable in version.variables.values()
+        if variable.provenance is not None and variable.provenance.fragment_refs
+    )
+    actions_with_evidence = sum(
+        1
+        for action in version.actions.values()
+        if action.provenance is not None and action.provenance.fragment_refs
+    )
     derivation_counts: dict[str, int] = {}
     status_counts: dict[str, int] = {}
+    variable_derivation_counts: dict[str, int] = {}
+    action_derivation_counts: dict[str, int] = {}
+    validation_item_status_counts: dict[str, int] = {}
     for rule in rules:
         derivation = rule.provenance.derivation.value
         derivation_counts[derivation] = derivation_counts.get(derivation, 0) + 1
         status = rule.validation_status.value
         status_counts[status] = status_counts.get(status, 0) + 1
+    for variable in version.variables.values():
+        if variable.provenance is None:
+            continue
+        derivation = variable.provenance.derivation.value
+        variable_derivation_counts[derivation] = variable_derivation_counts.get(derivation, 0) + 1
+    for action in version.actions.values():
+        if action.provenance is None:
+            continue
+        derivation = action.provenance.derivation.value
+        action_derivation_counts[derivation] = action_derivation_counts.get(derivation, 0) + 1
+    for item in version.validation_items.values():
+        status = item.status.value
+        validation_item_status_counts[status] = validation_item_status_counts.get(status, 0) + 1
     return PackageSummary(
         protocol_id=version.protocol.id,
         name=version.protocol.name,
@@ -75,9 +108,22 @@ def build_summary(
         documents=tuple(sorted(version.documents.values(), key=lambda doc: doc.document_id)),
         rules_with_evidence=with_evidence,
         rules_without_evidence=len(rules) - with_evidence,
+        variables_with_evidence=variables_with_evidence,
+        actions_with_evidence=actions_with_evidence,
         fragments_with_page=sum(1 for frag in version.fragments.values() if frag.page is not None),
+        fragments_with_document=sum(
+            1 for frag in version.fragments.values() if frag.document_id is not None
+        ),
+        fragments_with_text=sum(
+            1
+            for frag in version.fragments.values()
+            if bool(frag.verbatim_text and frag.verbatim_text.strip())
+        ),
         derivation_counts=dict(sorted(derivation_counts.items())),
         status_counts=dict(sorted(status_counts.items())),
+        variable_derivation_counts=dict(sorted(variable_derivation_counts.items())),
+        action_derivation_counts=dict(sorted(action_derivation_counts.items())),
+        validation_item_status_counts=dict(sorted(validation_item_status_counts.items())),
         validation=report,
     )
 
@@ -110,12 +156,34 @@ def render_summary(summary: PackageSummary) -> str:
     lines.append("Provenance status:")
     total_rules = summary.rules_with_evidence + summary.rules_without_evidence
     lines.append(f"  rules with source evidence: {summary.rules_with_evidence}/{total_rules}")
+    lines.append(
+        f"  variables with source evidence: {summary.variables_with_evidence}"
+        f"/{summary.counts['variables']}"
+    )
+    lines.append(
+        f"  actions with source evidence: {summary.actions_with_evidence}"
+        f"/{summary.counts['actions']}"
+    )
     lines.append(f"  fragments with page info: {summary.fragments_with_page}")
+    lines.append(f"  fragments with document: {summary.fragments_with_document}")
+    lines.append(f"  fragments with verbatim text: {summary.fragments_with_text}")
     lines.append(
         "  derivation: " + ", ".join(f"{k}={v}" for k, v in summary.derivation_counts.items())
     )
     lines.append(
         "  validation status: " + ", ".join(f"{k}={v}" for k, v in summary.status_counts.items())
+    )
+    lines.append(
+        "  derivation (variables): "
+        + ", ".join(f"{k}={v}" for k, v in summary.variable_derivation_counts.items())
+    )
+    lines.append(
+        "  derivation (actions): "
+        + ", ".join(f"{k}={v}" for k, v in summary.action_derivation_counts.items())
+    )
+    lines.append(
+        "  validation items: "
+        + ", ".join(f"{k}={v}" for k, v in summary.validation_item_status_counts.items())
     )
     lines.append("")
     lines.append(_render_validation_block(summary.validation))
@@ -157,9 +225,16 @@ def summary_to_json(summary: PackageSummary) -> dict[str, Any]:
         "counts": dict(summary.counts),
         "rules_with_evidence": summary.rules_with_evidence,
         "rules_without_evidence": summary.rules_without_evidence,
+        "variables_with_evidence": summary.variables_with_evidence,
+        "actions_with_evidence": summary.actions_with_evidence,
         "fragments_with_page": summary.fragments_with_page,
+        "fragments_with_document": summary.fragments_with_document,
+        "fragments_with_text": summary.fragments_with_text,
         "derivation_counts": dict(summary.derivation_counts),
         "status_counts": dict(summary.status_counts),
+        "variable_derivation_counts": dict(summary.variable_derivation_counts),
+        "action_derivation_counts": dict(summary.action_derivation_counts),
+        "validation_item_status_counts": dict(summary.validation_item_status_counts),
         "validation": validation,
     }
 

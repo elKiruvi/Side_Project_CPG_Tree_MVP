@@ -44,6 +44,14 @@ def test_inspect_shows_itu_counts(capsys: pytest.CaptureFixture[str]) -> None:
     assert "rules: 60" in out
     assert "actions: 45" in out
     assert "valid: yes" in out
+    assert "rules with source evidence: 60/60" in out
+    assert "variables with source evidence: 76/76" in out
+    assert "actions with source evidence: 45/45" in out
+    assert "fragments with document: 84" in out
+    assert "fragments with verbatim text: 84" in out
+    assert "derivation: NORMALIZED=45, SOURCE_STATED=15" in out
+    assert "derivation (variables): NORMALIZED=23, SOURCE_STATED=53" in out
+    assert "validation items: OPEN=12" in out
 
 
 def test_rule_detail_shows_declared_prescribe_actions(
@@ -111,3 +119,21 @@ def test_evaluate_empty_case_is_indeterminate(
     assert code == EXIT_OK
     assert "INDETERMINATE" in out
     assert "required information is UNKNOWN" in out
+
+
+def test_evaluate_committed_demo_case_reproduces_excepted(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    case_path = (
+        Path(__file__).resolve().parents[3]
+        / "evaluation"
+        / "cases"
+        / "CT-PL-197"
+        / "v06"
+        / "itu_excepted.json"
+    )
+    code, out, _ = _run(["evaluate", "CT-PL-197", str(case_path)], capsys)
+    assert code == EXIT_OK
+    assert "rule_t1_alta_hosp_con_fr_amikacina" in out
+    assert "EXCEPTED" in out
+    assert "condition TRUE but an exception evaluated TRUE" in out
