@@ -30,6 +30,7 @@ from typing import Any
 from cpg_tree.knowledge.enums import ActionType
 from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.knowledge.rules import Rule
+from cpg_tree.reconciliation.model import ReconciliationInventory
 from cpg_tree.views.clinical import render_clinical_view
 from cpg_tree.views.expression import render_operand
 from cpg_tree.views.manifest import (
@@ -37,6 +38,7 @@ from cpg_tree.views.manifest import (
     group_rules,
     load_manifest,  # noqa: F401  (re-exported for the established public API)
 )
+from cpg_tree.views.pathway_render import render_pathway_view
 from cpg_tree.views.tree import build_projection
 
 _CSS = """
@@ -98,9 +100,40 @@ p.map-note { font-size: .8rem; color: var(--muted); background: var(--card);
              border: 1px solid var(--line); border-radius: 6px;
              padding: .7rem 1rem; margin: .6rem 0 1rem 0; }
 svg.clinical-map { display: block; background: var(--card); border: 1px solid var(--line);
-                   border-radius: 6px; margin: 0 auto; max-width: 100%; height: auto; }
+                    border-radius: 6px; margin: 0 auto; max-width: 100%; height: auto; }
 svg.clinical-map .domain-title { font-size: 1.05rem; font-weight: 700; fill: var(--accent); }
 svg.clinical-map .domain-rule { stroke: var(--accent); stroke-width: 2; opacity: .45; }
+svg.pathway-map { display: block; background: var(--card); border: 1px solid var(--line);
+                  border-radius: 6px; margin: 0 auto; max-width: 100%; height: auto; }
+svg.pathway-map .pnode-box { fill: var(--card); stroke: var(--ink); stroke-width: 1.4; }
+svg.pathway-map .pnode-rule { stroke: var(--accent); }
+svg.pathway-map .pnode-context { stroke-dasharray: 7 5; }
+svg.pathway-map .pnode-terminal { stroke-dasharray: 3 3; stroke-width: 1.6; }
+svg.pathway-map .pnode-header { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700; font-size: .9rem; fill: var(--ink); }
+svg.pathway-map .pnode-label { font-size: .68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; fill: var(--muted); }
+svg.pathway-map .pnode-expr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .74rem; fill: var(--ink); }
+svg.pathway-map .pnode-small { font-size: .72rem; fill: var(--muted); }
+svg.pathway-map .pnode-action { font-size: .78rem; fill: var(--ink); }
+svg.pathway-map .pnode-lane { font-size: .72rem; fill: var(--accent); }
+svg.pathway-map .pnode-link { fill: var(--accent); text-decoration: underline; }
+svg.pathway-map .pedge-flow { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+svg.pathway-map .pedge-branch { stroke: var(--muted); stroke-width: 1.3;
+    stroke-dasharray: 5 4; fill: none; }
+svg.pathway-map .pedge-arrow { fill: var(--accent); }
+svg.pathway-map .pedge-label { font-size: .72rem; fill: var(--muted); }
+section.pathway-legend { background: var(--card); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem; margin: .6rem 0 1rem 0; font-size: .85rem;
+    color: var(--muted); }
+section.pathway-legend ul { margin: .3rem 0 0 0; padding-left: 1.2rem; }
+section.pathway-notices { background: var(--card); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem; margin: 1rem 0; font-size: .82rem; }
+section.pathway-notices h3 { margin: 0 0 .4rem 0; font-size: .9rem; color: var(--accent); }
+section.pathway-notices ul { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+section.pathway-notices li { margin-bottom: .3rem; }
+section.pathway-notices code { color: var(--ink); }
 .cnode { box-sizing: border-box; background: var(--card); border: 1px solid var(--line);
          border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px;
          overflow: hidden; color: var(--ink); height: 100%; }
@@ -154,6 +187,7 @@ _LEGEND = [
 def build_visual_document(
     package: ProtocolVersion,
     manifest: VisualizationManifest | None,
+    reconciliation: ReconciliationInventory | None = None,
 ) -> str:
     """Render one package into a deterministic, self-contained HTML document."""
     grouped = group_rules(package, manifest)
@@ -178,6 +212,7 @@ def build_visual_document(
         "<body>",
         _render_header(package),
         '<nav class="view-switch">'
+        '<a href="#pathway">Vía clínica de decisión</a>'
         '<a href="#clinical">Vista de conocimiento clínico</a>'
         '<a href="#technical">Vista técnica</a>'
         "</nav>",
@@ -187,6 +222,7 @@ def build_visual_document(
     parts.extend(f"  <p>{item}</p>" for item in _LEGEND)
     parts.append("</section>")
     parts.append("<main>")
+    parts.append(render_pathway_view(package, reconciliation, manifest))
     parts.append(render_clinical_view(package, manifest))
     parts.append(
         f'<h2 class="domain" id="technical">Vista técnica '
@@ -200,7 +236,11 @@ def build_visual_document(
         for rule_id in rule_ids:
             rule = package.rules[rule_id]
             shared_ids = shared_ids_by_rule.get(rule_id, (None, None, ()))
-            parts.append(_render_rule_card(package, rule, shared_ids, shared_by_id))
+            parts.append(
+                _render_rule_card(
+                    package, rule, shared_ids, shared_by_id, has_pathway=reconciliation is not None
+                )
+            )
     parts.append("</main>")
     parts.append(f"<footer>{_SAFETY_NOTICE}</footer>")
     parts.append("</body>")
@@ -212,11 +252,12 @@ def visualize_package(
     package: ProtocolVersion,
     manifest: VisualizationManifest | None,
     out_dir: Path,
+    reconciliation: ReconciliationInventory | None = None,
 ) -> Path:
     """Write the deterministic HTML document and return its path."""
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{package.protocol.id}-{package.version}.html"
-    out_path.write_text(build_visual_document(package, manifest), encoding="utf-8")
+    out_path.write_text(build_visual_document(package, manifest, reconciliation), encoding="utf-8")
     return out_path
 
 
@@ -264,8 +305,14 @@ def _render_rule_card(
     rule: Rule,
     shared_ids: tuple[str | None, str | None, tuple[str | None, ...]],
     shared_by_id: Mapping[str, Any],
+    has_pathway: bool = False,
 ) -> str:
     applies_shared, condition_shared, exception_shared = shared_ids
+    pathway_link = ""
+    if has_pathway:
+        pathway_link = (
+            f'<a class="tech-back" href="#pathway_rule_{_esc(rule.id)}">↩ en vía clínica</a>'
+        )
     parts = [
         f'<article class="card" id="{_esc(rule.id)}">',
         "<header>",
@@ -273,6 +320,7 @@ def _render_rule_card(
         f'<span class="badge status">{_esc(rule.validation_status.value)}</span>',
         f'<span class="badge derivation">{_esc(rule.provenance.derivation.value)}</span>',
         f'<a class="tech-back" href="#clinical_rule_{_esc(rule.id)}">↩ en vista clínica</a>',
+        pathway_link,
         "</header>",
     ]
     if rule.notes:

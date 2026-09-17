@@ -25,6 +25,8 @@ from typing import Any
 
 from cpg_tree.engine import Case, evaluate_package
 from cpg_tree.knowledge.protocol import ProtocolVersion
+from cpg_tree.reconciliation.io import load_reconciliation
+from cpg_tree.reconciliation.model import ReconciliationInventory
 from cpg_tree.validation import FindingSeverity, validate_package
 from cpg_tree.views.case_loader import load_case
 from cpg_tree.views.discovery import discover_protocols, load_protocol
@@ -49,7 +51,7 @@ EXIT_ERROR = 1
 _DESCRIPTION = "Inspect and evaluate computable clinical protocols (research prototype)."
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
     """Build the CLI argument parser."""
     parser = argparse.ArgumentParser(
         prog="python -m cpg_tree",
@@ -120,6 +122,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--out",
         default="data/08_reporting",
         help="output directory (default: data/08_reporting)",
+    )
+    visualize_parser.add_argument(
+        "--reconciliation",
+        help=(
+            "path to the D2.5 reconciliation YAML (default: auto-discovered from the "
+            "artifact tree or evaluation/pathway)"
+        ),
     )
     visualize_parser.set_defaults(handler=_cmd_visualize)
 
@@ -330,9 +339,34 @@ def _cmd_validate(args: argparse.Namespace) -> int:
 def _cmd_visualize(args: argparse.Namespace) -> int:
     package, artifact_path = _load_package(args)
     manifest = load_manifest(artifact_path.parent / "visualization.yaml")
-    out_path = visualize_package(package, manifest, Path(args.out))
+    reconciliation = _load_reconciliation_artifact(args, artifact_path, package)
+    out_path = visualize_package(package, manifest, Path(args.out), reconciliation)
     print(out_path)
     return EXIT_OK
+
+
+def _load_reconciliation_artifact(
+    args: argparse.Namespace,
+    artifact_path: Path,
+    package: ProtocolVersion,
+) -> ReconciliationInventory | None:
+    if getattr(args, "reconciliation", None):
+        path = Path(args.reconciliation)
+        if not path.is_file():
+            raise ValueError(f"reconciliation artifact not found: {path}")
+        return load_reconciliation(path)
+    sibling = artifact_path.parent / "reconciliation.yaml"
+    if sibling.is_file():
+        return load_reconciliation(sibling)
+    evaluation_path = (
+        artifact_path.parents[3]
+        / "evaluation"
+        / "pathway"
+        / f"{package.protocol.id}-{package.version}-reconciliation.yaml"
+    )
+    if evaluation_path.is_file():
+        return load_reconciliation(evaluation_path)
+    return None
 
 
 def _cmd_evaluate(args: argparse.Namespace) -> int:

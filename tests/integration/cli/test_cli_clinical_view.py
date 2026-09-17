@@ -70,6 +70,13 @@ def test_clinical_nodes_are_anchored_to_real_rule_ids(
     assert content.count('href="#clinical_rule_') == anchor_count
 
 
+def _clinical_map_svg(content: str) -> str:
+    marker = '<svg class="clinical-map"'
+    start = content.index(marker)
+    end = content.index("</svg>", start)
+    return content[start:end]
+
+
 @pytest.mark.parametrize(
     ("protocol_id", "version"),
     [("CT-PL-193", "v09"), ("CT-PL-197", "v06")],
@@ -84,7 +91,8 @@ def test_unknown_lane_is_present_for_every_rule(
     assert code == EXIT_OK
     content = (tmp_path / f"{protocol_id}-{version}.html").read_text(encoding="utf-8")
     expected = NAC_RULES if protocol_id == "CT-PL-193" else ITU_RULES
-    assert content.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == expected
+    clinical = _clinical_map_svg(content)
+    assert clinical.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == expected
 
 
 def test_nac_has_no_fabricated_exception_lanes(
@@ -105,8 +113,9 @@ def test_itu_exception_lanes_match_the_canonical_exception_rules(
     code, _, _ = _run(["visualize", "CT-PL-197", "v06", "--out", str(tmp_path)], capsys)
     assert code == EXIT_OK
     content = (tmp_path / "CT-PL-197-v06.html").read_text(encoding="utf-8")
-    assert content.count("excepción TRUE → EXCEPTED") == ITU_EXCEPTION_RULES
-    assert content.count("EXCEPCIÓN 1") == ITU_EXCEPTION_RULES
+    clinical = _clinical_map_svg(content)
+    assert clinical.count("excepción TRUE → EXCEPTED") == ITU_EXCEPTION_RULES
+    assert clinical.count("EXCEPCIÓN 1") == ITU_EXCEPTION_RULES
 
 
 def test_itu_prescribe_alternatives_remain_alternatives(

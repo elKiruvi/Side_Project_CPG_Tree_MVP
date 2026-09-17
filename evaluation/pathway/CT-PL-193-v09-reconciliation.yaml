@@ -1,0 +1,787 @@
+schema: relationship-reconciliation
+schema_version: 2
+protocol: CT-PL-193
+version: v09
+candidates:
+- candidate_id: rel-nac-001
+  from: signos_sintomas_respiratorios_bajos
+  to: rule_rx_torax_indicada
+  relation: gates
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «…La radiografía de tórax se hará en los pacientes con signos y síntomas
+    respiratorios bajos (tos, expec toración, dolor pleurítico, taquipnea, disnea, desaturación
+    y/o alteraciones auscultatorias compatibles).»
+  fragment_ids:
+  - frag_p3_rx_torax
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: El «from» es una variable, no una regla; el anclaje del nodo de decisión
+    requiere decisión humana.
+  reconciliation_notes: La frase establece la indicación de la radiografía (condición propia
+    de la regla), no una relación entre reglas. La compuerta de entrada de la vía es semántica
+    de nodo, no arista.
+- candidate_id: rel-nac-002
+  from: rule_rx_torax_indicada
+  to: rule_rx_repetir_48h
+  relation: branches
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: En el caso que la radiografía inicial no muestre hallazgos pero exista una
+    sospecha alta de neumonía debe repetirse la radiografía de tórax en 48 horas.
+  fragment_ids:
+  - frag_p3_rx_repetir
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito de repetición.
+  reconciliation_notes: Transición condicional explícita en la fuente. El intervalo de 48
+    h es declarativo (payload) y la semántica temporal mínima no programa eventos futuros
+    (vi_temporal_no_representable); sin maquinaria de programación.
+- candidate_id: rel-nac-003
+  from: rule_rx_torax_indicada
+  to: rule_tc_torax
+  relation: branches
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: 'Tomografía de tórax (IIA): Sólo está indicada en pacientes con alta pro
+    babilidad de neumonía por clínica, con radiografía de tórax no concluyente y en quien
+    es prioritario hacer el diagnóstico de neumonía o se sospeche alguna complicación (neumonía
+    necro sante, absceso pulmonar o empiema tabicado).'
+  fragment_ids:
+  - frag_p3_tc
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: «radiografía de tórax no concluyente» = rama explícita.
+  reconciliation_notes: Rama explícita entre el resultado de la radiografía y la indicación
+    de tomografía.
+- candidate_id: rel-nac-004
+  from: neutropenia_febril
+  to: rule_tc_neutropenia_febril
+  relation: gates
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: En los casos de neutropenia febril se solicitará tomografía de tórax simple
+    en todos los pacientes con sintomas respiratorios bajos.
+  fragment_ids:
+  - frag_p3_tc_neutropenia
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: «from» es variable; anclaje a decidir por el revisor.
+  reconciliation_notes: Condición propia de la regla (disparador clínico), no una relación
+    entre reglas. Semántica de nodo en D3.
+- candidate_id: rel-nac-005
+  from: rule_labs_sospecha
+  to: rule_hospitalizacion
+  relation: supports
+  presentation_role: FLOW
+  branch_label: apoya la decisión de hospitalización
+  evidence_quote: Para definir la necesidad de hospitalización, se hará hemoleucograma y nitrógeno
+    ureico en todo paciente con so specha de neumonía.
+  fragment_ids:
+  - frag_p3_labs_sospecha
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Propósito explícito: los exámenes alimentan la decisión de hospitalización.'
+  reconciliation_notes: 'Propósito explícito declarado por la fuente: los exámenes se realizan
+    para definir la hospitalización. Relación de apoyo («supports»), NO secuencia temporal
+    estricta; los criterios de hospitalización permanecen dentro de la regla de destino.'
+- candidate_id: rel-nac-006
+  from: rule_hospitalizacion
+  to: rule_labs_hospitalizacion
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: 'En pacientes con indicación de hospitalización se adicionarán: proteína
+    C reactiva, creatinina, lactato y sodio.'
+  fragment_ids:
+  - frag_p3_labs_hospitalizacion
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito en la redacción fuente.
+  reconciliation_notes: Condicional explícito («En pacientes con indicación de hospitalización
+    se adicionarán…»). La duplicación estructural de la expresión se registra aparte (rel-nac-044).
+- candidate_id: rel-nac-007
+  from: rule_hosp_criterio_sepsis_choque
+  to: rule_labs_shock
+  relation: gates
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: En pacientes con choque séptico, sepsis grave o falla orgánica múltiple
+    se realizarán además pruebas de coagulación, AST, A LT, bilirrubinas y gases arteriales.
+  fragment_ids:
+  - frag_p3_labs_shock
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Listas de disparo no idénticas entre reglas (criterio: sepsis/choque de
+    origen pulmonar; laboratorio: choque séptico/sepsis grave/falla orgánica múltiple) — verificar
+    anclaje.'
+  reconciliation_notes: Las listas de disparo del criterio y de la regla de laboratorio no
+    coinciden; el disparador es la condición propia de la regla de laboratorio. No hay relación
+    entre reglas que representar como arista.
+- candidate_id: rel-nac-008
+  from: desaturacion
+  to: rule_labs_desaturacion
+  relation: gates
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: También se solicitarán gases arteriales en pacientes con desaturación.
+  fragment_ids:
+  - frag_p3_labs_gases_desaturacion
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: «from» es variable; anclaje a decidir por el revisor.
+  reconciliation_notes: Condición propia de la regla; no es una relación entre reglas. Semántica
+    de nodo en D3.
+- candidate_id: rel-nac-009
+  from: rule_toracentesis_paraneumonico
+  to: rule_labs_derrame_pleural
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: En pacientes con derrame pleural e indicación de toracentesis se solicitarán
+    además deshidrogenasa láctica y proteínas totales en suero para la adecuada interpretación
+    de los hallazgos en el líquido pleural
+  fragment_ids:
+  - frag_p3_labs_derrame
+  - frag_p4_liquido_pleural
+  page: 3, 4
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito sobre la indicación de toracentesis.
+  reconciliation_notes: Condicional explícito («En pacientes con derrame pleural e indicación
+    de toracentesis…»).
+- candidate_id: rel-nac-010
+  from: rule_hospitalizacion
+  to: rule_hemocultivos
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: Deben tomarse en los pacientes hospitalizados por neumonía que presenten
+    una de las siguientes condiciones, nitrógeno ureico en sangre (BUN) mayor a 30 mg/dL,
+    Proteína C Reactiva (PCR) mayor a 15 mg/dL o Leucocitosis mayor a 15000; o en los pacientes
+    que presenten dos de las siguientes condiciones …
+  fragment_ids:
+  - frag_p3_hemocultivos
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito («pacientes hospitalizados por neumonía»).
+  reconciliation_notes: Condicional explícito. Las condiciones adicionales (BUN/PCR/leucocitosis
+    o 2 de 4) pertenecen a la regla de hemocultivos.
+- candidate_id: rel-nac-011
+  from: rule_hospitalizacion
+  to: rule_gram_cultivo_esputo
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: Deben obtenerse muestras de esputo para tinción y cultivo en todo paciente
+    con diagnóstico de neumonía e indicación de hospitalización.
+  fragment_ids:
+  - frag_p3_esputo_gram
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito.
+  reconciliation_notes: Condicional explícito.
+- candidate_id: rel-nac-012
+  from: rule_gram_cultivo_esputo
+  to: rule_esputo_inducido
+  relation: branches
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: Se tomará la muestra por esputo inducido por nebulización de 15-20 minutos
+    con solución salina hipertónica (3%) en pacientes que no pueden recoger la muestra de
+    forma espontánea.
+  fragment_ids:
+  - frag_p3_esputo_inducido
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Rama alternativa de toma de muestra.
+  reconciliation_notes: Rama alternativa explícita de la toma de muestra.
+- candidate_id: rel-nac-013
+  from: rule_hospitalizacion
+  to: rule_filmarray
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: 'Filmarray: Prueba de ácidos nucleicos diseñada para la detección rápida
+    y simultánea de virus y bacterias respiratorias, el cual se debe solicitar en todo paciente
+    adulto con diagnóstico confirmado de neumonía e indicación de hospitalización.'
+  fragment_ids:
+  - frag_p3_filmarray
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito.
+  reconciliation_notes: Condicional explícito.
+- candidate_id: rel-nac-014
+  from: rule_filmarray
+  to: rule_filmarray_panel_profundo
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: 'Diagnóstico molecular para panel de neumonía filmarray (cod 502828): como
+    primera opción. Muestra tomada de esputo, aspirado traqueal o lavado broncoalveolar en
+    pacientes sin sospecha de neumonia por SARSCOV2.'
+  fragment_ids:
+  - frag_p4_panel_profundo
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'vi_filmarray_seleccion_panel: la fuente no declara exclusividad entre paneles;
+    «como primera opción» es preferencia, no selección.'
+  reconciliation_notes: 'FLOW rechazado: la fuente no establece una rama exclusiva; las condiciones
+    de cada panel pertenecen a sus propias reglas y «como primera opción» es preferencia declarada.
+    Como REFERENCE, los paneles son alternativas contextuales del pedido Filmarray; sin exclusividad.'
+- candidate_id: rel-nac-015
+  from: rule_filmarray
+  to: rule_filmarray_panel_hisopado
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: 'Diagnóstico molecular para patógenos respiratorios (cod 502162): muestra
+    tomada de hisopado nasofaríngeo en pacientes que no espectoran.'
+  fragment_ids:
+  - frag_p4_panel_hisopado
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Ídem: sin exclusividad declarada (vi_filmarray_seleccion_panel).'
+  reconciliation_notes: 'FLOW rechazado: sin rama exclusiva en la fuente. Como REFERENCE,
+    alternativa contextual del pedido Filmarray.'
+- candidate_id: rel-nac-016
+  from: rule_plan_egreso
+  to: act_educar_recaida
+  relation: attaches
+  presentation_role: INTERNAL
+  branch_label: null
+  evidence_quote: Al momento del alta se indicarán al paciente los signos y síntomas que sugieren
+    recaída de la infección, específicamente fiebre, disnea, dolor torácico.
+  fragment_ids:
+  - frag_p6_alta_instrucciones
+  page: '6'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Anclaje temporal explícito «Al momento del alta».
+  reconciliation_notes: 'Relación interna regla→acción: act_educar_recaida ya pertenece a
+    rule_plan_egreso (action_refs canónico). NUNCA arista de vía clínica. La información temporal
+    («al momento del alta») permanece como contexto declarativo de la acción (payload/notas),
+    sin maquinaria de programación (vi_temporal_no_representable).'
+- candidate_id: rel-nac-017
+  from: rule_plan_egreso
+  to: act_cita_revision_4_semanas
+  relation: attaches
+  presentation_role: INTERNAL
+  branch_label: null
+  evidence_quote: Se dará cita de revisión con medicina interna a las 4 semanas del alta.
+  fragment_ids:
+  - frag_p6_alta_instrucciones
+  page: '6'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Ídem: anclaje temporal explícito.'
+  reconciliation_notes: Relación interna regla→acción; nunca arista de vía. El intervalo de
+    4 semanas permanece como metadato declarativo de la acción.
+- candidate_id: rel-nac-030
+  from: rule_filmarray_panel_profundo
+  to: rule_filmarray_panel_hisopado
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: '«…(cod 502828): como primera opción.…» / «…(cod 502162): …pacientes que
+    no espectoran.»'
+  fragment_ids:
+  - frag_p4_panel_profundo
+  - frag_p4_panel_hisopado
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Preferencia de orden declarada; NUNCA una selección ni exclusión mutua.
+  reconciliation_notes: Preferencia declarada por la fuente; nunca selección ni exclusión.
+- candidate_id: rel-nac-031
+  from: rule_definicion_nac
+  to: rule_diagnostico_radiografico
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: El diagnóstico de neumonía se basa en un cuadro clínico compatible asociado
+    a un infiltrado pulmonar de reciente aparición en la radiografía de tórax…
+  fragment_ids:
+  - frag_p1_definicion_nac
+  - frag_p3_rx_torax
+  page: 1, 3
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Ambas reglas derivan de la definición fuente; relación de derivación, no
+    flujo.
+  reconciliation_notes: Relación de derivación documental entre definición y criterio diagnóstico;
+    no es flujo clínico.
+- candidate_id: rel-nac-040
+  from: rule_hospitalizacion
+  to:
+  - rule_hosp_criterio_descompensacion
+  - rule_hosp_criterio_inmunosupresion
+  - rule_hosp_criterio_germenes_resistentes
+  - rule_hosp_criterio_intolerancia_oral
+  - rule_hosp_criterio_sepsis_choque
+  - rule_hosp_criterio_multilobar_derrame
+  - rule_hosp_criterio_curb65
+  - rule_hosp_criterio_factores_sociales
+  - rule_hosp_criterio_oxigeno
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: '«INDICACIONES DE HOSPITALIZACIÓN: Son indicaciones de hospitalización relacionadas
+    con el diagnóstico de neumonía:» + 9 bullets'
+  fragment_ids:
+  - frag_p4_hosp_01
+  - frag_p4_hosp_02
+  - frag_p4_hosp_03
+  - frag_p4_hosp_04
+  - frag_p4_hosp_05
+  - frag_p4_hosp_06
+  - frag_p4_hosp_07
+  - frag_p4_hosp_08
+  - frag_p4_hosp_09
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: MULTI_SOURCE
+  source_location: página 4; el encabezado está en la capa de texto de página (pdftotext)
+    y no fue capturado como fragmento del paquete
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: OR canónico de 9 criterios. NO es flujo.
+  reconciliation_notes: Los criterios son independientes entre sí (lista fuente); la composición
+    OR es normalización canónica. Nunca presentar como secuencia criterio→criterio.
+- candidate_id: rel-nac-041
+  from: rule_uci_criterios_3de
+  to:
+  - rule_uci_criterio_bun
+  - rule_uci_criterio_fr
+  - rule_uci_criterio_hipotension_lev
+  - rule_uci_criterio_multilobares
+  - rule_uci_criterio_pao2_fio2
+  - rule_uci_criterio_confusion
+  - rule_uci_criterio_hipotermia
+  - rule_uci_criterio_plaquetas
+  - rule_uci_criterio_leucocitos
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: 'Paciente que cumpla con 3 o más criterios de: - BUN > 30 - FR > 30 - Hipotensión
+    que requiera LEV agresivos - Infiltrados multilobares - PaO2/FiO2 menores de 250 - Confusión
+    - Hipotermia - Plaquetas menor de 100.000 - Leucocitos menor de 4000'
+  fragment_ids:
+  - frag_p4_uci_3de
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: CONFLICT
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids:
+  - SC-NAC-003
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: AT_LEAST_N(3, 9 criterios). NO es flujo.
+  reconciliation_notes: El conjunto y la cantidad de criterios están en conflicto con el diagrama
+    de la página 6 (SC-NAC-003); la composición textual no debe presentarse en la vía sin
+    resolver el conflicto.
+- candidate_id: rel-nac-042
+  from: rule_ingreso_uci_uce
+  to: rule_uci_criterios_3de
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: Paciente que cumpla con 3 o más criterios de:…
+  fragment_ids:
+  - frag_p4_uci_3de
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: CONFLICT
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids:
+  - SC-NAC-003
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Componente del OR de ingreso a UCI-UCE. NO es flujo.
+  reconciliation_notes: Componente textual del OR de ingreso; afectado por SC-NAC-003 (criterios
+    del diagrama).
+- candidate_id: rel-nac-043
+  from: rule_ingreso_uci_uce
+  to: rule_uci_bullet1
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: Insuficiencia respiratoria, choque séptico o lactato sérico mayor de 2,
+    falla renal aguda que requiere terapia de reemplazo renal o falla orgánica multisistémica.
+  fragment_ids:
+  - frag_p4_uci_bullet1
+  page: '4'
+  evidence_class: INFERRED
+  review_status: PROPOSED
+  reconciliation_status: INFERRED_STRUCTURE
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Agrupación por comas interpretada como OR de cinco (vi_uci_bullet1_parsing).
+    La composición misma es INFERRED; NUNCA debe presentarse como flujo validado.
+  reconciliation_notes: 'La fuente es una sola línea en prosa con comas y dos «o»; no hay
+    viñetas ni operador explícito. La estructura OR de cinco alternativas es interpretación
+    documentada (vi_uci_bullet1_parsing). Permanece INFERRED: nunca FLOW, solo presentable
+    con insignia de no validado.'
+- candidate_id: rel-nac-044
+  from: rule_hospitalizacion
+  to:
+  - rule_labs_hospitalizacion
+  - rule_gram_cultivo_esputo
+  - rule_esputo_inducido
+  - rule_hemocultivos
+  - rule_filmarray
+  - rule_filmarray_panel_profundo
+  - rule_filmarray_panel_hisopado
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: (duplicación estructural de la expresión OR de hospitalización en condiciones
+    y applies_to)
+  fragment_ids:
+  - frag_p4_hosp_01
+  - frag_p4_hosp_02
+  - frag_p4_hosp_03
+  - frag_p4_hosp_04
+  - frag_p4_hosp_05
+  - frag_p4_hosp_06
+  - frag_p4_hosp_07
+  - frag_p4_hosp_08
+  - frag_p4_hosp_09
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Duplicación estructural únicamente; el flujo de cada regla lo apoya su propia
+    frase fuente (rel-nac-006/010/011/013).
+  reconciliation_notes: 'Estructural únicamente: la duplicación no es evidencia de flujo;
+    cada regla porta su propia frase fuente.'
+- candidate_id: rel-nac-045
+  from: rule_toracentesis_paraneumonico
+  to: rule_labs_derrame_pleural
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: (duplicación estructural de la condición de toracentesis)
+  fragment_ids:
+  - frag_p4_liquido_pleural
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Duplicación estructural; el flujo lo apoya frag_p3_labs_derrame (rel-nac-009).
+  reconciliation_notes: Estructural únicamente.
+- candidate_id: rel-nac-050
+  from: (página 6)
+  to: (flujo completo de diagnóstico y manejo)
+  relation: missing
+  presentation_role: GAP
+  branch_label: null
+  evidence_quote: «ALGORITMOS DE DIAGNÓSTICO Y MANEJO:»
+  fragment_ids:
+  - frag_p6_algoritmos
+  page: '6'
+  evidence_class: UNRESOLVED
+  review_status: PROPOSED
+  reconciliation_status: UNRESOLVED_MAPPING
+  source_representation: DIAGRAM
+  source_location: 'página 6: imagen embebida 1270×976 px entre el encabezado «ALGORITMOS
+    DE DIAGNÓSTICO Y MANEJO:» y «REFERENCIAS BIBLIOGRÁFICAS:»'
+  source_conflict_ids:
+  - SC-NAC-001
+  - SC-NAC-002
+  - SC-NAC-003
+  - SC-NAC-004
+  source_evidence_status: EXTRACTION_LIMITED
+  reviewer_notes: 'vi_algoritmos_imagen: imagen embebida no extraíble como texto. NO reconstruir
+    con conocimiento médico general.'
+  reconciliation_notes: 'El flujograma EXISTE como evidencia de imagen (inventario de objetos
+    del PDF: 1 imagen por página 6; sin texto vectorial en el flujo de contenido). Su contenido
+    no es legible por máquina en este entorno (sin OCR ni visión disponible); el mapeo de
+    su contenido a reglas canónicas permanece no resuelto hasta la confirmación visual humana.
+    No es ausencia de fuente: es limitación de extracción.'
+- candidate_id: rel-nac-051
+  from: '(sección 2: manejo)'
+  to: (tratamiento antibiótico empírico)
+  relation: missing
+  presentation_role: GAP
+  branch_label: null
+  evidence_quote: «TRATAMIENTO ANTIBIÓTICO EMPÍRICO:»
+  fragment_ids:
+  - frag_p4_tratamiento_heading
+  - frag_p7_control_cambios_v09
+  page: 4, 7
+  evidence_class: UNRESOLVED
+  review_status: PROPOSED
+  reconciliation_status: GAP
+  source_representation: TEXT
+  source_location: 'página 4: tras el encabezado la página termina; la página 5 inicia con
+    «PLAN DE EGRESO.»'
+  source_conflict_ids: []
+  source_evidence_status: SOURCE_CONTENT_ABSENT
+  reviewer_notes: 'vi_tratamiento_empirico_gap: encabezado sin cuerpo en la capa de texto.
+    El control de cambios v09 menciona «tratamiento empírico según factores de riesgo». NO
+    inventar contenido.'
+  reconciliation_notes: 'Verificado: las páginas 4 y 5 NO contienen imágenes embebidas (inventario
+    pdfimages: solo páginas 1, 2 y 6 tienen imágenes) y la capa de texto termina en el encabezado.
+    El cuerpo del tratamiento NO está presente en este PDF: ausencia de contenido fuente,
+    no limitación de extracción.'
+- candidate_id: rel-nac-052
+  from: rule_hosp_criterio_curb65
+  to: (definición y cálculo de la escala CURB-65)
+  relation: missing
+  presentation_role: GAP
+  branch_label: null
+  evidence_quote: Escala de severidad CURB-65 ≥2
+  fragment_ids:
+  - frag_p4_hosp_07
+  page: '4'
+  evidence_class: UNRESOLVED
+  review_status: PROPOSED
+  reconciliation_status: GAP
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids:
+  - SC-NAC-001
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'vi_curb65_componentes: la fuente referencia la escala sin definir componentes
+    ni cálculo; el puntaje es dato externo. Regla UNRESOLVED.'
+  reconciliation_notes: La fuente no define componentes ni cálculo de la escala (gap). Además,
+    el umbral textual (≥2) difiere del reportado en el diagrama de la página 6 (SC-NAC-001).
+- candidate_id: rel-nac-060
+  from: rule_hemocultivos
+  to: (toma de hemocultivos antes de la primera dosis IV de antibiótico)
+  relation: references
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «antes de la primera dosis intravenosa de antibióticos» (citado en la nota
+    de procedencia de rule_hemocultivos; no aparece en la capa de texto del fragmento)
+  fragment_ids:
+  - frag_p3_hemocultivos
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Restricción de procedimiento no representable como regla.
+  reconciliation_notes: Instrucción de procedimiento; permanece declarativa en la procedencia
+    de la regla.
+- candidate_id: rel-nac-061
+  from: rule_rx_repetir_48h
+  to: '(programación temporal futura: 48 h / 4 semanas)'
+  relation: missing
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «…debe repetirse la radiografía de tórax en 48 horas.» / «…cita de revisión…
+    a las 4 semanas del alta.»
+  fragment_ids:
+  - frag_p3_rx_repetir
+  - frag_p6_alta_instrucciones
+  page: 3, 6
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'vi_temporal_no_representable: los intervalos son payloads declarativos;
+    la semántica temporal mínima del motor no programa eventos futuros.'
+  reconciliation_notes: Los intervalos temporales son información fuente conservada como payload
+    declarativo; no se introduce maquinaria de programación. Las transiciones FLOW (rel-nac-002/016/017)
+    siguen siendo válidas con evidencia.
+conflicts:
+- conflict_id: SC-NAC-001
+  topic: 'CURB-65: umbral de hospitalización'
+  status: OPEN
+  resolution: UNRESOLVED
+  representations:
+  - representation: TEXT
+    page: 4
+    statement: Escala de severidad CURB-65 ≥2
+    verification: VERIFIED_TEXT
+  - representation: DIAGRAM
+    page: 6
+    statement: CURB > 2
+    verification: PENDING_VISUAL_CONFIRMATION
+  notes: La capa de texto (página 4, frag_p4_hosp_07) declara ≥2. El diagrama de la página
+    6 reporta, según el revisor humano, > 2. El contenido del diagrama es una imagen raster
+    no legible por máquina en este entorno; la confirmación visual humana del lado diagrama
+    queda pendiente. No se elige un umbral ganador; la regla canónica permanece sin cambios.
+- conflict_id: SC-NAC-002
+  topic: 'UCI-UCE: umbral de BUN'
+  status: OPEN
+  resolution: UNRESOLVED
+  representations:
+  - representation: TEXT
+    page: 4
+    statement: BUN > 30
+    verification: VERIFIED_TEXT
+  - representation: DIAGRAM
+    page: 6
+    statement: BUN > 20
+    verification: PENDING_VISUAL_CONFIRMATION
+  notes: La capa de texto (página 4, frag_p4_uci_3de) declara BUN > 30. El diagrama de la
+    página 6 reporta, según el revisor humano, BUN > 20. Misma limitación de lectura del diagrama;
+    confirmación visual pendiente. No se corrige 20 a 30 ni 30 a 20; el paquete canónico no
+    se modifica.
+- conflict_id: SC-NAC-003
+  topic: 'UCI-UCE: cantidad y conjunto de criterios'
+  status: OPEN
+  resolution: UNRESOLVED
+  representations:
+  - representation: TEXT
+    page: 4
+    statement: «Paciente que cumpla con 3 o más criterios de:» seguido de 9 criterios (BUN,
+      FR, hipotensión-LEV, multilobares, PaO2/FiO2, confusión, hipotermia, plaquetas, leucocitos)
+    verification: VERIFIED_TEXT
+  - representation: DIAGRAM
+    page: 6
+    statement: (cantidad/conjunto de criterios reportados como potencialmente distintos por
+      el revisor humano)
+    verification: PENDING_VISUAL_CONFIRMATION
+  notes: La capa de texto declara «3 o más criterios» y lista 9 criterios. El diagrama de
+    la página 6 reporta, según el revisor humano, una cantidad/conjunto potencialmente distinto.
+    No se normalizan las dos representaciones en una sola lista; confirmación visual pendiente.
+- conflict_id: SC-NAC-004
+  topic: 'UCI-UCE: presencia de «TAS < 90»'
+  status: OPEN
+  resolution: UNRESOLVED
+  representations:
+  - representation: TEXT
+    page: 4
+    statement: (el criterio «TAS < 90» NO aparece en la lista textual de criterios UCI-UCE)
+    verification: VERIFIED_TEXT
+  - representation: DIAGRAM
+    page: 6
+    statement: TAS < 90 mmHg presente en el diagrama
+    verification: PENDING_VISUAL_CONFIRMATION
+  notes: La lista textual de criterios UCI-UCE no incluye TAS < 90. El diagrama de la página
+    6 reporta, según el revisor humano, TAS < 90. No se agrega silenciosamente el criterio
+    a la regla canónica textual; la evidencia del diagrama se conserva en este conflicto con
+    confirmación visual pendiente.

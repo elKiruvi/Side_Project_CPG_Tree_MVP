@@ -74,18 +74,25 @@ uv run python -m cpg_tree visualize CT-PL-197 v06
 
 `visualize` generates a self-contained static HTML presentation of a protocol
 into `data/08_reporting/<PROTOCOL_ID>-<VERSION>.html` (open it locally in any
-browser). One document contains two views with anchor navigation:
+browser). One document contains three views with anchor navigation:
 
-1. **Clinical Knowledge View** — a deterministic static SVG knowledge map
+1. **Clinical Pathway View (Vía clínica de decisión)** — a deterministic
+   static SVG pathway built exclusively from the D2.5 reconciliation contract
+   (`evaluation/pathway/<id>-<version>-reconciliation.yaml`; pass
+   `--reconciliation PATH` to override). Only source-reconciled FLOW
+   relationships become Rule-to-Rule edges; branch contexts, terminals, and
+   badges are presentation-only. Conflicts, gaps, and inferred structures
+   remain explicitly visible and are never resolved by the presentation.
+2. **Clinical Knowledge View** — the deterministic static SVG knowledge map
    (no JavaScript, no external resources): one visual node per rule with its
    `applies_to` / condition / exceptions, the engine's static
    TRUE/FALSE/UNKNOWN outcome lanes (never a live patient evaluation),
-   declarative actions (alternatives never selected), and a provenance line
-   linking back to the technical details.
-2. **Technical View** — the existing detailed rule cards with expressions,
+   declarative actions (alternatives never selected), and a provenance line.
+3. **Technical View** — the existing detailed rule cards with expressions,
    provenance chains, and shared-expression badges.
 
-Rules are grouped into presentation sections by an optional sidecar manifest
+Every Rule node links to its Technical View card and back. Rules are grouped
+into presentation sections by an optional sidecar manifest
 (`protocols/<id>/<version>/visualization.yaml`); sections are display
 groupings only — they do not represent clinical workflow or execution order.
 The manifest may additionally declare an optional `graph` key
@@ -93,9 +100,9 @@ The manifest may additionally declare an optional `graph` key
 connectors between rule nodes. Connectors are visual references
 ("referencia de presentación"), never clinical dependencies or workflow; the
 committed NAC and ITU manifests intentionally declare zero edges. The
-Clinical Knowledge View is a derived presentation: it does not constitute
-clinical validation, and `package.yaml` remains the single source of truth
-for all clinical content.
+clinical views are derived presentations: they do not constitute clinical
+validation, and `package.yaml` remains the single source of truth for all
+clinical content.
 
 ## Evaluation evidence
 
