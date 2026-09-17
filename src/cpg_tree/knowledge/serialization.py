@@ -171,6 +171,7 @@ def _protocol_from_dict(data: Mapping[str, Any]) -> Protocol:
 
 def _variable_from_dict(data: Mapping[str, Any]) -> Variable:
     allowed_values = data.get("allowed_values")
+    provenance = data.get("provenance")
     return Variable(
         id=data.get("id"),
         label=data.get("label"),
@@ -181,6 +182,7 @@ def _variable_from_dict(data: Mapping[str, Any]) -> Variable:
         else None,
         description=data.get("description"),
         source_note=data.get("source_note"),
+        provenance=_provenance_from_dict(provenance) if isinstance(provenance, Mapping) else None,
     )
 
 

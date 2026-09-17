@@ -304,3 +304,39 @@ def test_zero_action_rule_survives_round_trip() -> None:
 def test_dump_contains_documents_block(synthetic_package: ProtocolVersion) -> None:
     data = yaml.safe_load(dump_package(synthetic_package))
     assert data["documents"]["doc_1"]["document_id"] == "doc_1"
+
+
+def test_variable_without_provenance_key_still_loads() -> None:
+    text = (
+        _RULE_PACKAGE_HEADER + "variables:\n"
+        "  flag_y: {id: flag_y, label: Flag Y, type: BOOLEAN}\n"
+        "rules:\n"
+        "  rule_x:\n"
+        "    id: rule_x\n"
+        "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
+        "    provenance: {derivation: SOURCE_STATED}\n"
+    )
+    loaded = load_package(text)
+    assert loaded.variables["flag_y"].provenance is None
+
+
+def test_variable_provenance_survives_round_trip() -> None:
+    text = (
+        _RULE_PACKAGE_HEADER + "variables:\n"
+        "  flag_y:\n"
+        "    id: flag_y\n"
+        "    label: Flag Y\n"
+        "    type: BOOLEAN\n"
+        "    provenance: {derivation: SOURCE_STATED, fragment_refs: [frag_1]}\n"
+        "rules:\n"
+        "  rule_x:\n"
+        "    id: rule_x\n"
+        "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
+        "    provenance: {derivation: SOURCE_STATED, fragment_refs: [frag_1]}\n"
+    )
+    loaded = load_package(text)
+    variable = loaded.variables["flag_y"]
+    assert variable.provenance is not None
+    assert variable.provenance.derivation.value == "SOURCE_STATED"
+    assert variable.provenance.fragment_refs == ("frag_1",)
+    assert load_package(dump_package(loaded)) == loaded

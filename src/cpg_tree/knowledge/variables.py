@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from cpg_tree.knowledge._validation import validate_identifier
 from cpg_tree.knowledge.enums import VariableType
+from cpg_tree.knowledge.provenance import Provenance
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,6 +16,9 @@ class Variable:
     The model is protocol-agnostic: a variable carries only its identifier,
     display label, generic type, and optional unit/allowed values. Clinical
     meaning lives in protocol knowledge packages, never in this class.
+
+    ``provenance`` optionally anchors the variable to its source evidence,
+    mirroring the traceability of rules and actions.
     """
 
     id: str
@@ -24,6 +28,7 @@ class Variable:
     allowed_values: tuple[str, ...] | None = None
     description: str | None = None
     source_note: str | None = None
+    provenance: Provenance | None = None
 
     def __post_init__(self) -> None:
         validate_identifier(self.id, "Variable.id")

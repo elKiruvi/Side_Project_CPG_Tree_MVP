@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from cpg_tree.knowledge import Variable, VariableType
+from cpg_tree.knowledge import (
+    DerivationState,
+    Provenance,
+    Variable,
+    VariableType,
+)
 
 
 def test_numeric_variable_with_unit() -> None:
@@ -65,3 +70,19 @@ def test_whitespace_identifier_rejected() -> None:
 def test_empty_label_rejected() -> None:
     with pytest.raises(ValueError, match="label must not be empty"):
         Variable(id="count_x", label="", type=VariableType.NUMERIC)
+
+
+def test_provenance_defaults_to_none() -> None:
+    variable = Variable(id="count_x", label="Count X", type=VariableType.NUMERIC)
+    assert variable.provenance is None
+
+
+def test_variable_accepts_provenance() -> None:
+    provenance = Provenance(derivation=DerivationState.SOURCE_STATED, fragment_refs=("frag_1",))
+    variable = Variable(
+        id="count_x",
+        label="Count X",
+        type=VariableType.NUMERIC,
+        provenance=provenance,
+    )
+    assert variable.provenance is provenance
