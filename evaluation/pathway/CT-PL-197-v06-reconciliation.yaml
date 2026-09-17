@@ -1,0 +1,986 @@
+schema: relationship-reconciliation
+schema_version: 2
+protocol: CT-PL-197
+version: v06
+candidates:
+- candidate_id: rel-itu-001
+  from: rule_def_ba
+  to: rule_def_itu
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «…provenientes de pacientes sin signos o síntomas atribuibles a ITU» vs
+    «…en pacientes con signos o síntomas atribuibles a ITU»
+  fragment_ids:
+  - frag_p1_def_ba
+  - frag_p1_def_itu
+  page: '1'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Bifurcación definicional de entrada (BA vs ITU). Apoyada por «El diagnóstico
+    diferencial entre bacteriuria asintomática e ITU…» (capa de página 2, no es fragmento)
+    y por las filas separadas BA/ITU de la Tabla 1.
+  reconciliation_notes: 'FLOW rechazado: las definiciones contrastan dos categorías, pero
+    la fuente no establece una transición «si síntomas → ITU». La bifurcación BA/ITU es semántica
+    de clasificación (nodo de entrada en D3), no arista. Como REFERENCE, las definiciones
+    contextualizan las reglas posteriores.'
+- candidate_id: rel-itu-002
+  from: rule_def_ba
+  to: rule_tto_ba_indicado
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: «Indicaciones de tratamiento de bacteriuria asintomática • Mujer embarazada
+    • Procedimiento invasivo de vías urinarias con riesgo de sangrado o disrupción del uroepitelio»
+  fragment_ids:
+  - frag_p3_tto_ba_indicaciones
+  - frag_p3_tto_ba_gestante
+  - frag_p3_tto_ba_procedimiento
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Lista de indicaciones explícita que restringe el tratamiento de BA.
+  reconciliation_notes: 'Compuerta explícita: la fuente declara las indicaciones del tratamiento
+    de BA y la nota ** añade «sólo en gestantes o pacientes quienes serán sometidos a procedimientos
+    urológicos…».'
+- candidate_id: rel-itu-003
+  from: rule_def_ba
+  to: rule_t1_ba_row
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: «**Recordar su tratamiento sólo en gestantes o pacientes quienes serán sometidos
+    a procedimientos urológicos donde se prevé la disrupción del uroepitelio»
+  fragment_ids:
+  - frag_p4_t1_nota_ba
+  - frag_p4_t1_ba_row
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Nota ** de la fila «Bacteriuria asintomática**» de la Tabla 1.
+  reconciliation_notes: Compuerta explícita («sólo en gestantes o…»); aplicabilidad de la
+    fila BA de la Tabla 1.
+- candidate_id: rel-itu-004
+  from: rule_def_ba
+  to: rule_t2_ba_gestante
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: En mujeres embarazadas, la bacteriuria asintomática debe tratarse porque
+    se ha asociado con un mayor riesgo de pielonefritis
+  fragment_ids:
+  - frag_p2_embarazada_debe_tratarse
+  - frag_p4_t2_ba_row
+  page: 2, 4
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Fila «Bacteriuria asintomática» de la Tabla 2 (gestante).
+  reconciliation_notes: Compuerta explícita (gestante) para la fila BA de la Tabla 2.
+- candidate_id: rel-itu-005
+  from: rule_def_itu_bajo
+  to: rule_t1_itu_baja
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «ITU baja (complicada o no complicada)»
+  fragment_ids:
+  - frag_p4_t1_itu_baja
+  - frag_p2_clasificacion_alta_baja
+  page: '4'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: 'Tabla 1: estructura CONDICIÓN→ANTIBIÓTICO EMPÍRICO. La clasificación es
+    SOURCE_STATED; el mapeo fila→regla es estructura de tabla.'
+  reconciliation_notes: 'FLOW rechazado: la fila de tabla es aplicabilidad/mapeo contextual,
+    no una transición. La vinculación clasificación→tratamiento de la fuente ya está en rel-itu-030.
+    La condición de cada fila pertenece a la regla.'
+- candidate_id: rel-itu-006
+  from: rule_def_itu_alto
+  to: rule_t1_alta_ambulatoria
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «ITU alta ambulatoria Cefalexina 1»
+  fragment_ids:
+  - frag_p4_t1_ambulatoria
+  page: '4'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Rama «no hospitalizado» de la fila ITU alta; la celda adjunta es la nota
+    1 de reevaluación (rel-itu-010).
+  reconciliation_notes: 'FLOW rechazado: aplicabilidad por fila; la condición hospitalizado
+    pertenece a las reglas (rel-itu-007). Como REFERENCE, mapeo contextual de la fila.'
+- candidate_id: rel-itu-007
+  from: rule_def_itu_alto
+  to: rule_t1_alta_hosp_sin_fr
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «ITU alta ambulatoria» / «ITU alta hospitalaria sin FR para BGN resistentes»
+  fragment_ids:
+  - frag_p4_t1_ambulatoria
+  - frag_p4_t1_sin_fr
+  page: '4'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Rama hospitalizado vs ambulatorio, explícita en las filas de la Tabla 1.
+  reconciliation_notes: 'FLOW rechazado: la distinción ambulatoria/hospitalaria es condición
+    propia de cada regla, no una transición entre reglas. Como REFERENCE, mapeo contextual
+    de filas.'
+- candidate_id: rel-itu-008
+  from: rule_fr_bgn_resistentes
+  to: rule_t1_alta_hosp_con_fr_piperacilina
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: '«**FR BGN resistentes: hospitalización > 48 horas en los últimos 3 meses,
+    uso de antibióticos en últimos 90 días, colonización por germen BLEE.» + «ITU alta hospitalaria
+    con FR para BGN resistentes***»'
+  fragment_ids:
+  - frag_p4_t1_nota_fr
+  - frag_p4_t1_con_fr
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: La nota ** define la condición de la rama «con FR».
+  reconciliation_notes: 'FLOW rechazado: la selección de fila «con FR» es condición propia
+    de cada regla de tratamiento; la expresión compartida se registra como COMPOSITION (rel-itu-043).
+    Como REFERENCE, la nota ** define el contexto de las filas «con FR».'
+- candidate_id: rel-itu-009
+  from: rule_t1_alta_hosp_con_fr_amikacina
+  to: rule_t1_alta_hosp_con_fr_meropenem
+  relation: excepts
+  presentation_role: EXCEPTION_CONTEXT
+  branch_label: excepción (choque)
+  evidence_quote: «Piperacilina tazobactam o Amikacina2 o Meropenem3» + «2 Evitar en choque»
+    + «3 Administrar empíricamente si hay choque»
+  fragment_ids:
+  - frag_p4_t1_con_fr_drogas
+  - frag_p4_t1_nota_amikacina
+  - frag_p4_t1_nota_meropenem
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: 'Marcadores de nota 2/3: corresponde a la excepción canónica de rule_t1_alta_hosp_con_fr_amikacina
+    (choque_septico).'
+  reconciliation_notes: 'Semántica de excepción/alternativa condicional, NO secuencia fármaco→fármaco
+    y NO arista FLOW ordinaria. La fuente declara «2 Evitar en choque» (excepción canónica
+    choque_septico de la regla de amikacina) y «3 Administrar empíricamente si hay choque»
+    (condición de la regla de meropenem). D3 debe representar las alternativas desde las condiciones
+    canónicas: rama sin choque → alternativas aplicables; rama con choque → regla de meropenem;
+    y la excepción de amikacina → EXCEPTED. Nunca «amikacina → meropenem» como secuencia.'
+- candidate_id: rel-itu-010
+  from: rule_t1_alta_ambulatoria
+  to: rule_reevaluar_48h
+  relation: precedes
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: «1 Reevaluar con urocultivo a las 48 horas para ajuste» (celda adjunta a
+    la fila «ITU alta ambulatoria»)
+  fragment_ids:
+  - frag_p4_t1_reevaluar
+  - frag_p4_t1_ambulatoria
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Instrucción numerada explícita anclada a la fila ambulatoria.
+  reconciliation_notes: Instrucción temporal explícita anclada a la fila por el marcador 1.
+    El intervalo de 48 h es declarativo; sin maquinaria de programación.
+- candidate_id: rel-itu-011
+  from: rule_tirilla_descarta_diagnostico
+  to: 'TERMINAL: diagnóstico descartado'
+  relation: branches
+  presentation_role: FLOW
+  branch_label: 'NO'
+  evidence_quote: «…un resultado normal en pacientes con baja sospecha clínica descarta el
+    diagnóstico.»
+  fragment_ids:
+  - frag_p2_tirilla_descarta
+  page: '2'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Rama de fin de vía; «to» es un terminal de presentación propuesto, no una
+    regla canónica.
+  reconciliation_notes: 'Rama explícita de resultado («descarta el diagnóstico»); el estado
+    terminal está nombrado por la fuente. TERMINAL es un destino de presentación únicamente:
+    NUNCA una regla canónica nueva; D3 puede renderizarlo como nodo terminal de presentación.'
+- candidate_id: rel-itu-012
+  from: rule_citoquimico_orina
+  to: 'EXCEPTED: destino no declarado en la fuente'
+  relation: excepts
+  presentation_role: EXCEPTION_CONTEXT
+  branch_label: excepción
+  evidence_quote: Se debe realizar citoquímico de orina a todo paciente en el servicio de
+    urgencias con sospecha de ITU, excepto mujeres con primer episodio y síntomas típicos.
+  fragment_ids:
+  - frag_p2_citoquimico
+  page: '2'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Excepción canónica de rule_citoquimico_orina.
+  reconciliation_notes: 'Excepción canónica sin destino declarado en la fuente: NO se inventa
+    un terminal clínico ni una transición posterior. D3 debe mostrar la excepción desde la
+    regla canónica y, cuando aplique, el resultado EXCEPTED del motor. Nunca una arista FLOW
+    ordinaria.'
+- candidate_id: rel-itu-013
+  from: rule_urocultivo_indicado
+  to: 'EXCEPTED: destino no declarado en la fuente'
+  relation: excepts
+  presentation_role: EXCEPTION_CONTEXT
+  branch_label: excepción
+  evidence_quote: Debe solicitarse en todos los casos, excepto primer episodio de ITU baja
+    no complicada en mujer premenopáusica.
+  fragment_ids:
+  - frag_p3_urocultivo_indicacion
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Excepción canónica de rule_urocultivo_indicado.
+  reconciliation_notes: Excepción canónica sin destino declarado; sin terminales inventados;
+    D3 usa la excepción de la regla canónica.
+- candidate_id: rel-itu-014
+  from: rule_urocultivo_indicado
+  to: rule_urocultivo_positivo_1e5
+  relation: branches
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: Los urocultivos se consideran positivos con el crecimiento de ≥10 5 UFC
+    de una bacteria en una muestra de orina o btenida de forma adecuada por micción espontánea
+  fragment_ids:
+  - frag_p3_urocultivo_positivo_1e5
+  page: '3'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Rama de interpretación del resultado según contexto de muestra.
+  reconciliation_notes: 'FLOW rechazado: los umbrales son criterios de positividad contextuales,
+    condiciones propias de cada regla de interpretación; no son transiciones entre reglas.
+    D3 puede mostrarlos como ramas de interpretación del nodo urocultivo (semántica de nodo),
+    no como aristas.'
+- candidate_id: rel-itu-015
+  from: rule_urocultivo_indicado
+  to: rule_urocultivo_positivo_1e3
+  relation: branches
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: con un crecimiento ≥10 3 UFC en un paciente con síntomas no explicados por
+    otra patología
+  fragment_ids:
+  - frag_p3_urocultivo_positivo_1e3
+  page: '3'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Ídem: rama por contexto.'
+  reconciliation_notes: 'Ídem rel-itu-014: criterio contextual, no arista.'
+- candidate_id: rel-itu-016
+  from: rule_urocultivo_indicado
+  to: rule_urocultivo_positivo_1e2
+  relation: branches
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: el crecimiento de ≥10 2 UFC de una bacteria en una muestra de orina obtenida
+    a través de una sonda vesical recién insertada.
+  fragment_ids:
+  - frag_p3_urocultivo_positivo_1e2
+  page: '3'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'Ídem: rama por contexto.'
+  reconciliation_notes: 'Ídem rel-itu-014: criterio contextual, no arista.'
+- candidate_id: rel-itu-017
+  from: rule_def_itu_complicada_estructural
+  to: rule_imagen_urotomografia
+  relation: branches
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: en los casos de sospecha de alteración estructural, incluyendo la litiasis
+    de vías urinarias la elección será urotomografía
+  fragment_ids:
+  - frag_p3_imagen_urotomografia
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: «la elección será» = rama explícita.
+  reconciliation_notes: Rama de elección explícita («la elección será urotomografía») entre
+    las dos modalidades de imagen.
+- candidate_id: rel-itu-018
+  from: rule_def_itu_complicada_estructural
+  to: rule_imagen_ecografia_funcional
+  relation: branches
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: para los casos en los cuales se sospecha una alteración funcional, especialmente
+    por inadecuado vaciamiento vesical o trastornos obstructivos de las vías urinarias, la
+    elección será ecografía de vías urinarias con medición del residuo postmiccional.
+  fragment_ids:
+  - frag_p3_imagen_ecografia
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: «la elección será» = rama explícita.
+  reconciliation_notes: Rama de elección explícita («la elección será ecografía…»).
+- candidate_id: rel-itu-019
+  from: (tratamiento antibiótico — contexto)
+  to: rule_imagen_urgente
+  relation: gates
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «…fiebre persistente después de 72 horas de tratamiento antibiótico correcto.»
+  fragment_ids:
+  - frag_p3_imagen_urgente
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: REJECTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Disparador temporal interno a la condición canónica (vi_fiebre_72h_dos_condiciones).
+    El «from» era contexto de tratamiento, no una regla específica — decisión humana requerida
+    sobre el anclaje.
+  reconciliation_notes: 'Comodín eliminado: no se fabrican candidatos por regla de tratamiento
+    porque la fuente no nombra una regla específica. El disparador «fiebre persistente después
+    de 72 horas de tratamiento antibiótico correcto» es condición propia de rule_imagen_urgente
+    (vi_fiebre_72h_dos_condiciones). D3 puede representarlo como disparador temporal del nodo
+    de imagen urgente, no como arista.'
+- candidate_id: rel-itu-020
+  from: rule_hospitalizacion
+  to: rule_analisis_sangre
+  relation: gates
+  presentation_role: FLOW
+  branch_label: null
+  evidence_quote: En todo paciente con ITU que sea hospitalizado debe obtenerse muestra de
+    sangre para hemoleucograma, ionograma, función renal y proteína C reactiva (PCR).
+  fragment_ids:
+  - frag_p3_analisis_sangre
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito en la redacción fuente.
+  reconciliation_notes: Condicional explícito («En todo paciente con ITU que sea hospitalizado…»).
+- candidate_id: rel-itu-021
+  from: rule_def_itu_alto
+  to: rule_hemocultivos
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: Los hemocultivos deben solicitarse en todos los casos de pielonefritis aguda
+    que cursan con fiebre, hipotermia o ch oque séptico.
+  fragment_ids:
+  - frag_p3_hemocultivos
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Pielonefritis = ITU alta (definición frag_p1_def_itu_alto).
+  reconciliation_notes: 'FLOW rechazado: la fuente condiciona los hemocultivos a pielonefritis
+    QUE CURSA CON fiebre, hipotermia o choque séptico; las condiciones adicionales pertenecen
+    a la regla (applies_to + condición). Como REFERENCE, la pielonefritis contextualiza la
+    indicación.'
+- candidate_id: rel-itu-022
+  from: rule_def_itu_alto
+  to: rule_ecografia_renal_gestante
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: En las mujeres embarazadas se hará ecografía renal en todas las pacientes
+    con pielonefritis, más de un episodio de ITU durante el embarazo, sospecha de litiasis
+    por hematuria y/o dolor.
+  fragment_ids:
+  - frag_p3_imagen_gestante
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Condicional explícito (gestante + pielonefritis/otros).
+  reconciliation_notes: 'FLOW rechazado: las condiciones adicionales (gestante, más de un
+    episodio, sospecha de litiasis) pertenecen a la regla. Como REFERENCE, la pielonefritis
+    contextualiza la indicación en la gestante.'
+- candidate_id: rel-itu-023
+  from: 'BRANCH_CONTEXT: ITU alta en gestante — selección empírica según FR/choque'
+  to: rule_t2_itu_alta_gestante_piperacilina
+  relation: branches
+  presentation_role: BRANCH_CONTEXT
+  branch_label: con FR, sin choque
+  evidence_quote: «ITU alta Cefazolina* o Piperacilina tazobactam** o Meropenem***» + «*Sin
+    factores de riesgo para BGN resistentes» + «**Con factores de riesgo para BGN resistentes,
+    sin choque»
+  fragment_ids:
+  - frag_p5_t2_itu_alta_row
+  - frag_p5_t2_sin_fr
+  - frag_p5_t2_con_fr
+  page: '5'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Notas de marcador * / ** de la Tabla 2.
+  reconciliation_notes: 'Contexto de presentación por condición (NO secuencia fármaco→fármaco,
+    NO FLOW ordinario): «BRANCH_CONTEXT» es un ancla de presentación únicamente, no una regla
+    canónica. El contexto incluye tres ramas por sus propias condiciones: sin FR → cefazolina
+    (evidencia frag_p5_t2_sin_fr); con FR + sin choque → piperacilina tazobactam (esta fila);
+    con FR + choque → meropenem (rel-itu-024). Las tres reglas son alternativas seleccionadas
+    por sus condiciones canónicas.'
+- candidate_id: rel-itu-024
+  from: 'BRANCH_CONTEXT: ITU alta en gestante — selección empírica según FR/choque'
+  to: rule_t2_itu_alta_gestante_meropenem
+  relation: branches
+  presentation_role: BRANCH_CONTEXT
+  branch_label: con FR, con choque
+  evidence_quote: «**Con factores de riesgo para BGN resistentes, sin choque» + «***Con factores
+    de riesgo para BGN resistentes, con choque»
+  fragment_ids:
+  - frag_p5_t2_con_fr
+  - frag_p5_t2_con_fr_choque
+  - frag_p5_t2_itu_alta_row
+  page: '5'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Rama por choque, explícita en las notas de marcador.
+  reconciliation_notes: 'Rama del mismo contexto de presentación (rel-itu-023): con FR + choque
+    → meropenem. Nunca «piperacilina → meropenem» como secuencia; ambas son alternativas condicionales
+    del contexto BRANCH_CONTEXT.'
+- candidate_id: rel-itu-025
+  from: rule_t2_itu_baja_gestante
+  to: rule_t2_preventiva_baja
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «ITU baja Nitrofurantoína o Cefalexina o Fosfomicina 3 … No Sólo si hay
+    recurrencia de la infección»
+  fragment_ids:
+  - frag_p4_t2_itu_baja_row
+  page: '4'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Celda explícita de profilaxis condicionada a recurrencia.
+  reconciliation_notes: 'FLOW rechazado: «Sólo si hay recurrencia de la infección» es una
+    condición de la regla de profilaxis, no una arista; la celda de tabla es aplicabilidad/atributo,
+    no flujo.'
+- candidate_id: rel-itu-026
+  from: rule_t2_itu_alta_gestante_cefazolina
+  to: rule_t2_preventiva_alta
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «ITU alta Cefazolina* o Piperacilina tazobactam** o Meropenem*** … No Sí»
+  fragment_ids:
+  - frag_p5_t2_itu_alta_row
+  - frag_p5_t2_preventiva_alta
+  page: '5'
+  evidence_class: EXTRACTED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TABLE
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TABLE
+  reviewer_notes: Celda «Sí» de profilaxis en fila ITU alta; mapeo de tabla.
+  reconciliation_notes: 'FLOW rechazado: la celda «Sí» es un atributo de aplicabilidad, no
+    un flujo; no se infiere flujo del layout de la tabla.'
+- candidate_id: rel-itu-030
+  from: rule_def_itu_bajo
+  to: rule_t1_itu_baja
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: La presentación clínica de la ITU permite clasificar la infección como alta
+    o baja, clasificación necesaria para definir el tratamiento y el pronóstico.
+  fragment_ids:
+  - frag_p2_clasificacion_alta_baja
+  page: '2'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Vinculación de sección explícita en la fuente; NO es una transición temporal.
+  reconciliation_notes: 'Anclaje representativo de la referencia clasificación→tratamiento
+    (aplica igualmente a la clasificación alta: rule_def_itu_alto → filas de ITU alta; se
+    evitan comodines con un anclaje concreto). Nunca flecha temporal.'
+- candidate_id: rel-itu-031
+  from: rule_gram_urgencias
+  to: rule_t1_itu_baja
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: 'Gram de orina sin centrifugar: Suministra información inmediata sobre la
+    naturaleza de la infección y sirve para guiar el tratamiento empírico…'
+  fragment_ids:
+  - frag_p3_gram
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: La prueba informa al tratamiento; la fuente no define una transición.
+  reconciliation_notes: Anclaje representativo del vínculo prueba→tratamiento empírico; la
+    fuente no define transición ni regla de tratamiento específica.
+- candidate_id: rel-itu-032
+  from: rule_fosfomicina_preferida
+  to: rule_t1_itu_baja
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: «*Preferir en pacientes quienes tienen ITU recurrente o han estado expuestas
+    a terapia antimicrobiana en los últimos 90 días.»
+  fragment_ids:
+  - frag_p4_t1_nota_fosfomicina
+  - frag_p5_t2_nota3
+  page: 4, 5
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Preferencia declarada por la fuente; NUNCA una selección ni un ranking.
+  reconciliation_notes: Preferencia declarada («Preferir en…»), nunca selección ni ranking;
+    se representa como nota de preferencia, no como rama.
+- candidate_id: rel-itu-033
+  from: rule_def_ba
+  to: rule_def_itu_alto
+  relation: references
+  presentation_role: REFERENCE
+  branch_label: null
+  evidence_quote: En mujeres embarazadas, la bacteriuria asintomática debe tratarse porque
+    se ha asociado con un mayor riesgo de pielonefritis
+  fragment_ids:
+  - frag_p2_embarazada_debe_tratarse
+  page: '2'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Asociación causal declarada; no es flujo clínico.
+  reconciliation_notes: Asociación causal declarada por la fuente; no es una transición clínica.
+- candidate_id: rel-itu-040
+  from: rule_def_ba
+  to: rule_def_ba_cultivos
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: Se requiere 2 urocultivos con el mismo patógeno y perfil de sensibilidad
+    en mujeres no embarazadas, 1 en hombres y pacientes gestantes.
+  fragment_ids:
+  - frag_p1_def_ba_cultivos
+  - frag_p1_def_ba
+  page: '1'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Componente de la definición de BA (nota de procedencia de rule_def_ba).
+  reconciliation_notes: Componente definicional; estructura, no secuencia.
+- candidate_id: rel-itu-041
+  from: rule_hospitalizacion
+  to:
+  - rule_hosp_criterio_choque_septico
+  - rule_hosp_criterio_intolerancia_oral
+  - rule_hosp_criterio_itu_alta
+  - rule_hosp_criterio_descompensacion
+  - rule_hosp_criterio_germen_resistente
+  - rule_hosp_criterio_funcion_renal
+  - rule_hosp_criterio_absceso
+  - rule_hosp_criterio_soporte_social
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: «Indicaciones de hospitalización en pacientes con ITU:» + 8 bullets
+  fragment_ids:
+  - frag_p3_hosp_choque_septico
+  - frag_p3_hosp_intolerancia
+  - frag_p3_hosp_itu_alta
+  - frag_p3_hosp_descompensacion
+  - frag_p3_hosp_resistente
+  - frag_p3_hosp_funcion_renal
+  - frag_p3_hosp_absceso
+  - frag_p3_hosp_social
+  page: '3'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: MULTI_SOURCE
+  source_location: página 3; el encabezado «Indicaciones de hospitalización en pacientes con
+    ITU:» está en la capa de página (pdftotext) y no fue capturado como fragmento del paquete
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Encabezado presente en la capa de página (data/02_intermediate), no capturado
+    como fragmento. OR canónico de 8 criterios. NO es flujo.
+  reconciliation_notes: Composición OR de criterios independientes; nunca secuencia.
+- candidate_id: rel-itu-042
+  from: rule_plan_egreso
+  to:
+  - rule_egreso_afebril_48h
+  - rule_egreso_tas
+  - rule_egreso_fc
+  - rule_egreso_fr
+  - rule_egreso_sato2_pao2
+  - rule_egreso_via_oral
+  - rule_egreso_comorbilidades
+  - rule_egreso_tratamiento
+  - rule_egreso_social
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: «Indicaciones para paso a terapia oral y/o egreso:» + 9 bullets
+  fragment_ids:
+  - frag_p3_egreso_afebril
+  - frag_p3_egreso_tas
+  - frag_p4_egreso_fc
+  - frag_p4_egreso_fr
+  - frag_p4_egreso_sato2_pao2
+  - frag_p4_egreso_via_oral
+  - frag_p4_egreso_comorbilidades
+  - frag_p4_egreso_tratamiento
+  - frag_p4_egreso_social
+  page: 3, 4
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: MULTI_SOURCE
+  source_location: páginas 3-4; el encabezado «Indicaciones para paso a terapia oral y/o egreso:»
+    está en la capa de página y no fue capturado como fragmento del paquete
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Encabezado en la capa de página, no capturado como fragmento. AND canónico
+    de 9 criterios. NO es flujo.
+  reconciliation_notes: Composición AND de criterios de egreso; la fuente no contiene frase
+    «se dará de alta cuando…» para ITU (solo encabezado y bullets).
+- candidate_id: rel-itu-043
+  from: rule_fr_bgn_resistentes
+  to:
+  - rule_t1_alta_hosp_con_fr_piperacilina
+  - rule_t1_alta_hosp_con_fr_amikacina
+  - rule_t1_alta_hosp_con_fr_meropenem
+  - rule_t2_itu_alta_gestante_piperacilina
+  - rule_t2_itu_alta_gestante_meropenem
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: '«**FR BGN resistentes: hospitalización > 48 horas en los últimos 3 meses,
+    uso de antibióticos en últimos 90 días, colonización por germen BLEE.»'
+  fragment_ids:
+  - frag_p4_t1_nota_fr
+  page: '4'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Expresión OR compartida/duplicada entre reglas de tratamiento. Estructural;
+    NO es flujo.
+  reconciliation_notes: Expresión OR compartida entre reglas de tratamiento; estructura, no
+    secuencia.
+- candidate_id: rel-itu-044
+  from: rule_hospitalizacion
+  to: rule_analisis_sangre
+  relation: composes
+  presentation_role: COMPOSITION
+  branch_label: null
+  evidence_quote: applies_to = OR de los 8 criterios de hospitalización (duplicación estructural)
+  fragment_ids:
+  - frag_p3_analisis_sangre
+  page: '3'
+  evidence_class: NORMALIZED
+  review_status: PROPOSED
+  reconciliation_status: READY_FOR_REVIEW
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: La duplicación estructural NO es evidencia de flujo; el flujo lo apoya la
+    redacción del fragmento (rel-itu-020).
+  reconciliation_notes: Estructural únicamente; el flujo lo apoya la frase fuente (rel-itu-020).
+- candidate_id: rel-itu-050
+  from: (rule_def_ba / rule_def_itu)
+  to: (umbral universal de bacteriuria significativa)
+  relation: missing
+  presentation_role: GAP
+  branch_label: null
+  evidence_quote: «Recuento significativo de colonias bacterianas…»
+  fragment_ids:
+  - frag_p1_def_ba
+  - frag_p1_def_itu
+  page: '1'
+  evidence_class: UNRESOLVED
+  review_status: PROPOSED
+  reconciliation_status: GAP
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: 'vi_recuento_significativo_umbral: la decisión de entrada BA/ITU depende
+    de un umbral que la fuente define solo por contexto (pág. 3).'
+  reconciliation_notes: La fuente no define un umbral universal de «recuento significativo»;
+    los umbrales de la página 3 son contextuales (vi_recuento_significativo_umbral).
+- candidate_id: rel-itu-060
+  from: (terapia empírica — Tablas 1 y 2)
+  to: (ajuste según urocultivo y antibiograma)
+  relation: references
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «1Esta es la terapia empírica. Siempre debe ajustarse según resultados de
+    urocultivo y antibiograma» + «2La decisión se toma con base en los cultivos y pruebas
+    de sensibilidad»
+  fragment_ids:
+  - frag_p5_t2_nota1
+  - frag_p5_t2_nota2
+  page: '5'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Instrucción procedimental no computable (vi_ajuste_urocultivo_antibiograma).
+  reconciliation_notes: Instrucción procedimental; permanece como contexto declarativo.
+- candidate_id: rel-itu-061
+  from: (tratamiento profiláctico en gestante)
+  to: (cambio a semana 34 / hasta finalización del embarazo)
+  relation: missing
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «4 A la semana 34 podría hacerse cambio a cefalexina o nitrofurantoína,
+    si el microorganismo es sensible. Administrar hasta la finalización del embarazo.»
+  fragment_ids:
+  - frag_p5_t2_nota4
+  page: '5'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Calendario no computable (vi_semana34_calendar).
+  reconciliation_notes: Construcción de calendario no computable por la semántica temporal
+    mínima.
+- candidate_id: rel-itu-062
+  from: (observación de Tabla 2)
+  to: (restricción por medicamento en primer trimestre)
+  relation: missing
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «Evitar en primer trimestre. Hasta semana 34 gestación4»
+  fragment_ids:
+  - frag_p5_t2_observacion_trimestre
+  page: '5'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Ambigüedad de fármaco; no mapeable (vi_evitar_primer_trimestre_ambiguedad).
+  reconciliation_notes: La fuente no nombra el medicamento; no se mapea a una restricción
+    por fármaco.
+- candidate_id: rel-itu-063
+  from: rule_hospitalizacion
+  to: (criterio pediátrico)
+  relation: outside_scope
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «Pielonefritis aguda en pacientes pediátricos.»
+  fragment_ids:
+  - frag_p3_hosp_pediatrica
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Fuera del alcance adulto (vi_criterio_pediatrico_fuera_alcance).
+  reconciliation_notes: Fuera del alcance adulto declarado por el protocolo.
+- candidate_id: rel-itu-064
+  from: rule_def_itu_complicada_clinica
+  to: (prostatitis)
+  relation: outside_scope
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «…y prostatitis (este último tema excede los alcances del presente protocolo).»
+  fragment_ids:
+  - frag_p1_def_itu_complicada_clinica
+  page: '1'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Excluido por la propia fuente (vi_prostatitis_fuera_alcance).
+  reconciliation_notes: Excluido por la propia fuente.
+- candidate_id: rel-itu-065
+  from: rule_def_ba
+  to: (cláusula de piuria pediátrica)
+  relation: outside_scope
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: «En población pediátrica debe haber ausencia de piuria en el sedimento.»
+  fragment_ids:
+  - frag_p1_def_ba_piuria
+  page: '1'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Fuera del alcance adulto del protocolo.
+  reconciliation_notes: Cláusula pediátrica; fuera del alcance adulto.
+- candidate_id: rel-itu-066
+  from: rule_urocultivo_indicado
+  to: (toma de muestra antes de la primera dosis de antibiótico)
+  relation: references
+  presentation_role: OMITTED
+  branch_label: null
+  evidence_quote: '«Toma de la muestra: debe tomarse antes de la primera dosis de antibiótico»'
+  fragment_ids:
+  - frag_p3_toma_muestra_antibiotico
+  page: '3'
+  evidence_class: SOURCE_STATED
+  review_status: PROPOSED
+  reconciliation_status: OMITTED
+  source_representation: TEXT
+  source_location: null
+  source_conflict_ids: []
+  source_evidence_status: VERIFIED_TEXT
+  reviewer_notes: Instrucción de procedimiento (vi_restricciones_procedimiento).
+  reconciliation_notes: Instrucción de procedimiento; permanece declarativa.
+conflicts: []
