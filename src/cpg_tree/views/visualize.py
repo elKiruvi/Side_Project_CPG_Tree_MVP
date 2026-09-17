@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Deterministic HTML visualization of a knowledge package (derived view).
 
 TRY004 is disabled for this module on purpose: deserialization of malformed
@@ -25,21 +24,20 @@ from __future__ import annotations
 
 import html
 from collections.abc import Mapping
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-
-import yaml
 
 from cpg_tree.knowledge.enums import ActionType
 from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.knowledge.rules import Rule
+from cpg_tree.views.clinical import render_clinical_view
 from cpg_tree.views.expression import render_operand
+from cpg_tree.views.manifest import (
+    VisualizationManifest,
+    group_rules,
+    load_manifest,  # noqa: F401  (re-exported for the established public API)
+)
 from cpg_tree.views.tree import build_projection
-
-_FALLBACK_SECTION = "Reglas"
-_OVERFLOW_SECTION = "Otras reglas"
-_MANIFEST_FILENAME = "visualization.yaml"
 
 _CSS = """
 :root { --ink: #1f2937; --muted: #6b7280; --line: #d1d5db; --bg: #f6f7f9;
@@ -92,6 +90,37 @@ pre.expr { background: var(--soft); border-radius: 4px; padding: .5rem .7rem;
 .provenance { font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line);
               padding-top: .5rem; margin-top: .4rem; }
 .provenance .chain { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+nav.view-switch { display: flex; gap: .7rem; margin: 1rem 0 0 0; }
+nav.view-switch a { color: var(--accent); text-decoration: none; font-weight: 600;
+                    border: 1px solid var(--line); background: var(--card);
+                    border-radius: 6px; padding: .4rem .9rem; font-size: .9rem; }
+p.map-note { font-size: .8rem; color: var(--muted); background: var(--card);
+             border: 1px solid var(--line); border-radius: 6px;
+             padding: .7rem 1rem; margin: .6rem 0 1rem 0; }
+svg.clinical-map { display: block; background: var(--card); border: 1px solid var(--line);
+                   border-radius: 6px; margin: 0 auto; max-width: 100%; height: auto; }
+svg.clinical-map .domain-title { font-size: 1.05rem; font-weight: 700; fill: var(--accent); }
+svg.clinical-map .domain-rule { stroke: var(--accent); stroke-width: 2; opacity: .45; }
+.cnode { box-sizing: border-box; background: var(--card); border: 1px solid var(--line);
+         border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px;
+         overflow: hidden; color: var(--ink); height: 100%; }
+.clink { font-size: .72rem; color: var(--accent); text-decoration: none; display: block;
+         line-height: 13px; height: 13px; }
+.cline { overflow: hidden; white-space: pre; box-sizing: border-box; }
+.cline.header { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                font-weight: 700; font-size: .95rem; line-height: 20px; height: 20px; }
+.cline.label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
+               letter-spacing: .04em; color: var(--muted);
+               line-height: 15px; height: 15px; }
+.cline.expr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+              font-size: .78rem; line-height: 14px; height: 14px;
+              background: var(--soft); border-radius: 3px; }
+.cline.small { font-size: .75rem; color: var(--muted); line-height: 13px; height: 13px; }
+.cline.action { font-size: .82rem; line-height: 15px; height: 15px; }
+.c-edge { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; fill: none; opacity: .8; }
+.edge-arrow { fill: var(--muted); }
+.tech-back { font-size: .72rem; margin-left: .6rem; color: var(--accent);
+             text-decoration: none; }
 footer { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem 2.5rem 2rem;
          font-size: .78rem; color: var(--muted); }
 @media print { article.card { border: 1px solid var(--line); } }
@@ -122,85 +151,12 @@ _LEGEND = [
 ]
 
 
-@dataclass(frozen=True, slots=True)
-class ManifestSection:
-    """One presentation grouping: a title plus rule-id prefixes/explicit ids."""
-
-    title: str
-    prefixes: tuple[str, ...] = ()
-    rules: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class VisualizationManifest:
-    """Presentation-only groupings for one package version."""
-
-    sections: tuple[ManifestSection, ...]
-
-
-def load_manifest(path: Path) -> VisualizationManifest | None:
-    """Load and validate a visualization manifest; None when absent.
-
-    Malformed structure or invalid data raises ``ValueError`` deterministically;
-    nothing is silently ignored. Rule-id existence is checked later against
-    the package (see ``build_visual_document``).
-    """
-    if not path.is_file():
-        return None
-    try:
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as error:
-        raise ValueError(f"malformed visualization manifest at {path}: {error}") from error
-    if data is None:
-        raise ValueError(f"visualization manifest at {path} is empty")
-    if not isinstance(data, Mapping):
-        raise ValueError(f"visualization manifest at {path} must be a mapping")
-    unknown_keys = set(data) - {"sections"}
-    if unknown_keys:
-        raise ValueError(
-            f"visualization manifest at {path} has unknown keys: {sorted(unknown_keys)}"
-        )
-    raw_sections = data.get("sections")
-    if not isinstance(raw_sections, list) or not raw_sections:
-        raise ValueError(f"visualization manifest at {path} requires a non-empty 'sections' list")
-    sections: list[ManifestSection] = []
-    for index, raw in enumerate(raw_sections):
-        sections.append(_section_from_data(path, index, raw))
-    return VisualizationManifest(sections=tuple(sections))
-
-
-def _section_from_data(path: Path, index: int, raw: object) -> ManifestSection:
-    if not isinstance(raw, Mapping):
-        raise ValueError(f"section {index} of {path} must be a mapping")
-    unknown_keys = set(raw) - {"title", "prefixes", "rules"}
-    if unknown_keys:
-        raise ValueError(f"section {index} of {path} has unknown keys: {sorted(unknown_keys)}")
-    title = raw.get("title")
-    if not isinstance(title, str) or not title.strip():
-        raise ValueError(f"section {index} of {path} requires a non-empty 'title' string")
-    prefixes = _string_list(raw.get("prefixes"), path, index, "prefixes")
-    rules = _string_list(raw.get("rules"), path, index, "rules")
-    if not prefixes and not rules:
-        raise ValueError(f"section {index} of {path} requires 'prefixes' or 'rules'")
-    return ManifestSection(title=title, prefixes=prefixes, rules=rules)
-
-
-def _string_list(raw: object, path: Path, index: int, field: str) -> tuple[str, ...]:
-    if raw is None:
-        return ()
-    if not isinstance(raw, list) or not all(isinstance(entry, str) and entry for entry in raw):
-        raise ValueError(
-            f"section {index} of {path}: '{field}' must be a list of non-empty strings"
-        )
-    return tuple(raw)
-
-
 def build_visual_document(
     package: ProtocolVersion,
     manifest: VisualizationManifest | None,
 ) -> str:
     """Render one package into a deterministic, self-contained HTML document."""
-    grouped = _group_rules(package, manifest)
+    grouped = group_rules(package, manifest)
     shared = build_projection(package)
     shared_by_id = {entry.id: entry for entry in shared.shared_expressions}
     shared_ids_by_rule = {
@@ -221,12 +177,21 @@ def build_visual_document(
         "</head>",
         "<body>",
         _render_header(package),
+        '<nav class="view-switch">'
+        '<a href="#clinical">Vista de conocimiento clínico</a>'
+        '<a href="#technical">Vista técnica</a>'
+        "</nav>",
         '<section class="legend">',
         "  <strong>How to read this document</strong>",
     ]
     parts.extend(f"  <p>{item}</p>" for item in _LEGEND)
     parts.append("</section>")
     parts.append("<main>")
+    parts.append(render_clinical_view(package, manifest))
+    parts.append(
+        f'<h2 class="domain" id="technical">Vista técnica '
+        f'<span class="count">({len(package.rules)} reglas)</span></h2>'
+    )
     for title, rule_ids in grouped:
         parts.append(
             f'<h2 class="domain">{_esc(title)} '
@@ -253,35 +218,6 @@ def visualize_package(
     out_path = out_dir / f"{package.protocol.id}-{package.version}.html"
     out_path.write_text(build_visual_document(package, manifest), encoding="utf-8")
     return out_path
-
-
-def _group_rules(
-    package: ProtocolVersion,
-    manifest: VisualizationManifest | None,
-) -> list[tuple[str, list[str]]]:
-    """Assign every rule to exactly one section; nothing may be dropped."""
-    if manifest is None:
-        return [(_FALLBACK_SECTION, sorted(package.rules))]
-    grouped: list[tuple[str, list[str]]] = []
-    assigned: set[str] = set()
-    for section in manifest.sections:
-        matched: set[str] = set()
-        for rule_id in section.rules:
-            if rule_id not in package.rules:
-                raise ValueError(f"visualization manifest references unknown rule {rule_id!r}")
-            if rule_id in assigned:
-                raise ValueError(f"visualization manifest assigns rule {rule_id!r} more than once")
-            matched.add(rule_id)
-        for prefix in section.prefixes:
-            for rule_id in sorted(package.rules):
-                if rule_id not in assigned and rule_id.startswith(prefix):
-                    matched.add(rule_id)
-        assigned.update(matched)
-        grouped.append((section.title, sorted(matched)))
-    remaining = sorted(set(package.rules) - assigned)
-    if remaining:
-        grouped.append((_OVERFLOW_SECTION, remaining))
-    return grouped
 
 
 def _render_header(package: ProtocolVersion) -> str:
@@ -336,6 +272,7 @@ def _render_rule_card(
         f'<span class="rule-id">{_esc(rule.id)}</span>',
         f'<span class="badge status">{_esc(rule.validation_status.value)}</span>',
         f'<span class="badge derivation">{_esc(rule.provenance.derivation.value)}</span>',
+        f'<a class="tech-back" href="#clinical_rule_{_esc(rule.id)}">↩ en vista clínica</a>',
         "</header>",
     ]
     if rule.notes:

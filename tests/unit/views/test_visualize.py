@@ -223,3 +223,37 @@ def test_real_packages_render_every_rule_exactly_once(
     assert len(ids) == len(set(ids)) == expected
     assert set(ids) == set(package.rules)
     assert "Otras reglas" not in html_text
+
+
+def test_document_contains_both_views_with_navigation(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    html_text = build_visual_document(synthetic_package, None)
+    assert '<nav class="view-switch">' in html_text
+    assert 'href="#clinical"' in html_text
+    assert 'href="#technical"' in html_text
+    assert 'id="clinical"' in html_text
+    assert 'id="technical"' in html_text
+    assert html_text.index('id="clinical"') < html_text.index('id="technical"')
+
+
+def test_clinical_map_renders_every_rule_in_document(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    html_text = build_visual_document(synthetic_package, None)
+    assert html_text.count('class="cnode"') == len(synthetic_package.rules)
+    for rule_id in synthetic_package.rules:
+        assert f'id="clinical_rule_{rule_id}"' in html_text
+
+
+def test_every_technical_card_links_back_to_the_clinical_map(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    html_text = build_visual_document(synthetic_package, None)
+    for rule_id in synthetic_package.rules:
+        assert f'href="#clinical_rule_{rule_id}"' in html_text
+
+
+def test_document_output_has_no_scripts(synthetic_package: ProtocolVersion) -> None:
+    html_text = build_visual_document(synthetic_package, None)
+    assert "<script" not in html_text

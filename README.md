@@ -74,10 +74,28 @@ uv run python -m cpg_tree visualize CT-PL-197 v06
 
 `visualize` generates a self-contained static HTML presentation of a protocol
 into `data/08_reporting/<PROTOCOL_ID>-<VERSION>.html` (open it locally in any
-browser). Rules are grouped into presentation sections by an optional sidecar
-manifest (`protocols/<id>/<version>/visualization.yaml`); sections are display
+browser). One document contains two views with anchor navigation:
+
+1. **Clinical Knowledge View** — a deterministic static SVG knowledge map
+   (no JavaScript, no external resources): one visual node per rule with its
+   `applies_to` / condition / exceptions, the engine's static
+   TRUE/FALSE/UNKNOWN outcome lanes (never a live patient evaluation),
+   declarative actions (alternatives never selected), and a provenance line
+   linking back to the technical details.
+2. **Technical View** — the existing detailed rule cards with expressions,
+   provenance chains, and shared-expression badges.
+
+Rules are grouped into presentation sections by an optional sidecar manifest
+(`protocols/<id>/<version>/visualization.yaml`); sections are display
 groupings only — they do not represent clinical workflow or execution order.
-`package.yaml` remains the single source of truth for all clinical content.
+The manifest may additionally declare an optional `graph` key
+(`entry_points` + `edges` with `kind: reference`) for presentation-only
+connectors between rule nodes. Connectors are visual references
+("referencia de presentación"), never clinical dependencies or workflow; the
+committed NAC and ITU manifests intentionally declare zero edges. The
+Clinical Knowledge View is a derived presentation: it does not constitute
+clinical validation, and `package.yaml` remains the single source of truth
+for all clinical content.
 
 ## Evaluation evidence
 

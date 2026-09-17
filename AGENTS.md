@@ -1238,7 +1238,7 @@ Conventions:
 - Views/CLI code lives in `src/cpg_tree/views/` and `src/cpg_tree/cli.py`;
   it must never duplicate engine semantics or contain protocol knowledge.
 
-### visualize command (Phase 7 extension)
+### visualize command (Phase 7 extension, Phase 9 dual view)
 
 ```bash
 uv run python -m cpg_tree visualize <PROTOCOL_ID> [VERSION] [--out DIR]
@@ -1246,10 +1246,25 @@ uv run python -m cpg_tree visualize <PROTOCOL_ID> [VERSION] [--out DIR]
 
 - Generates a self-contained static HTML presentation into
   `data/08_reporting/` (gitignored; never committed).
+- One document holds TWO views with anchor navigation: the Clinical
+  Knowledge View (deterministic static SVG map, Phase 9) first, then the
+  Technical View (Phase 7 rule cards). No JavaScript, no external resources.
 - `protocols/<id>/<version>/visualization.yaml` is OPTIONAL presentation
   metadata (section titles + rule-id prefixes/explicit ids) only. It must not
   contain clinical content; every clinical fact comes from package.yaml.
+- The manifest may optionally declare a `graph` key:
+  `entry_points` (display emphasis) and `edges` (`from`/`to` + optional
+  `kind`, whitelist: `reference`). Connectors are presentation references
+  only, never clinical workflow, sequencing, or dependencies. Invalid ids,
+  self-edges, duplicate edges, and unknown kinds fail deterministically.
+  The committed NAC/ITU manifests intentionally declare ZERO edges.
 - Sections are display groupings only, never clinical workflow order.
+- Clinical rule nodes show the engine's static outcome lanes
+  (TRUE→MATCHED, FALSE→NOT_MATCHED, UNKNOWN→INDETERMINATE, exception
+  TRUE→EXCEPTED) as explanatory semantics — the view NEVER evaluates
+  conditions, and UNKNOWN is never presented as FALSE.
 - Output must remain byte-deterministic (no timestamps, stable ordering).
-- The renderer is generic (`src/cpg_tree/views/visualize.py`); a third
-  protocol needs only package.yaml (manifest optional, fallback "Reglas").
+- The renderers are generic (`src/cpg_tree/views/visualize.py`,
+  `src/cpg_tree/views/clinical.py`, `src/cpg_tree/views/manifest.py`); a
+  third protocol needs only package.yaml (manifest optional, fallback
+  "Reglas").
