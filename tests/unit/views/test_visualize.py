@@ -68,9 +68,7 @@ def test_unmatched_rules_go_to_otras_reglas(
 ) -> None:
     manifest = _manifest(
         tmp_path,
-        "sections:\n"
-        "  - title: Solo una\n"
-        "    rules: [rule_alternatives]\n",
+        "sections:\n  - title: Solo una\n    rules: [rule_alternatives]\n",
     )
     html_text = build_visual_document(synthetic_package, manifest)
     assert "Otras reglas" in html_text

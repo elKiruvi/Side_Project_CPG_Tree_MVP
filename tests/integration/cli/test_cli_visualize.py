@@ -31,7 +31,7 @@ def _rendered_rule_ids(html_text: str) -> list[str]:
         ("CT-PL-193", "v09", 42, "rule_hemocultivos"),
     ],
 )
-def test_visualize_real_packages(
+def test_visualize_real_packages(  # noqa: PLR0913, PLR0917
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
     protocol_id: str,
@@ -39,16 +39,14 @@ def test_visualize_real_packages(
     expected_rules: int,
     representative: str,
 ) -> None:
-    code, out, err = _run(
-        ["visualize", protocol_id, version, "--out", str(tmp_path)], capsys
-    )
+    code, out, err = _run(["visualize", protocol_id, version, "--out", str(tmp_path)], capsys)
     assert code == EXIT_OK
     assert err == ""
     html_path = tmp_path / f"{protocol_id}-{version}.html"
     assert html_path.is_file()
     assert str(html_path) in out
     content = html_path.read_text(encoding="utf-8")
-    assert f"Derived view" in content
+    assert "Derived view" in content
     assert f"{protocol_id} · {version}" in content
     assert representative in content
     ids = _rendered_rule_ids(content)
@@ -103,8 +101,6 @@ def test_visualize_unknown_protocol_fails(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
 ) -> None:
-    code, _, err = _run(
-        ["visualize", "CT-PL-000", "--out", str(tmp_path)], capsys
-    )
+    code, _, err = _run(["visualize", "CT-PL-000", "--out", str(tmp_path)], capsys)
     assert code == 1
     assert "unknown protocol" in err

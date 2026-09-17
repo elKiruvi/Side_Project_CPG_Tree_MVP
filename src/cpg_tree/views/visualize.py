@@ -1,4 +1,10 @@
+# ruff: noqa: TRY004
 """Deterministic HTML visualization of a knowledge package (derived view).
+
+TRY004 is disabled for this module on purpose: deserialization of malformed
+visualization manifests raises ValueError by API contract (matching the
+serialization and validation modules), and the test suite asserts ValueError
+explicitly.
 
 The visualization is a pure presentation layer: it renders the canonical
 ``ProtocolVersion`` (the single source of truth) into one self-contained,
@@ -183,7 +189,9 @@ def _string_list(raw: object, path: Path, index: int, field: str) -> tuple[str, 
     if raw is None:
         return ()
     if not isinstance(raw, list) or not all(isinstance(entry, str) and entry for entry in raw):
-        raise ValueError(f"section {index} of {path}: '{field}' must be a list of non-empty strings")
+        raise ValueError(
+            f"section {index} of {path}: '{field}' must be a list of non-empty strings"
+        )
     return tuple(raw)
 
 
@@ -227,9 +235,7 @@ def build_visual_document(
         for rule_id in rule_ids:
             rule = package.rules[rule_id]
             shared_ids = shared_ids_by_rule.get(rule_id, (None, None, ()))
-            parts.append(
-                _render_rule_card(package, rule, shared_ids, shared_by_id)
-            )
+            parts.append(_render_rule_card(package, rule, shared_ids, shared_by_id))
     parts.append("</main>")
     parts.append(f"<footer>{_SAFETY_NOTICE}</footer>")
     parts.append("</body>")
@@ -262,13 +268,9 @@ def _group_rules(
         matched: set[str] = set()
         for rule_id in section.rules:
             if rule_id not in package.rules:
-                raise ValueError(
-                    f"visualization manifest references unknown rule {rule_id!r}"
-                )
+                raise ValueError(f"visualization manifest references unknown rule {rule_id!r}")
             if rule_id in assigned:
-                raise ValueError(
-                    f"visualization manifest assigns rule {rule_id!r} more than once"
-                )
+                raise ValueError(f"visualization manifest assigns rule {rule_id!r} more than once")
             matched.add(rule_id)
         for prefix in section.prefixes:
             for rule_id in sorted(package.rules):
@@ -288,10 +290,10 @@ def _render_header(package: ProtocolVersion) -> str:
         size = f"{document.byte_size} bytes" if document.byte_size is not None else "unknown size"
         document_lines.append(
             f'<span class="chain">{_esc(document.filename)}</span> '
-            f'— sha256 {_esc(document.sha256)} — {_esc(document.file_format)}, {size}'
+            f"— sha256 {_esc(document.sha256)} — {_esc(document.file_format)}, {size}"
         )
     meta = [
-        f"<div class=\"meta\">{_esc(package.protocol.id)} · {_esc(package.version)}"
+        f'<div class="meta">{_esc(package.protocol.id)} · {_esc(package.version)}'
         + (f" · approved {_esc(package.approval_date)}" if package.approval_date else "")
         + "</div>",
     ]
@@ -338,10 +340,7 @@ def _render_rule_card(
     ]
     if rule.notes:
         parts.append(f'<p class="notes">{_esc(rule.notes)}</p>')
-    parts.append(
-        '<p class="eval-order">Evaluation order: '
-        "applies_to → condition → exceptions</p>"
-    )
+    parts.append('<p class="eval-order">Evaluation order: applies_to → condition → exceptions</p>')
     if rule.applies_to is not None:
         parts.append(
             _render_expression_block("Applies to", rule.applies_to, applies_shared, shared_by_id)
@@ -352,9 +351,7 @@ def _render_rule_card(
     for index, exception in enumerate(rule.exceptions):
         shared_ref = exception_shared[index] if index < len(exception_shared) else None
         parts.append(
-            _render_expression_block(
-                f"Exception {index + 1}", exception, shared_ref, shared_by_id
-            )
+            _render_expression_block(f"Exception {index + 1}", exception, shared_ref, shared_by_id)
         )
     parts.append(_render_actions(package, rule))
     parts.append(_render_provenance(package, rule))
@@ -379,7 +376,7 @@ def _render_expression_block(
             )
     return (
         f'<div class="expr-block"><span class="expr-label">{_esc(label)}{badge}</span>'
-        f"<pre class=\"expr\">{_esc(rendered)}</pre></div>"
+        f'<pre class="expr">{_esc(rendered)}</pre></div>'
     )
 
 
@@ -387,7 +384,7 @@ def _render_actions(package: ProtocolVersion, rule: Rule) -> str:
     if not rule.action_refs:
         return (
             '<div class="actions"><span class="expr-label">Declared actions</span>'
-            "<p class=\"payload\">(none declared)</p></div>"
+            '<p class="payload">(none declared)</p></div>'
         )
     resolved = [(ref, package.actions.get(ref)) for ref in rule.action_refs]
     prescribe_count = sum(
@@ -444,9 +441,7 @@ def _render_provenance(package: ProtocolVersion, rule: Rule) -> str:
             short_id = fragment.document_id[:12]
             document_ref = f" → {_esc(short_id)}"
         suffix = f" ({', '.join(details)})" if details else ""
-        parts.append(
-            f'<div class="chain">{_esc(ref)}{suffix}{document_ref}</div>'
-        )
+        parts.append(f'<div class="chain">{_esc(ref)}{suffix}{document_ref}</div>')
     parts.append("</div>")
     return "\n".join(parts)
 
