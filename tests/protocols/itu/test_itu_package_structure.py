@@ -13,6 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from cpg_tree.knowledge import ProtocolVersion, dump_package, load_package
+from cpg_tree.knowledge.conditions import Condition, LogicalOperand
 from cpg_tree.knowledge.enums import ActionType, ConditionKind, DerivationState
 from cpg_tree.protocols.itu_v06 import (
     DOCUMENT_ID,
@@ -205,8 +206,10 @@ def test_pediatric_hospitalization_criterion_is_evidence_only() -> None:
     assert "rule_hosp_criterio_pediatrica" not in package.rules
     hospitalizacion = package.rules["rule_hospitalizacion"]
     assert len(hospitalizacion.condition.operands) == HOSPITALIZACION_CRITERIOS_ADULTOS
-    assert all("poblacion_pediatrica" not in _condition_refs(op) for op in
-               hospitalizacion.condition.operands)
+    assert all(
+        "poblacion_pediatrica" not in _condition_refs(op)
+        for op in hospitalizacion.condition.operands
+    )
 
 
 def test_no_prostatitis_education_action_exists() -> None:
@@ -291,7 +294,8 @@ def test_derivations_are_source_stated_or_normalized() -> None:
         assert action.provenance is not None
         assert action.provenance.derivation in allowed
     for normalized in (
-        rule.provenance for rule in package.rules.values()
+        rule.provenance
+        for rule in package.rules.values()
         if rule.provenance.derivation is DerivationState.NORMALIZED
     ):
         assert normalized.notes
@@ -325,9 +329,15 @@ def test_strict_and_inclusive_thresholds_are_exact() -> None:
     assert sato2[0].operator.value == "GT" and sato2[0].operand == UMBRAL_SATO2_EGRESO
     assert sato2[1].operator.value == "GT" and sato2[1].operand == UMBRAL_PAO2_EGRESO
     assert package.rules["rule_piuria_mayor_10"].condition.operator.value == "GT"
-    assert package.rules["rule_urocultivo_positivo_1e5"].condition.operands[0].operator.value == "GE"
-    assert package.rules["rule_urocultivo_positivo_1e3"].condition.operands[0].operator.value == "GE"
-    assert package.rules["rule_urocultivo_positivo_1e2"].condition.operands[0].operator.value == "GE"
+    assert (
+        package.rules["rule_urocultivo_positivo_1e5"].condition.operands[0].operator.value == "GE"
+    )
+    assert (
+        package.rules["rule_urocultivo_positivo_1e3"].condition.operands[0].operator.value == "GE"
+    )
+    assert (
+        package.rules["rule_urocultivo_positivo_1e2"].condition.operands[0].operator.value == "GE"
+    )
 
 
 def test_temporal_conditions_use_hours_duration() -> None:
@@ -372,8 +382,8 @@ def test_first_trimester_restriction_is_not_medication_specific() -> None:
         assert "evitar_primer_trimestre" not in payload
 
 
-def _condition_refs(operand: object) -> set[str]:
-    if hasattr(operand, "variable_ref"):
+def _condition_refs(operand: LogicalOperand) -> set[str]:
+    if isinstance(operand, Condition):
         return {operand.variable_ref}
     refs: set[str] = set()
     for child in operand.operands:

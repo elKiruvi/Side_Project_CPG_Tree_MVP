@@ -59,9 +59,7 @@ from cpg_tree.knowledge.types import Scalar
 
 DOCUMENT_ID = "doc-800af94bc0654138"
 SHA256 = "800af94bc0654138a8e213cd1e42ad2e6021a955226a142b36c5b3f24e24777a"
-SOURCE_FILENAME = (
-    "CT-PL-197 PROTOCOLO INFECCION TRACTO URINARIO -ITU ADULTOS (v6-sep-2025).pdf"
-)
+SOURCE_FILENAME = "CT-PL-197 PROTOCOLO INFECCION TRACTO URINARIO -ITU ADULTOS (v6-sep-2025).pdf"
 SOURCE_BYTE_SIZE = 272638
 
 T = TruthValue.TRUE
@@ -180,7 +178,9 @@ def _action(
     label: str | None = None,
     payload: dict[str, Scalar] | None = None,
 ) -> Action:
-    return Action(id=action_id, type=action_type, label=label, payload=payload, provenance=provenance)
+    return Action(
+        id=action_id, type=action_type, label=label, payload=payload, provenance=provenance
+    )
 
 
 def _rule(  # noqa: PLR0913
@@ -347,8 +347,7 @@ def _build_fragments() -> dict[str, SourceFragment]:
             "frag_p2_no_sintomas_itu",
             2,
             None,
-            "No se consideran síntomas compatibles con ITU la orina turb ia o de "
-            "mal olor.",
+            "No se consideran síntomas compatibles con ITU la orina turb ia o de mal olor.",
         ),
         "frag_p2_embarazada_debe_tratarse": _fragment(
             "frag_p2_embarazada_debe_tratarse",
@@ -422,8 +421,7 @@ def _build_fragments() -> dict[str, SourceFragment]:
             "frag_p3_toma_muestra_antibiotico",
             3,
             "5. Diagnóstico",
-            "Toma de la muestra: debe tomarse antes de la primera dosis de "
-            "antibiótico",
+            "Toma de la muestra: debe tomarse antes de la primera dosis de antibiótico",
         ),
         "frag_p3_analisis_sangre": _fragment(
             "frag_p3_analisis_sangre",
@@ -567,12 +565,8 @@ def _build_fragments() -> dict[str, SourceFragment]:
             "6. TRATAMIENTO",
             "TAS > 90 mmHg",
         ),
-        "frag_p4_egreso_fc": _fragment(
-            "frag_p4_egreso_fc", 4, "6. TRATAMIENTO", "FC < 100 lpm"
-        ),
-        "frag_p4_egreso_fr": _fragment(
-            "frag_p4_egreso_fr", 4, "6. TRATAMIENTO", "FR < 24 rpm"
-        ),
+        "frag_p4_egreso_fc": _fragment("frag_p4_egreso_fc", 4, "6. TRATAMIENTO", "FC < 100 lpm"),
+        "frag_p4_egreso_fr": _fragment("frag_p4_egreso_fr", 4, "6. TRATAMIENTO", "FR < 24 rpm"),
         "frag_p4_egreso_sato2_pao2": _fragment(
             "frag_p4_egreso_sato2_pao2", 4, "6. TRATAMIENTO", "Sat O2 > 90% o PaO2 > 60"
         ),
@@ -613,8 +607,7 @@ def _build_fragments() -> dict[str, SourceFragment]:
             "frag_p4_t1_dosis_baja_ba",
             4,
             "6. TRATAMIENTO",
-            "100 mg VO cada 6 horas 500 mg VO cada 6 horas 3 g VO 5 días 5 días "
-            "Dosis única",
+            "100 mg VO cada 6 horas 500 mg VO cada 6 horas 3 g VO 5 días 5 días Dosis única",
         ),
         "frag_p4_t1_ambulatoria": _fragment(
             "frag_p4_t1_ambulatoria",
@@ -766,8 +759,7 @@ def _build_fragments() -> dict[str, SourceFragment]:
             "frag_p5_t2_nota2",
             5,
             "Tabla 2. Consideraciones manejo de la ITU en la paciente gestante",
-            "2La decisión se toma con base en los cultivos y pruebas de "
-            "sensibilidad",
+            "2La decisión se toma con base en los cultivos y pruebas de sensibilidad",
         ),
         "frag_p5_t2_nota3": _fragment(
             "frag_p5_t2_nota3",
@@ -849,7 +841,9 @@ def _build_variables() -> dict[str, Variable]:
             "signos_sintomas_itu (las pruebas nunca afirman ambos a la vez).",
         ),
         "mujer_no_embarazada": _variable(
-            "mujer_no_embarazada", "Mujer no embarazada", VariableType.BOOLEAN,
+            "mujer_no_embarazada",
+            "Mujer no embarazada",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_ba_cultivos",)),
         ),
         "urocultivos_2_mismo_patron": _variable(
@@ -859,12 +853,13 @@ def _build_variables() -> dict[str, Variable]:
             _prov(
                 n,
                 ("frag_p1_def_ba_cultivos",),
-                notes="Colapsa '2 urocultivos con el mismo patógeno y perfil de "
-                "sensibilidad'.",
+                notes="Colapsa '2 urocultivos con el mismo patógeno y perfil de sensibilidad'.",
             ),
         ),
         "hombre": _variable(
-            "hombre", "Hombre", VariableType.BOOLEAN,
+            "hombre",
+            "Hombre",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_ba_cultivos",)),
         ),
         "urocultivo_unico": _variable(
@@ -884,7 +879,9 @@ def _build_variables() -> dict[str, Variable]:
             _prov(s, ("frag_p1_def_ba_piuria",)),
         ),
         "poblacion_pediatrica": _variable(
-            "poblacion_pediatrica", "Población pediátrica", VariableType.BOOLEAN,
+            "poblacion_pediatrica",
+            "Población pediátrica",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_ba_piuria",)),
         ),
         "signos_sintomas_itu": _variable(
@@ -917,23 +914,32 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "sin_leucorrea": _variable(
-            "sin_leucorrea", "Ausencia de leucorrea", VariableType.BOOLEAN,
+            "sin_leucorrea",
+            "Ausencia de leucorrea",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_bajo",)),
         ),
         "sin_irritacion_vaginal": _variable(
-            "sin_irritacion_vaginal", "Ausencia de irritación vaginal",
-            VariableType.BOOLEAN, _prov(s, ("frag_p1_def_itu_bajo",)),
+            "sin_irritacion_vaginal",
+            "Ausencia de irritación vaginal",
+            VariableType.BOOLEAN,
+            _prov(s, ("frag_p1_def_itu_bajo",)),
         ),
         "sin_fiebre": _variable(
-            "sin_fiebre", "Ausencia de fiebre", VariableType.BOOLEAN,
+            "sin_fiebre",
+            "Ausencia de fiebre",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_bajo",)),
         ),
         "sin_dolor_lumbar": _variable(
-            "sin_dolor_lumbar", "Ausencia de dolor lumbar", VariableType.BOOLEAN,
+            "sin_dolor_lumbar",
+            "Ausencia de dolor lumbar",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_bajo",)),
         ),
         "sin_compromiso_sistemico": _variable(
-            "sin_compromiso_sistemico", "Ausencia de compromiso sistémico",
+            "sin_compromiso_sistemico",
+            "Ausencia de compromiso sistémico",
             VariableType.BOOLEAN,
             _prov(
                 n,
@@ -942,50 +948,70 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "infeccion_aguda_rinon": _variable(
-            "infeccion_aguda_rinon", "Infección aguda del riñón", VariableType.BOOLEAN,
+            "infeccion_aguda_rinon",
+            "Infección aguda del riñón",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_alto",)),
         ),
         "pielonefritis": _variable(
-            "pielonefritis", "Pielonefritis", VariableType.BOOLEAN,
+            "pielonefritis",
+            "Pielonefritis",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_alto", "frag_p1_def_itu_complicada_clinica")),
         ),
         "itu_febril_bacteriemica": _variable(
-            "itu_febril_bacteriemica", "ITU febril o bacteriémica", VariableType.BOOLEAN,
+            "itu_febril_bacteriemica",
+            "ITU febril o bacteriémica",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_complicada_clinica",)),
         ),
         "itu_asociada_cateter": _variable(
-            "itu_asociada_cateter", "ITU asociada a catéter", VariableType.BOOLEAN,
+            "itu_asociada_cateter",
+            "ITU asociada a catéter",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_complicada_clinica",)),
         ),
         "gestante": _variable(
-            "gestante", "Mujer embarazada (gestante)", VariableType.BOOLEAN,
+            "gestante",
+            "Mujer embarazada (gestante)",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_tto_ba_gestante", "frag_p2_embarazada_debe_tratarse")),
         ),
         # --- Diagnosis (15) ---
         "en_urgencias": _variable(
-            "en_urgencias", "Paciente en el servicio de urgencias", VariableType.BOOLEAN,
+            "en_urgencias",
+            "Paciente en el servicio de urgencias",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_citoquimico",)),
         ),
         "sospecha_itu": _variable(
-            "sospecha_itu", "Sospecha de ITU", VariableType.BOOLEAN,
+            "sospecha_itu",
+            "Sospecha de ITU",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_citoquimico",)),
-            description="Sospecha clínica; distinta de infeccion_urinaria (condición "
-            "establecida).",
+            description="Sospecha clínica; distinta de infeccion_urinaria (condición establecida).",
         ),
         "primer_episodio": _variable(
-            "primer_episodio", "Primer episodio", VariableType.BOOLEAN,
+            "primer_episodio",
+            "Primer episodio",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_citoquimico",)),
         ),
         "sintomas_tipicos": _variable(
-            "sintomas_tipicos", "Síntomas típicos", VariableType.BOOLEAN,
+            "sintomas_tipicos",
+            "Síntomas típicos",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_citoquimico",)),
         ),
         "mujer": _variable(
-            "mujer", "Mujer", VariableType.BOOLEAN,
+            "mujer",
+            "Mujer",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_citoquimico",)),
         ),
         "tirilla_normal": _variable(
-            "tirilla_normal", "Resultado normal de la tirilla de orina",
+            "tirilla_normal",
+            "Resultado normal de la tirilla de orina",
             VariableType.BOOLEAN,
             _prov(
                 n,
@@ -994,11 +1020,14 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "sospecha_clinica_baja": _variable(
-            "sospecha_clinica_baja", "Baja sospecha clínica", VariableType.BOOLEAN,
+            "sospecha_clinica_baja",
+            "Baja sospecha clínica",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p2_tirilla_descarta",)),
         ),
         "leucocitos_orina_campo": _variable(
-            "leucocitos_orina_campo", "Leucocitos en orina por campo",
+            "leucocitos_orina_campo",
+            "Leucocitos en orina por campo",
             VariableType.NUMERIC,
             _prov(
                 n,
@@ -1007,12 +1036,15 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "sonda_recien_insertada": _variable(
-            "sonda_recien_insertada", "Muestra a través de sonda vesical recién insertada",
+            "sonda_recien_insertada",
+            "Muestra a través de sonda vesical recién insertada",
             VariableType.BOOLEAN,
             _prov(s, ("frag_p3_urocultivo_positivo_1e2",)),
         ),
         "urocultivo_cfu_ml": _variable(
-            "urocultivo_cfu_ml", "Recuento de UFC del urocultivo", VariableType.NUMERIC,
+            "urocultivo_cfu_ml",
+            "Recuento de UFC del urocultivo",
+            VariableType.NUMERIC,
             _prov(
                 n,
                 (
@@ -1038,11 +1070,15 @@ def _build_variables() -> dict[str, Variable]:
             _prov(s, ("frag_p3_urocultivo_positivo_1e3",)),
         ),
         "itu_baja_no_complicada": _variable(
-            "itu_baja_no_complicada", "ITU baja no complicada", VariableType.BOOLEAN,
+            "itu_baja_no_complicada",
+            "ITU baja no complicada",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_urocultivo_indicacion",)),
         ),
         "premenopausica": _variable(
-            "premenopausica", "Mujer premenopáusica", VariableType.BOOLEAN,
+            "premenopausica",
+            "Mujer premenopáusica",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_urocultivo_indicacion",)),
         ),
         "infeccion_urinaria": _variable(
@@ -1060,11 +1096,15 @@ def _build_variables() -> dict[str, Variable]:
         ),
         # --- Treatment / population (27) ---
         "itu_alta": _variable(
-            "itu_alta", "ITU alta", VariableType.BOOLEAN,
+            "itu_alta",
+            "ITU alta",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_alto", "frag_p3_hosp_itu_alta")),
         ),
         "itu_baja": _variable(
-            "itu_baja", "ITU baja", VariableType.BOOLEAN,
+            "itu_baja",
+            "ITU baja",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p1_def_itu_bajo", "frag_p4_t1_itu_baja")),
         ),
         "procedimiento_invasivo_vias_urinarias": _variable(
@@ -1082,7 +1122,9 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "choque_septico": _variable(
-            "choque_septico", "Choque séptico", VariableType.BOOLEAN,
+            "choque_septico",
+            "Choque séptico",
+            VariableType.BOOLEAN,
             _prov(
                 s,
                 (
@@ -1093,7 +1135,9 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "intolerancia_via_oral": _variable(
-            "intolerancia_via_oral", "Intolerancia a la vía oral", VariableType.BOOLEAN,
+            "intolerancia_via_oral",
+            "Intolerancia a la vía oral",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_hosp_intolerancia",)),
         ),
         "descompensacion_enfermedad_base": _variable(
@@ -1104,8 +1148,7 @@ def _build_variables() -> dict[str, Variable]:
         ),
         "germen_resistente_sin_opcion_ambulatoria": _variable(
             "germen_resistente_sin_opcion_ambulatoria",
-            "Demostración de germen resistente sin opción de tratamiento antibiótico "
-            "ambulatorio",
+            "Demostración de germen resistente sin opción de tratamiento antibiótico ambulatorio",
             VariableType.BOOLEAN,
             _prov(
                 n,
@@ -1120,7 +1163,9 @@ def _build_variables() -> dict[str, Variable]:
             _prov(s, ("frag_p3_hosp_funcion_renal",)),
         ),
         "absceso_renal_pararrenal": _variable(
-            "absceso_renal_pararrenal", "Absceso renal/pararrenal", VariableType.BOOLEAN,
+            "absceso_renal_pararrenal",
+            "Absceso renal/pararrenal",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_hosp_absceso",)),
         ),
         "soporte_social_inadecuado": _variable(
@@ -1134,7 +1179,9 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "hospitalizado": _variable(
-            "hospitalizado", "Paciente hospitalizado", VariableType.BOOLEAN,
+            "hospitalizado",
+            "Paciente hospitalizado",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_analisis_sangre",)),
             description="Paciente hospitalizado al momento de la evaluación.",
         ),
@@ -1154,28 +1201,40 @@ def _build_variables() -> dict[str, Variable]:
             description="Entrada histórica externa; el motor no computa la ventana.",
         ),
         "colonizacion_blee": _variable(
-            "colonizacion_blee", "Colonización por germen BLEE", VariableType.BOOLEAN,
+            "colonizacion_blee",
+            "Colonización por germen BLEE",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p4_t1_nota_fr",)),
         ),
         "itu_recurrente": _variable(
-            "itu_recurrente", "ITU recurrente", VariableType.BOOLEAN,
+            "itu_recurrente",
+            "ITU recurrente",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p4_t1_nota_fosfomicina", "frag_p5_t2_nota3")),
             description="Entrada histórica externa; el motor no computa la recurrencia.",
         ),
         "fiebre": _variable(
-            "fiebre", "Fiebre", VariableType.BOOLEAN,
+            "fiebre",
+            "Fiebre",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_hemocultivos",)),
         ),
         "hipotermia": _variable(
-            "hipotermia", "Hipotermia", VariableType.BOOLEAN,
+            "hipotermia",
+            "Hipotermia",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_hemocultivos",)),
         ),
         "falla_renal_aguda": _variable(
-            "falla_renal_aguda", "Falla renal aguda", VariableType.BOOLEAN,
+            "falla_renal_aguda",
+            "Falla renal aguda",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_imagen_urgente",)),
         ),
         "complicacion_local": _variable(
-            "complicacion_local", "Clínica de complicación local", VariableType.BOOLEAN,
+            "complicacion_local",
+            "Clínica de complicación local",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_imagen_urgente",)),
         ),
         "tratamiento_antibiotico_correcto": _variable(
@@ -1197,11 +1256,15 @@ def _build_variables() -> dict[str, Variable]:
             allowed_values=("estructural", "funcional"),
         ),
         "hematuria": _variable(
-            "hematuria", "Hematuria", VariableType.BOOLEAN,
+            "hematuria",
+            "Hematuria",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_imagen_gestante",)),
         ),
         "dolor": _variable(
-            "dolor", "Dolor", VariableType.BOOLEAN,
+            "dolor",
+            "Dolor",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_imagen_gestante",)),
         ),
         "mas_de_un_episodio_itu": _variable(
@@ -1216,7 +1279,9 @@ def _build_variables() -> dict[str, Variable]:
             description="Entrada histórica externa; el motor no cuenta episodios.",
         ),
         "recurrencia_itu": _variable(
-            "recurrencia_itu", "Recurrencia de la infección", VariableType.BOOLEAN,
+            "recurrencia_itu",
+            "Recurrencia de la infección",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p4_t2_itu_baja_row",)),
             description="Entrada histórica externa; el motor no computa la recurrencia.",
         ),
@@ -1231,13 +1296,17 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "sospecha_litiasis": _variable(
-            "sospecha_litiasis", "Sospecha de litiasis", VariableType.BOOLEAN,
+            "sospecha_litiasis",
+            "Sospecha de litiasis",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p3_imagen_gestante",)),
             description="Entrada clínica externa; no derivada de hematuria/dolor.",
         ),
         # --- Discharge (10) ---
         "afebril_horas": _variable(
-            "afebril_horas", "Horas afebril", VariableType.DURATION,
+            "afebril_horas",
+            "Horas afebril",
+            VariableType.DURATION,
             _prov(
                 n,
                 ("frag_p3_egreso_afebril",),
@@ -1246,7 +1315,9 @@ def _build_variables() -> dict[str, Variable]:
             unit="hours",
         ),
         "tas": _variable(
-            "tas", "Presión arterial sistólica", VariableType.NUMERIC,
+            "tas",
+            "Presión arterial sistólica",
+            VariableType.NUMERIC,
             _prov(
                 n,
                 ("frag_p3_egreso_tas",),
@@ -1255,22 +1326,30 @@ def _build_variables() -> dict[str, Variable]:
             unit="mmHg",
         ),
         "fc": _variable(
-            "fc", "Frecuencia cardiaca", VariableType.NUMERIC,
+            "fc",
+            "Frecuencia cardiaca",
+            VariableType.NUMERIC,
             _prov(s, ("frag_p4_egreso_fc",)),
             unit="lpm",
         ),
         "fr": _variable(
-            "fr", "Frecuencia respiratoria", VariableType.NUMERIC,
+            "fr",
+            "Frecuencia respiratoria",
+            VariableType.NUMERIC,
             _prov(s, ("frag_p4_egreso_fr",)),
             unit="rpm",
         ),
         "sato2": _variable(
-            "sato2", "Saturación de oxígeno", VariableType.NUMERIC,
+            "sato2",
+            "Saturación de oxígeno",
+            VariableType.NUMERIC,
             _prov(n, ("frag_p4_egreso_sato2_pao2",), notes="'Sat O2'; umbral '> 90%'."),
             unit="%",
         ),
         "pao2": _variable(
-            "pao2", "PaO2", VariableType.NUMERIC,
+            "pao2",
+            "PaO2",
+            VariableType.NUMERIC,
             _prov(
                 n,
                 ("frag_p4_egreso_sato2_pao2",),
@@ -1278,12 +1357,16 @@ def _build_variables() -> dict[str, Variable]:
             ),
         ),
         "tolera_via_oral": _variable(
-            "tolera_via_oral", "Tolerancia a la vía oral", VariableType.BOOLEAN,
+            "tolera_via_oral",
+            "Tolerancia a la vía oral",
+            VariableType.BOOLEAN,
             _prov(s, ("frag_p4_egreso_via_oral",)),
         ),
         "comorbilidades_compensadas": _variable(
-            "comorbilidades_compensadas", "Comorbilidades compensadas",
-            VariableType.BOOLEAN, _prov(s, ("frag_p4_egreso_comorbilidades",)),
+            "comorbilidades_compensadas",
+            "Comorbilidades compensadas",
+            VariableType.BOOLEAN,
+            _prov(s, ("frag_p4_egreso_comorbilidades",)),
         ),
         "tratamiento_ambulatorio_asegurado": _variable(
             "tratamiento_ambulatorio_asegurado",
@@ -1307,7 +1390,9 @@ def _build_variables() -> dict[str, Variable]:
         ),
         # --- Temporal (2) ---
         "fiebre_horas": _variable(
-            "fiebre_horas", "Horas de fiebre persistente", VariableType.DURATION,
+            "fiebre_horas",
+            "Horas de fiebre persistente",
+            VariableType.DURATION,
             _prov(
                 n,
                 ("frag_p3_imagen_urgente",),
@@ -1323,8 +1408,7 @@ def _build_variables() -> dict[str, Variable]:
             _prov(
                 n,
                 ("frag_p4_t1_reevaluar",),
-                notes="Tiempo desde el inicio de la terapia para la reevaluación a las "
-                "48 horas.",
+                notes="Tiempo desde el inicio de la terapia para la reevaluación a las 48 horas.",
             ),
             unit="hours",
         ),
@@ -1412,8 +1496,7 @@ def _build_actions() -> dict[str, Action]:
             "act_gram_orina", ActionType.REQUEST_TEST, _prov(s, ("frag_p3_gram",))
         ),
         "act_urocultivo": _action(
-            "act_urocultivo", ActionType.REQUEST_TEST,
-            _prov(s, ("frag_p3_urocultivo_indicacion",))
+            "act_urocultivo", ActionType.REQUEST_TEST, _prov(s, ("frag_p3_urocultivo_indicacion",))
         ),
         "act_urocultivo_control": _action(
             "act_urocultivo_control",
@@ -1447,12 +1530,12 @@ def _build_actions() -> dict[str, Action]:
             _prov(s, ("frag_p3_imagen_urgente",)),
         ),
         "act_tc_contraste": _action(
-            "act_tc_contraste", ActionType.REQUEST_TEST,
-            _prov(s, ("frag_p3_imagen_tc_abscesos",))
+            "act_tc_contraste", ActionType.REQUEST_TEST, _prov(s, ("frag_p3_imagen_tc_abscesos",))
         ),
         "act_urotomografia": _action(
-            "act_urotomografia", ActionType.REQUEST_TEST,
-            _prov(s, ("frag_p3_imagen_urotomografia",))
+            "act_urotomografia",
+            ActionType.REQUEST_TEST,
+            _prov(s, ("frag_p3_imagen_urotomografia",)),
         ),
         "act_ecografia_vias_urinarias": _action(
             "act_ecografia_vias_urinarias",
@@ -1460,8 +1543,7 @@ def _build_actions() -> dict[str, Action]:
             _prov(s, ("frag_p3_imagen_ecografia",)),
         ),
         "act_ecografia_renal": _action(
-            "act_ecografia_renal", ActionType.REQUEST_TEST,
-            _prov(s, ("frag_p3_imagen_gestante",))
+            "act_ecografia_renal", ActionType.REQUEST_TEST, _prov(s, ("frag_p3_imagen_gestante",))
         ),
         # --- ADMIT (1) ---
         "act_hospitalizar": _action(
@@ -1508,165 +1590,307 @@ def _build_actions() -> dict[str, Action]:
         "act_t1_nitrofurantoina": _action(
             "act_t1_nitrofurantoina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
-                notes=prescribe_note),
-            payload={"medicamento": "Nitrofurantoína", "dosis": "100 mg", "via": "VO",
-                     "frecuencia": "cada 6 horas", "duracion": "5 días"},
+            _prov(
+                n,
+                ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Nitrofurantoína",
+                "dosis": "100 mg",
+                "via": "VO",
+                "frecuencia": "cada 6 horas",
+                "duracion": "5 días",
+            },
         ),
         "act_t1_cefalexina": _action(
             "act_t1_cefalexina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
-                notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg", "via": "VO",
-                     "frecuencia": "cada 6 horas", "duracion": "5 días"},
+            _prov(
+                n,
+                ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "via": "VO",
+                "frecuencia": "cada 6 horas",
+                "duracion": "5 días",
+            },
         ),
         "act_t1_fosfomicina": _action(
             "act_t1_fosfomicina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
-                notes=prescribe_note),
-            payload={"medicamento": "Fosfomicina", "dosis": "3 g", "via": "VO",
-                     "duracion": "Dosis única"},
+            _prov(
+                n,
+                ("frag_p4_t1_itu_baja_antibioticos", "frag_p4_t1_dosis_baja_ba"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Fosfomicina",
+                "dosis": "3 g",
+                "via": "VO",
+                "duracion": "Dosis única",
+            },
         ),
         "act_t1_ba_nitrofurantoina": _action(
             "act_t1_ba_nitrofurantoina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_ba_row", "frag_p4_t1_itu_baja_antibioticos",
-                      "frag_p4_t1_dosis_baja_ba"), notes=prescribe_note),
-            payload={"medicamento": "Nitrofurantoína", "dosis": "100 mg", "via": "VO",
-                     "frecuencia": "cada 6 horas", "duracion": "5 días"},
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_ba_row",
+                    "frag_p4_t1_itu_baja_antibioticos",
+                    "frag_p4_t1_dosis_baja_ba",
+                ),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Nitrofurantoína",
+                "dosis": "100 mg",
+                "via": "VO",
+                "frecuencia": "cada 6 horas",
+                "duracion": "5 días",
+            },
         ),
         "act_t1_ba_cefalexina": _action(
             "act_t1_ba_cefalexina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_ba_row", "frag_p4_t1_itu_baja_antibioticos",
-                      "frag_p4_t1_dosis_baja_ba"), notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg", "via": "VO",
-                     "frecuencia": "cada 6 horas", "duracion": "5 días"},
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_ba_row",
+                    "frag_p4_t1_itu_baja_antibioticos",
+                    "frag_p4_t1_dosis_baja_ba",
+                ),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "via": "VO",
+                "frecuencia": "cada 6 horas",
+                "duracion": "5 días",
+            },
         ),
         "act_t1_ba_fosfomicina": _action(
             "act_t1_ba_fosfomicina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_ba_row", "frag_p4_t1_itu_baja_antibioticos",
-                      "frag_p4_t1_dosis_baja_ba"), notes=prescribe_note),
-            payload={"medicamento": "Fosfomicina", "dosis": "3 g", "via": "VO",
-                     "duracion": "Dosis única"},
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_ba_row",
+                    "frag_p4_t1_itu_baja_antibioticos",
+                    "frag_p4_t1_dosis_baja_ba",
+                ),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Fosfomicina",
+                "dosis": "3 g",
+                "via": "VO",
+                "duracion": "Dosis única",
+            },
         ),
         "act_cefalexina_alta_amb": _action(
             "act_cefalexina_alta_amb",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_ambulatoria", "frag_p4_t1_ambulatoria_dosis"),
-                notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg", "via": "VO",
-                     "frecuencia": "cada 6 horas", "duracion": "5-7 días"},
+            _prov(
+                n, ("frag_p4_t1_ambulatoria", "frag_p4_t1_ambulatoria_dosis"), notes=prescribe_note
+            ),
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "via": "VO",
+                "frecuencia": "cada 6 horas",
+                "duracion": "5-7 días",
+            },
         ),
         "act_cefazolina": _action(
             "act_cefazolina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_sin_fr_drogas", "frag_p4_t1_sin_fr_dosis",
-                      "frag_p5_t2_itu_alta_row"), notes=prescribe_note),
-            payload={"medicamento": "Cefazolina", "dosis": "1 g", "via": "IV",
-                     "frecuencia": "cada 8 horas", "duracion": "7 días"},
+            _prov(
+                n,
+                ("frag_p4_t1_sin_fr_drogas", "frag_p4_t1_sin_fr_dosis", "frag_p5_t2_itu_alta_row"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Cefazolina",
+                "dosis": "1 g",
+                "via": "IV",
+                "frecuencia": "cada 8 horas",
+                "duracion": "7 días",
+            },
         ),
         "act_amikacina": _action(
             "act_amikacina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_sin_fr_dosis", "frag_p4_t1_con_fr_dosis",
-                      "frag_p4_t1_nota_amikacina"), notes=prescribe_note),
-            payload={"medicamento": "Amikacina", "dosis": "15 mg/kg", "via": "IV",
-                     "frecuencia": "cada día", "duracion": "7 días"},
+            _prov(
+                n,
+                ("frag_p4_t1_sin_fr_dosis", "frag_p4_t1_con_fr_dosis", "frag_p4_t1_nota_amikacina"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Amikacina",
+                "dosis": "15 mg/kg",
+                "via": "IV",
+                "frecuencia": "cada día",
+                "duracion": "7 días",
+            },
         ),
         "act_piperacilina_tazobactam": _action(
             "act_piperacilina_tazobactam",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_con_fr_drogas", "frag_p4_t1_con_fr_dosis",
-                      "frag_p5_t2_itu_alta_row"), notes=prescribe_note),
-            payload={"medicamento": "Piperacilina tazobactam", "dosis": "4.5 g",
-                     "via": "IV", "frecuencia": "cada 8 horas", "duracion": "7 días"},
+            _prov(
+                n,
+                ("frag_p4_t1_con_fr_drogas", "frag_p4_t1_con_fr_dosis", "frag_p5_t2_itu_alta_row"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Piperacilina tazobactam",
+                "dosis": "4.5 g",
+                "via": "IV",
+                "frecuencia": "cada 8 horas",
+                "duracion": "7 días",
+            },
         ),
         "act_meropenem": _action(
             "act_meropenem",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t1_con_fr_drogas", "frag_p4_t1_con_fr_dosis",
-                      "frag_p4_t1_nota_meropenem", "frag_p5_t2_itu_alta_row"),
-                notes=prescribe_note),
-            payload={"medicamento": "Meropenem", "dosis": "1 g", "via": "IV",
-                     "frecuencia": "cada 8 horas", "duracion": "7 días"},
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_con_fr_drogas",
+                    "frag_p4_t1_con_fr_dosis",
+                    "frag_p4_t1_nota_meropenem",
+                    "frag_p5_t2_itu_alta_row",
+                ),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Meropenem",
+                "dosis": "1 g",
+                "via": "IV",
+                "frecuencia": "cada 8 horas",
+                "duracion": "7 días",
+            },
         ),
         "act_t2_ba_nitrofurantoina": _action(
             "act_t2_ba_nitrofurantoina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_ba_row",), notes=prescribe_note),
-            payload={"medicamento": "Nitrofurantoína", "dosis": "100 mg",
-                     "frecuencia": "cada 6 h", "duracion": "5 días"},
+            payload={
+                "medicamento": "Nitrofurantoína",
+                "dosis": "100 mg",
+                "frecuencia": "cada 6 h",
+                "duracion": "5 días",
+            },
         ),
         "act_t2_ba_cefalexina": _action(
             "act_t2_ba_cefalexina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_ba_row",), notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg",
-                     "frecuencia": "cada 6 h", "duracion": "5 días"},
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "frecuencia": "cada 6 h",
+                "duracion": "5 días",
+            },
         ),
         "act_t2_ba_fosfomicina": _action(
             "act_t2_ba_fosfomicina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_ba_row",), notes=prescribe_note),
-            payload={"medicamento": "Fosfomicina", "dosis": "3 g",
-                     "duracion": "Dosis única"},
+            payload={"medicamento": "Fosfomicina", "dosis": "3 g", "duracion": "Dosis única"},
         ),
         "act_t2_baja_nitrofurantoina": _action(
             "act_t2_baja_nitrofurantoina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_itu_baja_row",), notes=prescribe_note),
-            payload={"medicamento": "Nitrofurantoína", "dosis": "100 mg",
-                     "frecuencia": "cada 6 h", "duracion": "5 días"},
+            payload={
+                "medicamento": "Nitrofurantoína",
+                "dosis": "100 mg",
+                "frecuencia": "cada 6 h",
+                "duracion": "5 días",
+            },
         ),
         "act_t2_baja_cefalexina": _action(
             "act_t2_baja_cefalexina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_itu_baja_row",), notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg",
-                     "frecuencia": "cada 6 h", "duracion": "5 días"},
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "frecuencia": "cada 6 h",
+                "duracion": "5 días",
+            },
         ),
         "act_t2_baja_fosfomicina": _action(
             "act_t2_baja_fosfomicina",
             ActionType.PRESCRIBE,
             _prov(n, ("frag_p4_t2_itu_baja_row",), notes=prescribe_note),
-            payload={"medicamento": "Fosfomicina", "dosis": "3 g",
-                     "duracion": "Dosis única"},
+            payload={"medicamento": "Fosfomicina", "dosis": "3 g", "duracion": "Dosis única"},
         ),
         "act_preventiva_nitrofurantoina": _action(
             "act_preventiva_nitrofurantoina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta",
-                      "frag_p5_t2_nota4"), notes=prescribe_note),
-            payload={"medicamento": "Nitrofurantoína", "dosis": "100 mg",
-                     "frecuencia": "cada día", "duracion": "hasta semana 34 gestación"},
+            _prov(
+                n,
+                ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta", "frag_p5_t2_nota4"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Nitrofurantoína",
+                "dosis": "100 mg",
+                "frecuencia": "cada día",
+                "duracion": "hasta semana 34 gestación",
+            },
         ),
         "act_preventiva_cefalexina": _action(
             "act_preventiva_cefalexina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta",
-                      "frag_p5_t2_nota4"), notes=prescribe_note),
-            payload={"medicamento": "Cefalexina", "dosis": "500 mg",
-                     "frecuencia": "cada día", "duracion": "hasta semana 34 gestación"},
+            _prov(
+                n,
+                ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta", "frag_p5_t2_nota4"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Cefalexina",
+                "dosis": "500 mg",
+                "frecuencia": "cada día",
+                "duracion": "hasta semana 34 gestación",
+            },
         ),
         "act_preventiva_tmpsmx": _action(
             "act_preventiva_tmpsmx",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta",
-                      "frag_p5_t2_nota4"), notes=prescribe_note),
-            payload={"medicamento": "TMP-SMX", "dosis": "480 mg",
-                     "frecuencia": "cada día", "duracion": "hasta semana 34 gestación"},
+            _prov(
+                n,
+                ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta", "frag_p5_t2_nota4"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "TMP-SMX",
+                "dosis": "480 mg",
+                "frecuencia": "cada día",
+                "duracion": "hasta semana 34 gestación",
+            },
         ),
         "act_preventiva_fosfomicina": _action(
             "act_preventiva_fosfomicina",
             ActionType.PRESCRIBE,
-            _prov(n, ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta",
-                      "frag_p5_t2_nota4"), notes=prescribe_note),
-            payload={"medicamento": "Fosfomicina", "dosis": "3 g",
-                     "frecuencia": "cada semana", "duracion": "hasta semana 34 gestación"},
+            _prov(
+                n,
+                ("frag_p4_t2_preventiva_baja", "frag_p5_t2_preventiva_alta", "frag_p5_t2_nota4"),
+                notes=prescribe_note,
+            ),
+            payload={
+                "medicamento": "Fosfomicina",
+                "dosis": "3 g",
+                "frecuencia": "cada semana",
+                "duracion": "hasta semana 34 gestación",
+            },
         ),
         # --- RESTRICTION (1) ---
         "act_restriccion_muestra_previa": _action(
@@ -1727,10 +1951,13 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
         "rule_def_ba": _rule(
             "rule_def_ba",
             _and(_flag("bacteriuria_significativa"), _flag("sin_signos_sintomas_itu")),
-            _prov(n, ("frag_p1_def_ba",),
+            _prov(
+                n,
+                ("frag_p1_def_ba",),
                 notes="Componente 1 de la definición de BA: bacteriuria significativa "
                 "sin signos ni síntomas atribuibles a ITU; ver rule_def_ba_cultivos y "
-                "rule_def_ba_piuria_pediatrica."),
+                "rule_def_ba_piuria_pediatrica.",
+            ),
         ),
         "rule_def_ba_cultivos": _rule(
             "rule_def_ba_cultivos",
@@ -1739,23 +1966,32 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _and(_flag("hombre"), _flag("urocultivo_unico")),
                 _and(_flag("gestante"), _flag("urocultivo_unico")),
             ),
-            _prov(n, ("frag_p1_def_ba_cultivos",),
+            _prov(
+                n,
+                ("frag_p1_def_ba_cultivos",),
                 notes="Componente 2 de la definición de BA: requisito microbiológico "
-                "por población de la misma oración fuente."),
+                "por población de la misma oración fuente.",
+            ),
         ),
         "rule_def_ba_piuria_pediatrica": _rule(
             "rule_def_ba_piuria_pediatrica",
             _and(_flag("poblacion_pediatrica"), _flag("ausencia_piuria_sedimento")),
-            _prov(n, ("frag_p1_def_ba_piuria",),
+            _prov(
+                n,
+                ("frag_p1_def_ba_piuria",),
                 notes="Componente 3 de la definición de BA: cláusula pediátrica "
                 "conservada como evidencia fuera del alcance adulto del protocolo; no "
-                "es un requisito del BA adulto."),
+                "es un requisito del BA adulto.",
+            ),
         ),
         "rule_def_itu": _rule(
             "rule_def_itu",
             _and(_flag("bacteriuria_significativa"), _flag("signos_sintomas_itu")),
-            _prov(n, ("frag_p1_def_itu",),
-                notes="Definición de ITU ensamblada desde la frase de DEFINICIONES."),
+            _prov(
+                n,
+                ("frag_p1_def_itu",),
+                notes="Definición de ITU ensamblada desde la frase de DEFINICIONES.",
+            ),
         ),
         "rule_def_itu_complicada_estructural": _rule(
             "rule_def_itu_complicada_estructural",
@@ -1773,9 +2009,12 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _flag("sin_dolor_lumbar"),
                 _flag("sin_compromiso_sistemico"),
             ),
-            _prov(n, ("frag_p1_def_itu_bajo", "frag_p2_clasificacion_alta_baja"),
+            _prov(
+                n,
+                ("frag_p1_def_itu_bajo", "frag_p2_clasificacion_alta_baja"),
                 notes="Definición de ITU bajo ensamblada; la clasificación alta/baja "
-                "es necesaria para definir tratamiento y pronóstico."),
+                "es necesaria para definir tratamiento y pronóstico.",
+            ),
             action_refs=("act_classify_itu_bajo",),
         ),
         "rule_def_itu_alto": _rule(
@@ -1791,37 +2030,47 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _flag("itu_febril_bacteriemica"),
                 _flag("itu_asociada_cateter"),
             ),
-            _prov(n, ("frag_p1_def_itu_complicada_clinica",),
+            _prov(
+                n,
+                ("frag_p1_def_itu_complicada_clinica",),
                 notes="Definición de ITU complicada con compromiso más allá de la "
                 "vejiga; prostatitis excluida de la condición porque la fuente declara "
-                "que excede los alcances del protocolo (vi_prostatitis_fuera_alcance)."),
+                "que excede los alcances del protocolo (vi_prostatitis_fuera_alcance).",
+            ),
         ),
         # --- Diagnosis (11) ---
         "rule_citoquimico_orina": _rule(
             "rule_citoquimico_orina",
             _flag("sospecha_itu"),
-            _prov(n, ("frag_p2_citoquimico",),
+            _prov(
+                n,
+                ("frag_p2_citoquimico",),
                 notes="Citoquímico de orina ante sospecha de ITU en urgencias; "
-                "excepción: mujeres con primer episodio y síntomas típicos."),
+                "excepción: mujeres con primer episodio y síntomas típicos.",
+            ),
             applies_to=_flag("en_urgencias"),
-            exceptions=(_and(_flag("mujer"), _flag("primer_episodio"),
-                             _flag("sintomas_tipicos")),),
+            exceptions=(_and(_flag("mujer"), _flag("primer_episodio"), _flag("sintomas_tipicos")),),
             action_refs=("act_citoquimico",),
         ),
         "rule_tirilla_descarta_diagnostico": _rule(
             "rule_tirilla_descarta_diagnostico",
             _and(_flag("tirilla_normal"), _flag("sospecha_clinica_baja")),
-            _prov(n, ("frag_p2_tirilla_descarta",),
+            _prov(
+                n,
+                ("frag_p2_tirilla_descarta",),
                 notes="Resultado normal de la tirilla con baja sospecha clínica "
-                "descarta el diagnóstico."),
+                "descarta el diagnóstico.",
+            ),
             action_refs=("act_descarta_diagnostico_itu",),
         ),
         "rule_piuria_mayor_10": _rule(
             "rule_piuria_mayor_10",
             _gt("leucocitos_orina_campo", 10),
-            _prov(n, ("frag_p2_piuria",),
-                notes="Criterio de piuria '>10 leucocitos'; correlación descriptiva de "
-                "la fuente."),
+            _prov(
+                n,
+                ("frag_p2_piuria",),
+                notes="Criterio de piuria '>10 leucocitos'; correlación descriptiva de la fuente.",
+            ),
         ),
         "rule_gram_urgencias": _rule(
             "rule_gram_urgencias",
@@ -1832,21 +2081,33 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
         "rule_urocultivo_indicado": _rule(
             "rule_urocultivo_indicado",
             _flag("sospecha_itu"),
-            _prov(n, ("frag_p3_urocultivo_indicacion", "frag_p3_toma_muestra_antibiotico"),
+            _prov(
+                n,
+                ("frag_p3_urocultivo_indicacion", "frag_p3_toma_muestra_antibiotico"),
                 notes="Excepción: primer episodio de ITU baja no complicada en mujer "
                 "premenopáusica. La restricción de tomar la muestra antes de la primera "
                 "dosis de antibiótico es una instrucción de procedimiento adherida a la "
-                "indicación del urocultivo; la fuente no le da condición propia."),
-            exceptions=(_and(_flag("mujer"), _flag("primer_episodio"),
-                             _flag("itu_baja_no_complicada"), _flag("premenopausica")),),
+                "indicación del urocultivo; la fuente no le da condición propia.",
+            ),
+            exceptions=(
+                _and(
+                    _flag("mujer"),
+                    _flag("primer_episodio"),
+                    _flag("itu_baja_no_complicada"),
+                    _flag("premenopausica"),
+                ),
+            ),
             action_refs=("act_urocultivo", "act_restriccion_muestra_previa"),
         ),
         "rule_urocultivo_positivo_1e5": _rule(
             "rule_urocultivo_positivo_1e5",
             _and(_ge("urocultivo_cfu_ml", 100000), _flag("muestra_miccion_espontanea")),
-            _prov(n, ("frag_p3_urocultivo_positivo_1e5",),
+            _prov(
+                n,
+                ("frag_p3_urocultivo_positivo_1e5",),
                 notes="Umbral '≥10 5 UFC' en muestra por micción espontánea; artefacto "
-                "OCR preservado en la evidencia."),
+                "OCR preservado en la evidencia.",
+            ),
             action_refs=("act_classify_urocultivo_positivo_1e5",),
         ),
         "rule_urocultivo_positivo_1e3": _rule(
@@ -1855,46 +2116,59 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _ge("urocultivo_cfu_ml", 1000),
                 _flag("sintomas_no_explicados_otra_patologia"),
             ),
-            _prov(n, ("frag_p3_urocultivo_positivo_1e3",),
+            _prov(
+                n,
+                ("frag_p3_urocultivo_positivo_1e3",),
                 notes="Umbral '≥10 3 UFC' en paciente con síntomas no explicados por "
-                "otra patología."),
+                "otra patología.",
+            ),
             action_refs=("act_classify_urocultivo_positivo_1e3",),
         ),
         "rule_urocultivo_positivo_1e2": _rule(
             "rule_urocultivo_positivo_1e2",
             _and(_ge("urocultivo_cfu_ml", 100), _flag("sonda_recien_insertada")),
-            _prov(n, ("frag_p3_urocultivo_positivo_1e2",),
-                notes="Umbral '≥10 2 UFC' en muestra por sonda vesical recién "
-                "insertada."),
+            _prov(
+                n,
+                ("frag_p3_urocultivo_positivo_1e2",),
+                notes="Umbral '≥10 2 UFC' en muestra por sonda vesical recién insertada.",
+            ),
             action_refs=("act_classify_urocultivo_positivo_1e2",),
         ),
         "rule_analisis_sangre": _rule(
             "rule_analisis_sangre",
             _flag("infeccion_urinaria"),
-            _prov(n, ("frag_p3_analisis_sangre",),
+            _prov(
+                n,
+                ("frag_p3_analisis_sangre",),
                 notes="Muestra de sangre en todo paciente con ITU que sea "
                 "hospitalizado; la condición de hospitalización es la composición de "
-                "los criterios de la fuente."),
+                "los criterios de la fuente.",
+            ),
             applies_to=hospitalization,
-            action_refs=("act_hemoleucograma", "act_ionograma", "act_funcion_renal",
-                         "act_pcr"),
+            action_refs=("act_hemoleucograma", "act_ionograma", "act_funcion_renal", "act_pcr"),
         ),
         "rule_hemocultivos": _rule(
             "rule_hemocultivos",
             _or(_flag("fiebre"), _flag("hipotermia"), _flag("choque_septico")),
-            _prov(n, ("frag_p3_hemocultivos",),
+            _prov(
+                n,
+                ("frag_p3_hemocultivos",),
                 notes="Hemocultivos en pielonefritis aguda que cursa con fiebre, "
-                "hipotermia o choque séptico."),
+                "hipotermia o choque séptico.",
+            ),
             applies_to=_flag("pielonefritis"),
             action_refs=("act_hemocultivos",),
         ),
         "rule_fr_bgn_resistentes": _rule(
             "rule_fr_bgn_resistentes",
             fr_bgn,
-            _prov(n, ("frag_p4_t1_nota_fr",),
+            _prov(
+                n,
+                ("frag_p4_t1_nota_fr",),
                 notes="Composición OR de los tres factores de riesgo para BGN "
                 "resistentes declarados por la fuente; expresión compartida por las "
-                "reglas de selección de tratamiento."),
+                "reglas de selección de tratamiento.",
+            ),
         ),
         # --- Imaging (5) ---
         "rule_imagen_urgente": _rule(
@@ -1911,36 +2185,47 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                     ),
                 ),
             ),
-            _prov(n, ("frag_p3_imagen_urgente",),
+            _prov(
+                n,
+                ("frag_p3_imagen_urgente",),
                 notes="Estudios imaginológicos urgentes; 'fiebre persistente después "
                 "de 72 horas de tratamiento antibiótico correcto' se representa como "
                 "duración de fiebre ≥72h acoplada a tratamiento correcto "
-                "(vi_fiebre_72h_dos_condiciones)."),
+                "(vi_fiebre_72h_dos_condiciones).",
+            ),
             action_refs=("act_imagen_urgente_eco_tc",),
         ),
         "rule_tc_abscesos_nefritis": _rule(
             "rule_tc_abscesos_nefritis",
             _flag("sospecha_absceso_nefritis_local"),
-            _prov(n, ("frag_p3_imagen_tc_abscesos",),
+            _prov(
+                n,
+                ("frag_p3_imagen_tc_abscesos",),
                 notes="TC con contraste cuando se busquen pequeños abscesos y áreas de "
-                "nefritis local."),
+                "nefritis local.",
+            ),
             action_refs=("act_tc_contraste",),
         ),
         "rule_imagen_urotomografia": _rule(
             "rule_imagen_urotomografia",
             _membership("sospecha_alteracion", ("estructural",)),
-            _prov(n, ("frag_p3_imagen_urotomografia",),
-                notes="Sospecha de alteración estructural (incluyendo litiasis) → "
-                "urotomografía."),
+            _prov(
+                n,
+                ("frag_p3_imagen_urotomografia",),
+                notes="Sospecha de alteración estructural (incluyendo litiasis) → urotomografía.",
+            ),
             action_refs=("act_urotomografia",),
         ),
         "rule_imagen_ecografia_funcional": _rule(
             "rule_imagen_ecografia_funcional",
             _membership("sospecha_alteracion", ("funcional",)),
-            _prov(n, ("frag_p3_imagen_ecografia",),
+            _prov(
+                n,
+                ("frag_p3_imagen_ecografia",),
                 notes="Sospecha de alteración funcional (vaciamiento vesical "
                 "inadecuado u obstrucción) → ecografía de vías urinarias con residuo "
-                "postmiccional."),
+                "postmiccional.",
+            ),
             action_refs=("act_ecografia_vias_urinarias",),
         ),
         "rule_ecografia_renal_gestante": _rule(
@@ -1950,11 +2235,14 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _flag("mas_de_un_episodio_itu"),
                 _and(_flag("sospecha_litiasis"), _or(_flag("hematuria"), _flag("dolor"))),
             ),
-            _prov(n, ("frag_p3_imagen_gestante",),
+            _prov(
+                n,
+                ("frag_p3_imagen_gestante",),
                 notes="Ecografía renal en gestantes con pielonefritis, más de un "
                 "episodio de ITU durante el embarazo, o sospecha de litiasis por "
                 "hematuria y/o dolor; hematuria/dolor no son indicaciones "
-                "independientes."),
+                "independientes.",
+            ),
             applies_to=_flag("gestante"),
             action_refs=("act_ecografia_renal",),
         ),
@@ -1966,124 +2254,171 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _flag("sin_signos_sintomas_itu"),
                 _or(_flag("gestante"), _flag("procedimiento_invasivo_vias_urinarias")),
             ),
-            _prov(n, ("frag_p3_tto_ba_indicaciones", "frag_p3_tto_ba_gestante",
-                      "frag_p3_tto_ba_procedimiento", "frag_p2_embarazada_debe_tratarse"),
+            _prov(
+                n,
+                (
+                    "frag_p3_tto_ba_indicaciones",
+                    "frag_p3_tto_ba_gestante",
+                    "frag_p3_tto_ba_procedimiento",
+                    "frag_p2_embarazada_debe_tratarse",
+                ),
                 notes="El encabezado 'Indicaciones de tratamiento de bacteriuria "
                 "asintomática' define el contexto; el contexto BA se explicita en la "
-                "condición porque el modelo no tiene campo de alcance por sección."),
+                "condición porque el modelo no tiene campo de alcance por sección.",
+            ),
             action_refs=("act_tratar_bacteriuria_asintomatica",),
         ),
         # --- Hospitalization (9) ---
         "rule_hosp_criterio_choque_septico": _rule(
-            "rule_hosp_criterio_choque_septico", _flag("choque_septico"),
+            "rule_hosp_criterio_choque_septico",
+            _flag("choque_septico"),
             _prov(s, ("frag_p3_hosp_choque_septico",)),
         ),
         "rule_hosp_criterio_intolerancia_oral": _rule(
-            "rule_hosp_criterio_intolerancia_oral", _flag("intolerancia_via_oral"),
+            "rule_hosp_criterio_intolerancia_oral",
+            _flag("intolerancia_via_oral"),
             _prov(s, ("frag_p3_hosp_intolerancia",)),
         ),
         "rule_hosp_criterio_itu_alta": _rule(
-            "rule_hosp_criterio_itu_alta", _flag("itu_alta"),
+            "rule_hosp_criterio_itu_alta",
+            _flag("itu_alta"),
             _prov(s, ("frag_p3_hosp_itu_alta",)),
         ),
         "rule_hosp_criterio_descompensacion": _rule(
-            "rule_hosp_criterio_descompensacion", _flag("descompensacion_enfermedad_base"),
+            "rule_hosp_criterio_descompensacion",
+            _flag("descompensacion_enfermedad_base"),
             _prov(s, ("frag_p3_hosp_descompensacion",)),
         ),
         "rule_hosp_criterio_germen_resistente": _rule(
             "rule_hosp_criterio_germen_resistente",
             _flag("germen_resistente_sin_opcion_ambulatoria"),
-            _prov(n, ("frag_p3_hosp_resistente",),
-                notes="Colapsa el bullet completo de la fuente."),
+            _prov(
+                n, ("frag_p3_hosp_resistente",), notes="Colapsa el bullet completo de la fuente."
+            ),
         ),
         "rule_hosp_criterio_funcion_renal": _rule(
-            "rule_hosp_criterio_funcion_renal", _flag("deterioro_funcion_renal"),
+            "rule_hosp_criterio_funcion_renal",
+            _flag("deterioro_funcion_renal"),
             _prov(s, ("frag_p3_hosp_funcion_renal",)),
         ),
         "rule_hosp_criterio_absceso": _rule(
-            "rule_hosp_criterio_absceso", _flag("absceso_renal_pararrenal"),
+            "rule_hosp_criterio_absceso",
+            _flag("absceso_renal_pararrenal"),
             _prov(s, ("frag_p3_hosp_absceso",)),
         ),
         "rule_hosp_criterio_soporte_social": _rule(
-            "rule_hosp_criterio_soporte_social", _flag("soporte_social_inadecuado"),
-            _prov(n, ("frag_p3_hosp_social",),
-                notes="Colapsa el bullet completo de la fuente."),
+            "rule_hosp_criterio_soporte_social",
+            _flag("soporte_social_inadecuado"),
+            _prov(n, ("frag_p3_hosp_social",), notes="Colapsa el bullet completo de la fuente."),
         ),
         "rule_hospitalizacion": _rule(
             "rule_hospitalizacion",
             hospitalization,
-            _prov(n, ("frag_p3_hosp_choque_septico", "frag_p3_hosp_intolerancia",
-                      "frag_p3_hosp_itu_alta", "frag_p3_hosp_descompensacion",
-                      "frag_p3_hosp_resistente", "frag_p3_hosp_funcion_renal",
-                      "frag_p3_hosp_absceso", "frag_p3_hosp_social"),
+            _prov(
+                n,
+                (
+                    "frag_p3_hosp_choque_septico",
+                    "frag_p3_hosp_intolerancia",
+                    "frag_p3_hosp_itu_alta",
+                    "frag_p3_hosp_descompensacion",
+                    "frag_p3_hosp_resistente",
+                    "frag_p3_hosp_funcion_renal",
+                    "frag_p3_hosp_absceso",
+                    "frag_p3_hosp_social",
+                ),
                 notes="Composición OR de las 8 indicaciones de hospitalización "
                 "aplicables a adultos; 'Pielonefritis aguda en pacientes pediátricos' "
-                "queda fuera del alcance adulto (vi_criterio_pediatrico_fuera_alcance)."),
+                "queda fuera del alcance adulto (vi_criterio_pediatrico_fuera_alcance).",
+            ),
             action_refs=("act_hospitalizar",),
         ),
         # --- Discharge (10) ---
         "rule_egreso_afebril_48h": _rule(
             "rule_egreso_afebril_48h",
             _temporal("afebril_horas", 48, "hours"),
-            _prov(n, ("frag_p3_egreso_afebril",),
-                notes="'48 horas afebril' como duración del estado afebril."),
+            _prov(
+                n,
+                ("frag_p3_egreso_afebril",),
+                notes="'48 horas afebril' como duración del estado afebril.",
+            ),
         ),
         "rule_egreso_tas": _rule(
             "rule_egreso_tas",
             _gt("tas", 90),
             _prov(n, ("frag_p3_egreso_tas",), notes="Umbral estricto '> 90 mmHg'."),
         ),
-        "rule_egreso_fc": _rule(
-            "rule_egreso_fc", _lt("fc", 100), _prov(s, ("frag_p4_egreso_fc",))
-        ),
-        "rule_egreso_fr": _rule(
-            "rule_egreso_fr", _lt("fr", 24), _prov(s, ("frag_p4_egreso_fr",))
-        ),
+        "rule_egreso_fc": _rule("rule_egreso_fc", _lt("fc", 100), _prov(s, ("frag_p4_egreso_fc",))),
+        "rule_egreso_fr": _rule("rule_egreso_fr", _lt("fr", 24), _prov(s, ("frag_p4_egreso_fr",))),
         "rule_egreso_sato2_pao2": _rule(
             "rule_egreso_sato2_pao2",
             _or(_gt("sato2", 90), _gt("pao2", 60)),
             _prov(s, ("frag_p4_egreso_sato2_pao2",)),
         ),
         "rule_egreso_via_oral": _rule(
-            "rule_egreso_via_oral", _flag("tolera_via_oral"),
+            "rule_egreso_via_oral",
+            _flag("tolera_via_oral"),
             _prov(s, ("frag_p4_egreso_via_oral",)),
         ),
         "rule_egreso_comorbilidades": _rule(
-            "rule_egreso_comorbilidades", _flag("comorbilidades_compensadas"),
+            "rule_egreso_comorbilidades",
+            _flag("comorbilidades_compensadas"),
             _prov(s, ("frag_p4_egreso_comorbilidades",)),
         ),
         "rule_egreso_tratamiento": _rule(
-            "rule_egreso_tratamiento", _flag("tratamiento_ambulatorio_asegurado"),
-            _prov(n, ("frag_p4_egreso_tratamiento",),
-                notes="Colapsa 'Se ha asegurado el tratamiento ambulatorio'."),
+            "rule_egreso_tratamiento",
+            _flag("tratamiento_ambulatorio_asegurado"),
+            _prov(
+                n,
+                ("frag_p4_egreso_tratamiento",),
+                notes="Colapsa 'Se ha asegurado el tratamiento ambulatorio'.",
+            ),
         ),
         "rule_egreso_social": _rule(
-            "rule_egreso_social", _flag("condiciones_sociales_permiten"),
-            _prov(n, ("frag_p4_egreso_social",),
-                notes="Colapsa 'Lo permiten las condiciones sociales'."),
+            "rule_egreso_social",
+            _flag("condiciones_sociales_permiten"),
+            _prov(
+                n,
+                ("frag_p4_egreso_social",),
+                notes="Colapsa 'Lo permiten las condiciones sociales'.",
+            ),
         ),
         "rule_plan_egreso": _rule(
             "rule_plan_egreso",
             egreso,
-            _prov(n, ("frag_p3_egreso_afebril", "frag_p3_egreso_tas", "frag_p4_egreso_fc",
-                      "frag_p4_egreso_fr", "frag_p4_egreso_sato2_pao2",
-                      "frag_p4_egreso_via_oral", "frag_p4_egreso_comorbilidades",
-                      "frag_p4_egreso_tratamiento", "frag_p4_egreso_social"),
+            _prov(
+                n,
+                (
+                    "frag_p3_egreso_afebril",
+                    "frag_p3_egreso_tas",
+                    "frag_p4_egreso_fc",
+                    "frag_p4_egreso_fr",
+                    "frag_p4_egreso_sato2_pao2",
+                    "frag_p4_egreso_via_oral",
+                    "frag_p4_egreso_comorbilidades",
+                    "frag_p4_egreso_tratamiento",
+                    "frag_p4_egreso_social",
+                ),
                 notes="Indicaciones para paso a terapia oral y/o egreso compuestas con "
-                "AND de los criterios de la fuente."),
+                "AND de los criterios de la fuente.",
+            ),
             action_refs=("act_egreso",),
         ),
         # --- Treatment selection (9) ---
         "rule_t1_itu_baja": _rule(
             "rule_t1_itu_baja",
             _flag("itu_baja"),
-            _prov(n, ("frag_p4_t1_itu_baja", "frag_p4_t1_itu_baja_antibioticos",
-                      "frag_p4_t1_dosis_baja_ba"),
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_itu_baja",
+                    "frag_p4_t1_itu_baja_antibioticos",
+                    "frag_p4_t1_dosis_baja_ba",
+                ),
                 notes="Fila 'ITU baja (complicada o no complicada)'; las tres acciones "
                 "PRESCRIBE son alternativas declaradas en la fuente, nunca ejecución "
-                "simultánea."),
-            action_refs=("act_t1_nitrofurantoina", "act_t1_cefalexina",
-                         "act_t1_fosfomicina"),
+                "simultánea.",
+            ),
+            action_refs=("act_t1_nitrofurantoina", "act_t1_cefalexina", "act_t1_fosfomicina"),
         ),
         "rule_t1_ba_row": _rule(
             "rule_t1_ba_row",
@@ -2092,57 +2427,86 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
                 _flag("sin_signos_sintomas_itu"),
                 _or(_flag("gestante"), _flag("procedimiento_invasivo_vias_urinarias")),
             ),
-            _prov(n, ("frag_p4_t1_ba_row", "frag_p4_t1_itu_baja_antibioticos",
-                      "frag_p4_t1_dosis_baja_ba", "frag_p4_t1_nota_ba"),
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_ba_row",
+                    "frag_p4_t1_itu_baja_antibioticos",
+                    "frag_p4_t1_dosis_baja_ba",
+                    "frag_p4_t1_nota_ba",
+                ),
                 notes="Fila 'Bacteriuria asintomática**'; la nota ** restringe su "
                 "tratamiento a gestantes o pacientes con procedimientos urológicos "
                 "donde se prevé la disrupción del uroepitelio. Alternativas declaradas "
-                "en la fuente."),
-            action_refs=("act_t1_ba_nitrofurantoina", "act_t1_ba_cefalexina",
-                         "act_t1_ba_fosfomicina"),
+                "en la fuente.",
+            ),
+            action_refs=(
+                "act_t1_ba_nitrofurantoina",
+                "act_t1_ba_cefalexina",
+                "act_t1_ba_fosfomicina",
+            ),
         ),
         "rule_t1_alta_ambulatoria": _rule(
             "rule_t1_alta_ambulatoria",
             _and(_flag("itu_alta"), _not(_flag("hospitalizado"))),
-            _prov(n, ("frag_p4_t1_ambulatoria", "frag_p4_t1_ambulatoria_dosis"),
-                notes="Fila 'ITU alta ambulatoria' representada como ITU alta no "
-                "hospitalizada."),
+            _prov(
+                n,
+                ("frag_p4_t1_ambulatoria", "frag_p4_t1_ambulatoria_dosis"),
+                notes="Fila 'ITU alta ambulatoria' representada como ITU alta no hospitalizada.",
+            ),
             action_refs=("act_cefalexina_alta_amb",),
         ),
         "rule_t1_alta_hosp_sin_fr": _rule(
             "rule_t1_alta_hosp_sin_fr",
             _and(_flag("itu_alta"), _flag("hospitalizado"), _not(fr_bgn)),
-            _prov(n, ("frag_p4_t1_sin_fr", "frag_p4_t1_sin_fr_drogas",
-                      "frag_p4_t1_sin_fr_dosis"),
+            _prov(
+                n,
+                ("frag_p4_t1_sin_fr", "frag_p4_t1_sin_fr_drogas", "frag_p4_t1_sin_fr_dosis"),
                 notes="Fila 'ITU alta hospitalaria sin FR para BGN resistentes'; "
-                "alternativas declaradas en la fuente."),
+                "alternativas declaradas en la fuente.",
+            ),
             action_refs=("act_cefazolina", "act_amikacina"),
         ),
         "rule_t1_alta_hosp_con_fr_piperacilina": _rule(
             "rule_t1_alta_hosp_con_fr_piperacilina",
             _and(_flag("itu_alta"), _flag("hospitalizado"), fr_bgn),
-            _prov(n, ("frag_p4_t1_con_fr", "frag_p4_t1_con_fr_drogas",
-                      "frag_p4_t1_con_fr_dosis"),
+            _prov(
+                n,
+                ("frag_p4_t1_con_fr", "frag_p4_t1_con_fr_drogas", "frag_p4_t1_con_fr_dosis"),
                 notes="Fila 'ITU alta hospitalaria con FR para BGN resistentes'; "
-                "piperacilina tazobactam sin restricción de choque declarada."),
+                "piperacilina tazobactam sin restricción de choque declarada.",
+            ),
             action_refs=("act_piperacilina_tazobactam",),
         ),
         "rule_t1_alta_hosp_con_fr_amikacina": _rule(
             "rule_t1_alta_hosp_con_fr_amikacina",
             _and(_flag("itu_alta"), _flag("hospitalizado"), fr_bgn),
-            _prov(n, ("frag_p4_t1_con_fr", "frag_p4_t1_con_fr_drogas",
-                      "frag_p4_t1_con_fr_dosis", "frag_p4_t1_nota_amikacina"),
-                notes="Nota 2: evitar amikacina en choque."),
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_con_fr",
+                    "frag_p4_t1_con_fr_drogas",
+                    "frag_p4_t1_con_fr_dosis",
+                    "frag_p4_t1_nota_amikacina",
+                ),
+                notes="Nota 2: evitar amikacina en choque.",
+            ),
             exceptions=(_flag("choque_septico"),),
             action_refs=("act_amikacina",),
         ),
         "rule_t1_alta_hosp_con_fr_meropenem": _rule(
             "rule_t1_alta_hosp_con_fr_meropenem",
-            _and(_flag("itu_alta"), _flag("hospitalizado"), fr_bgn,
-                 _flag("choque_septico")),
-            _prov(n, ("frag_p4_t1_con_fr", "frag_p4_t1_con_fr_drogas",
-                      "frag_p4_t1_con_fr_dosis", "frag_p4_t1_nota_meropenem"),
-                notes="Nota 3: meropenem se administra empíricamente si hay choque."),
+            _and(_flag("itu_alta"), _flag("hospitalizado"), fr_bgn, _flag("choque_septico")),
+            _prov(
+                n,
+                (
+                    "frag_p4_t1_con_fr",
+                    "frag_p4_t1_con_fr_drogas",
+                    "frag_p4_t1_con_fr_dosis",
+                    "frag_p4_t1_nota_meropenem",
+                ),
+                notes="Nota 3: meropenem se administra empíricamente si hay choque.",
+            ),
             action_refs=("act_meropenem",),
         ),
         "rule_fosfomicina_preferida": _rule(
@@ -2154,9 +2518,12 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
         "rule_reevaluar_48h": _rule(
             "rule_reevaluar_48h",
             _temporal("tiempo_desde_inicio_terapia_hours", 48, "hours"),
-            _prov(n, ("frag_p4_t1_reevaluar",),
+            _prov(
+                n,
+                ("frag_p4_t1_reevaluar",),
                 notes="Reevaluar con urocultivo a las 48 horas para ajuste; nota 1 de "
-                "la fila 'ITU alta ambulatoria'."),
+                "la fila 'ITU alta ambulatoria'.",
+            ),
             applies_to=_and(_flag("itu_alta"), _not(_flag("hospitalizado"))),
             action_refs=("act_urocultivo_control",),
         ),
@@ -2164,72 +2531,103 @@ def _build_rules(expressions: dict[str, Any]) -> dict[str, Rule]:
         "rule_t2_ba_gestante": _rule(
             "rule_t2_ba_gestante",
             _and(_flag("bacteriuria_significativa"), _flag("sin_signos_sintomas_itu")),
-            _prov(n, ("frag_p4_t2_ba_row",),
+            _prov(
+                n,
+                ("frag_p4_t2_ba_row",),
                 notes="Fila 'Bacteriuria asintomática' de la Tabla 2; alternativas "
-                "declaradas en la fuente."),
+                "declaradas en la fuente.",
+            ),
             applies_to=_flag("gestante"),
-            action_refs=("act_t2_ba_nitrofurantoina", "act_t2_ba_cefalexina",
-                         "act_t2_ba_fosfomicina"),
+            action_refs=(
+                "act_t2_ba_nitrofurantoina",
+                "act_t2_ba_cefalexina",
+                "act_t2_ba_fosfomicina",
+            ),
         ),
         "rule_t2_itu_baja_gestante": _rule(
             "rule_t2_itu_baja_gestante",
             _flag("itu_baja"),
-            _prov(n, ("frag_p4_t2_itu_baja_row",),
-                notes="Fila 'ITU baja' de la Tabla 2; alternativas declaradas en la "
-                "fuente."),
+            _prov(
+                n,
+                ("frag_p4_t2_itu_baja_row",),
+                notes="Fila 'ITU baja' de la Tabla 2; alternativas declaradas en la fuente.",
+            ),
             applies_to=_flag("gestante"),
-            action_refs=("act_t2_baja_nitrofurantoina", "act_t2_baja_cefalexina",
-                         "act_t2_baja_fosfomicina"),
+            action_refs=(
+                "act_t2_baja_nitrofurantoina",
+                "act_t2_baja_cefalexina",
+                "act_t2_baja_fosfomicina",
+            ),
         ),
         "rule_t2_itu_alta_gestante_cefazolina": _rule(
             "rule_t2_itu_alta_gestante_cefazolina",
             _and(_flag("itu_alta"), _not(fr_bgn)),
-            _prov(n, ("frag_p5_t2_itu_alta_row", "frag_p5_t2_sin_fr"),
-                notes="Cefazolina: * sin factores de riesgo para BGN resistentes."),
+            _prov(
+                n,
+                ("frag_p5_t2_itu_alta_row", "frag_p5_t2_sin_fr"),
+                notes="Cefazolina: * sin factores de riesgo para BGN resistentes.",
+            ),
             applies_to=_flag("gestante"),
             action_refs=("act_cefazolina",),
         ),
         "rule_t2_itu_alta_gestante_piperacilina": _rule(
             "rule_t2_itu_alta_gestante_piperacilina",
             _and(_flag("itu_alta"), fr_bgn, _not(_flag("choque_septico"))),
-            _prov(n, ("frag_p5_t2_itu_alta_row", "frag_p5_t2_con_fr"),
+            _prov(
+                n,
+                ("frag_p5_t2_itu_alta_row", "frag_p5_t2_con_fr"),
                 notes="Piperacilina tazobactam: ** con factores de riesgo para BGN "
-                "resistentes, sin choque."),
+                "resistentes, sin choque.",
+            ),
             applies_to=_flag("gestante"),
             action_refs=("act_piperacilina_tazobactam",),
         ),
         "rule_t2_itu_alta_gestante_meropenem": _rule(
             "rule_t2_itu_alta_gestante_meropenem",
             _and(_flag("itu_alta"), fr_bgn, _flag("choque_septico")),
-            _prov(n, ("frag_p5_t2_itu_alta_row", "frag_p5_t2_con_fr_choque"),
-                notes="Meropenem: *** con factores de riesgo para BGN resistentes, "
-                "con choque."),
+            _prov(
+                n,
+                ("frag_p5_t2_itu_alta_row", "frag_p5_t2_con_fr_choque"),
+                notes="Meropenem: *** con factores de riesgo para BGN resistentes, con choque.",
+            ),
             applies_to=_flag("gestante"),
             action_refs=("act_meropenem",),
         ),
         "rule_t2_preventiva_baja": _rule(
             "rule_t2_preventiva_baja",
             _and(_flag("itu_baja"), _flag("recurrencia_itu")),
-            _prov(n, ("frag_p4_t2_itu_baja_row", "frag_p4_t2_preventiva_baja",
-                      "frag_p5_t2_nota2"),
+            _prov(
+                n,
+                ("frag_p4_t2_itu_baja_row", "frag_p4_t2_preventiva_baja", "frag_p5_t2_nota2"),
                 notes="Terapia preventiva 'sólo si hay recurrencia de la infección'; "
                 "la decisión se toma con base en cultivos y pruebas de sensibilidad "
-                "(nota 2). Alternativas declaradas en la fuente."),
+                "(nota 2). Alternativas declaradas en la fuente.",
+            ),
             applies_to=_flag("gestante"),
-            action_refs=("act_preventiva_nitrofurantoina", "act_preventiva_cefalexina",
-                         "act_preventiva_tmpsmx", "act_preventiva_fosfomicina"),
+            action_refs=(
+                "act_preventiva_nitrofurantoina",
+                "act_preventiva_cefalexina",
+                "act_preventiva_tmpsmx",
+                "act_preventiva_fosfomicina",
+            ),
         ),
         "rule_t2_preventiva_alta": _rule(
             "rule_t2_preventiva_alta",
             _flag("itu_alta"),
-            _prov(n, ("frag_p5_t2_itu_alta_row", "frag_p5_t2_preventiva_alta",
-                      "frag_p5_t2_nota2"),
+            _prov(
+                n,
+                ("frag_p5_t2_itu_alta_row", "frag_p5_t2_preventiva_alta", "frag_p5_t2_nota2"),
                 notes="Terapia preventiva indicada ('Sí') en la fila ITU alta de la "
                 "Tabla 2; la decisión se toma con base en cultivos y pruebas de "
-                "sensibilidad (nota 2). Alternativas declaradas en la fuente."),
+                "sensibilidad (nota 2). Alternativas declaradas en la fuente.",
+            ),
             applies_to=_flag("gestante"),
-            action_refs=("act_preventiva_nitrofurantoina", "act_preventiva_cefalexina",
-                         "act_preventiva_tmpsmx", "act_preventiva_fosfomicina"),
+            action_refs=(
+                "act_preventiva_nitrofurantoina",
+                "act_preventiva_cefalexina",
+                "act_preventiva_tmpsmx",
+                "act_preventiva_fosfomicina",
+            ),
         ),
     }
 
@@ -2323,8 +2721,13 @@ def _build_validation_items() -> dict[str, ValidationItem]:
             "son entradas clínicas/históricas externas; el motor no computa historias "
             "ni calendarios.",
             severity="medium",
-            related_ids=("hospitalizacion_48h_ultimos_3meses", "antibioticos_ultimos_90dias",
-                         "mas_de_un_episodio_itu", "recurrencia_itu", "itu_recurrente"),
+            related_ids=(
+                "hospitalizacion_48h_ultimos_3meses",
+                "antibioticos_ultimos_90dias",
+                "mas_de_un_episodio_itu",
+                "recurrencia_itu",
+                "itu_recurrente",
+            ),
             status=open_status,
         ),
         "vi_fiebre_72h_dos_condiciones": ValidationItem(
@@ -2334,8 +2737,7 @@ def _build_validation_items() -> dict[str, ValidationItem]:
             "antibiótico correcto' acopla duración de fiebre y adecuación del "
             "tratamiento; se representa como duración ≥72h AND tratamiento correcto.",
             severity="low",
-            related_ids=("fiebre_horas", "tratamiento_antibiotico_correcto",
-                         "rule_imagen_urgente"),
+            related_ids=("fiebre_horas", "tratamiento_antibiotico_correcto", "rule_imagen_urgente"),
             status=open_status,
         ),
         "vi_criterio_pediatrico_fuera_alcance": ValidationItem(
@@ -2358,8 +2760,7 @@ def _build_validation_items() -> dict[str, ValidationItem]:
             "se conserva como evidencia y en las notas de la regla, sin acción "
             "operativa inventada.",
             severity="medium",
-            related_ids=("frag_p1_def_itu_complicada_clinica",
-                         "rule_def_itu_complicada_clinica"),
+            related_ids=("frag_p1_def_itu_complicada_clinica", "rule_def_itu_complicada_clinica"),
             status=open_status,
         ),
         "vi_ajuste_urocultivo_antibiograma": ValidationItem(

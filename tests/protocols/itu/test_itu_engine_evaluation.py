@@ -23,9 +23,7 @@ def test_all_package_test_cases_pass() -> None:
 
 def test_repeated_package_evaluation_is_equal() -> None:
     package = build_itu_package()
-    case = Case.from_inputs(
-        {"itu_alta": True, "hospitalizado": True, "colonizacion_blee": True}
-    )
+    case = Case.from_inputs({"itu_alta": True, "hospitalizado": True, "colonizacion_blee": True})
     first = evaluate_package(package, case)
     second = evaluate_package(package, case)
     assert first == second
@@ -66,8 +64,7 @@ def test_urocultivo_rule_carries_sample_restriction_actions() -> None:
 def test_ba_indication_and_table_row_share_the_same_condition() -> None:
     package = build_itu_package()
     assert (
-        package.rules["rule_tto_ba_indicado"].condition
-        == package.rules["rule_t1_ba_row"].condition
+        package.rules["rule_tto_ba_indicado"].condition == package.rules["rule_t1_ba_row"].condition
     )
 
 
@@ -189,7 +186,10 @@ def test_fr_bgn_expression_is_reused_across_treatment_rules() -> None:
     assert package.rules["rule_t1_alta_hosp_con_fr_amikacina"].condition.operands[2] is shared
     assert package.rules["rule_t1_alta_hosp_con_fr_meropenem"].condition.operands[2] is shared
     assert package.rules["rule_t1_alta_hosp_sin_fr"].condition.operands[2].operands[0] is shared
-    assert package.rules["rule_t2_itu_alta_gestante_cefazolina"].condition.operands[1].operands[0] is shared
+    assert (
+        package.rules["rule_t2_itu_alta_gestante_cefazolina"].condition.operands[1].operands[0]
+        is shared
+    )
     assert package.rules["rule_t2_itu_alta_gestante_piperacilina"].condition.operands[1] is shared
     assert package.rules["rule_t2_itu_alta_gestante_meropenem"].condition.operands[1] is shared
 
