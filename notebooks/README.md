@@ -1,4 +1,4 @@
-# Template data science container - Notebooks
+# Side_Project_CPG_Tree_MVP - Notebooks
 
 Project the notebooks. The naming convention is:
 `[##.#]-[creator initials]-[short_description]-[yyyy_mm_dd].ipynb`

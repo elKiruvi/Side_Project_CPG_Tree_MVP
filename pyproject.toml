@@ -1,10 +1,7 @@
 [project]
-name = "template-data-science-container"
+name = "Side_Project_CPG_Tree_MVP"
 version = "0.1.0"
-description = "Template for data science and AI Projects with the last stable version of python and devcontainer"
-authors = [
-    "Jose R. Zapata <joserzapata.github.io>",
-]
+description = "Research prototype for transforming institutional clinical practice protocols into structured, traceable, versioned, and executable computational knowledge."
 requires-python = ">=3.12"
 readme = "README.md"
 
@@ -13,8 +10,7 @@ dependencies = [
 ]
 
 [project.urls]
-documentation = "https://.github.io/template-data-science-container"
-repository = "https://github.com//template-data-science-container"
+repository = "https://github.com/elKiruvi/Side_Project_CPG_Tree_MVP"
 
 
 [dependency-groups]
