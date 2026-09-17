@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`python -m cpg_tree`: list, inspect, variables, rules, provenance, tree,
   validate, evaluate) with deterministic text/JSON output and exit codes
   0/1/2.
+- **Phase 7 extension — static HTML visualization.** `visualize` CLI command
+  generating a self-contained, byte-deterministic HTML presentation per
+  protocol (sections, rule cards, conditions, exceptions, declarative
+  actions, shared-expression badges, provenance chains). Presentation
+  groupings come from an optional `visualization.yaml` sidecar manifest;
+  `package.yaml` remains the canonical source of truth. Output goes to
+  `data/08_reporting/` (gitignored).
 
 ### History backfill (Phases 0–6)
 

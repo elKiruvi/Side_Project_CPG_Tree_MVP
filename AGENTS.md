@@ -1223,6 +1223,7 @@ uv run python -m cpg_tree provenance <PROTOCOL_ID> [VERSION] (--rule|--variable|
 uv run python -m cpg_tree tree <PROTOCOL_ID> [VERSION]
 uv run python -m cpg_tree validate <PROTOCOL_ID> [VERSION]
 uv run python -m cpg_tree evaluate <PROTOCOL_ID> case.json [VERSION]
+uv run python -m cpg_tree visualize <PROTOCOL_ID> [VERSION] [--out DIR]
 ```
 
 Conventions:
@@ -1236,3 +1237,19 @@ Conventions:
 - Exit codes: `0` success, `1` operational/input failure, `2` usage error.
 - Views/CLI code lives in `src/cpg_tree/views/` and `src/cpg_tree/cli.py`;
   it must never duplicate engine semantics or contain protocol knowledge.
+
+### visualize command (Phase 7 extension)
+
+```bash
+uv run python -m cpg_tree visualize <PROTOCOL_ID> [VERSION] [--out DIR]
+```
+
+- Generates a self-contained static HTML presentation into
+  `data/08_reporting/` (gitignored; never committed).
+- `protocols/<id>/<version>/visualization.yaml` is OPTIONAL presentation
+  metadata (section titles + rule-id prefixes/explicit ids) only. It must not
+  contain clinical content; every clinical fact comes from package.yaml.
+- Sections are display groupings only, never clinical workflow order.
+- Output must remain byte-deterministic (no timestamps, stable ordering).
+- The renderer is generic (`src/cpg_tree/views/visualize.py`); a third
+  protocol needs only package.yaml (manifest optional, fallback "Reglas").

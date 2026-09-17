@@ -52,6 +52,7 @@ uv run python -m cpg_tree provenance CT-PL-197 v06 --rule rule_t1_itu_baja
 uv run python -m cpg_tree tree CT-PL-197 v06
 uv run python -m cpg_tree validate CT-PL-197 v06
 uv run python -m cpg_tree evaluate CT-PL-197 v06 case.json
+uv run python -m cpg_tree visualize CT-PL-197 v06
 ```
 
 - `case.json` maps variable ids to `string | number | boolean | null`; `null`
@@ -64,6 +65,13 @@ uv run python -m cpg_tree evaluate CT-PL-197 v06 case.json
   engine. Actions are declarative and are never executed; multiple `PRESCRIBE`
   actions on one rule are source-declared alternatives, never a selection.
   This is a research prototype, not clinical advice.
+
+`visualize` generates a self-contained static HTML presentation of a protocol
+into `data/08_reporting/<PROTOCOL_ID>-<VERSION>.html` (open it locally in any
+browser). Rules are grouped into presentation sections by an optional sidecar
+manifest (`protocols/<id>/<version>/visualization.yaml`); sections are display
+groupings only — they do not represent clinical workflow or execution order.
+`package.yaml` remains the single source of truth for all clinical content.
 
 ## Credits
 
