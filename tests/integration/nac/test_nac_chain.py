@@ -18,6 +18,8 @@ from cpg_tree.validation import validate_package
 
 RAW_DIR = Path(__file__).resolve().parents[3] / "data" / "01_raw"
 
+EXPECTED_TEST_CASES = 30
+
 pytestmark = pytest.mark.skipif(
     not any(RAW_DIR.glob("CT-PL-193*.pdf")),
     reason="the raw NAC PDF is not available locally",
@@ -36,7 +38,7 @@ def test_full_nac_chain_validates_and_runs() -> None:
     assert report.error_count == 0
     assert report.warning_count == 0
     outcomes = run_test_cases(package)
-    assert len(outcomes) == 30
+    assert len(outcomes) == EXPECTED_TEST_CASES
     assert all(outcome.passed for outcome in outcomes)
 
 

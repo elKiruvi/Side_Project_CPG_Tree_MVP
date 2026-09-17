@@ -13,6 +13,13 @@ from cpg_tree.engine import Case, RuleOutcome, evaluate_package, run_test_cases
 from cpg_tree.knowledge import TruthValue, dump_package
 from cpg_tree.protocols.nac_v09 import build_nac_package
 
+EXPECTED_TEST_CASES = 30
+UCI_3DE_UMBRAL = 3
+UCI_3DE_CRITERIOS = 9
+HEMOCULTIVOS_UMBRAL = 2
+HEMOCULTIVOS_CRITERIOS = 4
+AFEBRIL_UMBRAL_HORAS = 48
+
 GENERIC_LAYERS = (
     Path(__file__).resolve().parents[3] / "src" / "cpg_tree" / "engine",
     Path(__file__).resolve().parents[3] / "src" / "cpg_tree" / "validation",
@@ -22,15 +29,13 @@ GENERIC_LAYERS = (
 
 def test_all_package_test_cases_pass() -> None:
     outcomes = run_test_cases(build_nac_package())
-    assert len(outcomes) == 30
+    assert len(outcomes) == EXPECTED_TEST_CASES
     assert all(outcome.passed for outcome in outcomes)
 
 
 def test_repeated_package_evaluation_is_equal() -> None:
     package = build_nac_package()
-    case = Case.from_inputs(
-        {"inmunosuprimido": True, "curb65_score": 0, "bun": 31}
-    )
+    case = Case.from_inputs({"inmunosuprimido": True, "curb65_score": 0, "bun": 31})
     first = evaluate_package(package, case)
     second = evaluate_package(package, case)
     assert first == second
@@ -117,13 +122,13 @@ def test_at_least_n_formula_is_preserved() -> None:
     package = build_nac_package()
     three_de = package.rules["rule_uci_criterios_3de"].condition
     assert three_de.operator.value == "AT_LEAST_N"
-    assert three_de.threshold == 3
-    assert len(three_de.operands) == 9
+    assert three_de.threshold == UCI_3DE_UMBRAL
+    assert len(three_de.operands) == UCI_3DE_CRITERIOS
     hemocultivos = package.rules["rule_hemocultivos"].condition
     two_of_four = hemocultivos.operands[1]
     assert two_of_four.operator.value == "AT_LEAST_N"
-    assert two_of_four.threshold == 2
-    assert len(two_of_four.operands) == 4
+    assert two_of_four.threshold == HEMOCULTIVOS_UMBRAL
+    assert len(two_of_four.operands) == HEMOCULTIVOS_CRITERIOS
 
 
 def test_temporal_discharge_threshold_is_inclusive_48_hours() -> None:
@@ -131,7 +136,7 @@ def test_temporal_discharge_threshold_is_inclusive_48_hours() -> None:
     temporal = package.rules["rule_plan_egreso"].condition.operands[0]
     assert temporal.kind.value == "TEMPORAL"
     assert temporal.temporal_operator.value == "AT_LEAST_FOR_LAST"
-    assert temporal.duration_value == 48
+    assert temporal.duration_value == AFEBRIL_UMBRAL_HORAS
     assert temporal.duration_unit == "hours"
 
 

@@ -23,6 +23,7 @@ EXPECTED_ACTIONS = 26
 EXPECTED_TEST_CASES = 30
 EXPECTED_FRAGMENTS = 35
 EXPECTED_VALIDATION_ITEMS = 8
+EXPECTED_INFO_FINDINGS = 2
 
 ARTIFACT_PATH = (
     Path(__file__).resolve().parents[3] / "protocols" / "CT-PL-193" / "v09" / "package.yaml"
@@ -59,10 +60,8 @@ def test_validate_package_has_exact_expected_findings() -> None:
     report = validate_package(package)
     assert report.error_count == 0
     assert report.warning_count == 0
-    assert report.info_count == 2
-    codes_and_paths = {
-        (finding.code, finding.path) for finding in report.findings
-    }
+    assert report.info_count == EXPECTED_INFO_FINDINGS
+    codes_and_paths = {(finding.code, finding.path) for finding in report.findings}
     assert codes_and_paths == {
         ("PROV.UNRESOLVED_NOT_EXECUTABLE", "rules.rule_hosp_criterio_curb65.provenance"),
         ("PROV.INFERRED_NOT_VALIDATED", "rules.rule_uci_bullet1.provenance"),
@@ -76,7 +75,7 @@ def test_validation_items_are_open_and_not_findings() -> None:
     assert len(package.validation_items) == EXPECTED_VALIDATION_ITEMS
     for item in package.validation_items.values():
         assert item.status.value == "OPEN"
-    assert len(report.findings) == 2
+    assert len(report.findings) == EXPECTED_INFO_FINDINGS
 
 
 def test_every_rule_has_provenance() -> None:
