@@ -9,7 +9,6 @@ preservation, declarative actions, and source traceability.
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -156,12 +155,8 @@ def test_evaluate_json_is_deterministic(
 ) -> None:
     case_path = tmp_path / "case.json"
     case_path.write_text('{"curb65_score": 2, "bun": 35}', encoding="utf-8")
-    first = _run(
-        ["evaluate", "CT-PL-193", str(case_path), "--json"], capsys
-    )[1]
-    second = _run(
-        ["evaluate", "CT-PL-193", str(case_path), "--json"], capsys
-    )[1]
+    first = _run(["evaluate", "CT-PL-193", str(case_path), "--json"], capsys)[1]
+    second = _run(["evaluate", "CT-PL-193", str(case_path), "--json"], capsys)[1]
     assert first == second
     data = json.loads(first)
     assert data["protocol_id"] == "CT-PL-193"
