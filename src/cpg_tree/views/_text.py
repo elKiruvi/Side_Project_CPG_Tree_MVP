@@ -13,6 +13,5 @@ def bullet_text(text: str, prefix: str = "      - ") -> str:
     lines = text.splitlines()
     continuation = " " * len(prefix)
     return "\n".join(
-        (prefix + line) if index == 0 else (continuation + line)
-        for index, line in enumerate(lines)
+        (prefix + line) if index == 0 else (continuation + line) for index, line in enumerate(lines)
     )

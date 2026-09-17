@@ -90,7 +90,6 @@ def load_protocol(
         )
     if package.version != version:
         raise DiscoveryError(
-            f"artifact at {package_path} declares version {package.version!r}; "
-            f"expected {version!r}"
+            f"artifact at {package_path} declares version {package.version!r}; expected {version!r}"
         )
     return package, package_path

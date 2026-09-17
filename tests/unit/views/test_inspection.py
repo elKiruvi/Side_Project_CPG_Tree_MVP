@@ -17,6 +17,8 @@ from cpg_tree.views.inspection import (
     variables_to_json,
 )
 
+EXPECTED_RULES_WITH_EVIDENCE = 2
+
 
 def test_summary_exposes_only_package_facts(synthetic_package: ProtocolVersion) -> None:
     summary = build_summary(synthetic_package)
@@ -34,7 +36,7 @@ def test_summary_exposes_only_package_facts(synthetic_package: ProtocolVersion) 
         "test_cases": 1,
         "validation_items": 1,
     }
-    assert summary.rules_with_evidence == 2
+    assert summary.rules_with_evidence == EXPECTED_RULES_WITH_EVIDENCE
     assert summary.rules_without_evidence == 0
     assert summary.fragments_with_page == 1
     assert summary.derivation_counts == {"NORMALIZED": 1, "SOURCE_STATED": 1}

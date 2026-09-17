@@ -8,6 +8,9 @@ from cpg_tree.engine import CaseValueState
 from cpg_tree.knowledge import ProtocolVersion
 from cpg_tree.views.case_loader import CaseLoadError, load_case_text
 
+COUNT_X_KNOWN = 101
+SPAN_T_KNOWN = 48
+
 
 def test_valid_scalars_load_as_known_values(synthetic_package: ProtocolVersion) -> None:
     case = load_case_text(
@@ -15,10 +18,10 @@ def test_valid_scalars_load_as_known_values(synthetic_package: ProtocolVersion) 
         synthetic_package.variables,
     )
     assert case.values["count_x"].state is CaseValueState.KNOWN
-    assert case.values["count_x"].value == 101
+    assert case.values["count_x"].value == COUNT_X_KNOWN
     assert case.values["flag_y"].value is True
     assert case.values["category_z"].value == "alpha"
-    assert case.values["span_t"].value == 48
+    assert case.values["span_t"].value == SPAN_T_KNOWN
 
 
 def test_null_loads_as_explicit_unknown(synthetic_package: ProtocolVersion) -> None:

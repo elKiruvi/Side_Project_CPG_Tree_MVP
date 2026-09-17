@@ -21,7 +21,7 @@ from cpg_tree.knowledge.serialization import to_dict
 _TARGET_TYPES = ("rule", "variable", "action", "fragment")
 
 
-def render_provenance(
+def render_provenance(  # noqa: C901, PLR0912
     version: ProtocolVersion,
     target_type: str,
     target_id: str,
@@ -31,7 +31,9 @@ def render_provenance(
     target, provenance = _resolve_target(version, target_type, target_id)
     lines = [f"Target     : {target_type} {target_id}"]
     if target_type == "fragment":
-        lines.append("Note       : a fragment is itself source evidence; it has no provenance field")
+        lines.append(
+            "Note       : a fragment is itself source evidence; it has no provenance field"
+        )
     elif provenance is None:
         lines.append("Provenance : (none declared for this element)")
     else:
@@ -121,9 +123,7 @@ def _resolve_target(
     else:
         element = version.actions.get(target_id)
     if element is None:
-        raise ValueError(
-            f"unknown {target_type} {target_id!r} in protocol {version.protocol.id!r}"
-        )
+        raise ValueError(f"unknown {target_type} {target_id!r} in protocol {version.protocol.id!r}")
     return element, getattr(element, "provenance", None)
 
 

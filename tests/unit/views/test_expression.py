@@ -72,12 +72,7 @@ def test_render_flag_membership_and_temporal_conditions() -> None:
 
 def test_render_or_block() -> None:
     expression = LogicalExpression(operator=LogicalOperator.OR, operands=(FLAG_A, COMPARE))
-    assert render_operand(expression) == (
-        "OR(\n"
-        "    edad_adulta = true,\n"
-        "    bun > 30\n"
-        ")"
-    )
+    assert render_operand(expression) == ("OR(\n    edad_adulta = true,\n    bun > 30\n)")
 
 
 def test_render_nested_blocks_preserve_nesting() -> None:
@@ -106,13 +101,19 @@ def test_render_not_and_at_least_n_inline() -> None:
         operands=(FLAG_A, COMPARE, MEMBERSHIP),
         threshold=2,
     )
-    assert render_operand(at_least) == "AT_LEAST_N(2; edad_adulta = true, bun > 30, categoria IN {x, y})"
+    assert (
+        render_operand(at_least)
+        == "AT_LEAST_N(2; edad_adulta = true, bun > 30, categoria IN {x, y})"
+    )
 
 
 def test_render_is_deterministic() -> None:
     expression = LogicalExpression(
         operator=LogicalOperator.AND,
-        operands=(FLAG_A, LogicalExpression(operator=LogicalOperator.OR, operands=(COMPARE, MEMBERSHIP))),
+        operands=(
+            FLAG_A,
+            LogicalExpression(operator=LogicalOperator.OR, operands=(COMPARE, MEMBERSHIP)),
+        ),
     )
     assert render_operand(expression) == render_operand(expression)
     assert render_operand(TEMPORAL) == render_operand(TEMPORAL)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -11,7 +12,7 @@ from cpg_tree.views.discovery import DiscoveryError, discover_protocols, load_pr
 
 
 def _write_artifact(
-    root,
+    root: Path,
     protocol_id: str,
     version: str,
     package: ProtocolVersion,
@@ -22,7 +23,7 @@ def _write_artifact(
     (target / "package.yaml").write_text(dump_package(versioned), encoding="utf-8")
 
 
-def test_discovers_protocols_sorted(tmp_path, synthetic_package: ProtocolVersion) -> None:
+def test_discovers_protocols_sorted(tmp_path: Path, synthetic_package: ProtocolVersion) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v01", synthetic_package)
     _write_artifact(root, "OTHER-PL-111", "v02", synthetic_package)
@@ -32,7 +33,7 @@ def test_discovers_protocols_sorted(tmp_path, synthetic_package: ProtocolVersion
 
 
 def test_discovers_multiple_versions_sorted(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v02", synthetic_package)
@@ -41,7 +42,7 @@ def test_discovers_multiple_versions_sorted(
     assert list(index["TEST-PL-999"]) == ["v01", "v02"]
 
 
-def test_ignores_directories_without_package_artifact(tmp_path) -> None:
+def test_ignores_directories_without_package_artifact(tmp_path: Path) -> None:
     root = tmp_path / "protocols"
     (root / "TEST-PL-999" / "v01").mkdir(parents=True)
     (root / "TEST-PL-999" / "notes.txt").write_text("not an artifact", encoding="utf-8")
@@ -49,7 +50,7 @@ def test_ignores_directories_without_package_artifact(tmp_path) -> None:
 
 
 def test_loads_single_version_without_selector(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v01", synthetic_package)
@@ -60,7 +61,7 @@ def test_loads_single_version_without_selector(
 
 
 def test_unknown_protocol_fails_deterministically(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v01", synthetic_package)
@@ -69,7 +70,7 @@ def test_unknown_protocol_fails_deterministically(
 
 
 def test_unknown_version_fails_deterministically(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v01", synthetic_package)
@@ -78,7 +79,7 @@ def test_unknown_version_fails_deterministically(
 
 
 def test_multiple_versions_require_explicit_selector(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "TEST-PL-999", "v01", synthetic_package)
@@ -89,7 +90,7 @@ def test_multiple_versions_require_explicit_selector(
     assert package.version == "v02"
 
 
-def test_malformed_yaml_raises_value_error(tmp_path) -> None:
+def test_malformed_yaml_raises_value_error(tmp_path: Path) -> None:
     root = tmp_path / "protocols"
     target = root / "TEST-PL-999" / "v01"
     target.mkdir(parents=True)
@@ -99,7 +100,7 @@ def test_malformed_yaml_raises_value_error(tmp_path) -> None:
 
 
 def test_directory_identity_must_match_package(
-    tmp_path, synthetic_package: ProtocolVersion
+    tmp_path: Path, synthetic_package: ProtocolVersion
 ) -> None:
     root = tmp_path / "protocols"
     _write_artifact(root, "OTHER-PL-111", "v01", synthetic_package)

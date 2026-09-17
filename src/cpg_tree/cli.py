@@ -45,9 +45,7 @@ from cpg_tree.views.tree import build_projection, projection_to_json, render_pro
 EXIT_OK = 0
 EXIT_ERROR = 1
 
-_DESCRIPTION = (
-    "Inspect and evaluate computable clinical protocols (research prototype)."
-)
+_DESCRIPTION = "Inspect and evaluate computable clinical protocols (research prototype)."
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -157,9 +155,7 @@ def _load_package(args: argparse.Namespace) -> tuple[ProtocolVersion, Path]:
     root = Path(args.protocols_root)
     package: ProtocolVersion
     artifact_path: Path
-    package, artifact_path = load_protocol(
-        discover_protocols(root), args.protocol, args.version
-    )
+    package, artifact_path = load_protocol(discover_protocols(root), args.protocol, args.version)
     return package, artifact_path
 
 
@@ -248,7 +244,9 @@ def _cmd_provenance(args: argparse.Namespace) -> int:
     if args.json:
         _print_json(provenance_to_json(package, target_type, target_id))
     else:
-        print(render_provenance(package, target_type, target_id, show_evidence=not args.no_evidence))
+        print(
+            render_provenance(package, target_type, target_id, show_evidence=not args.no_evidence)
+        )
     return EXIT_OK
 
 

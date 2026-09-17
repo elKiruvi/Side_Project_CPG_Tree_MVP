@@ -21,8 +21,13 @@ from cpg_tree.knowledge import (
 )
 from cpg_tree.views.discovery import discover_protocols, load_protocol
 
+EXPECTED_VARIABLE_COUNT = 3
+EXIT_USAGE = 2
 
-def _run(argv: list[str], cli_root: Path, capsys: pytest.CaptureFixture[str]) -> tuple[int, str, str]:
+
+def _run(
+    argv: list[str], cli_root: Path, capsys: pytest.CaptureFixture[str]
+) -> tuple[int, str, str]:
     code = main(["--protocols-root", str(cli_root), *argv])
     captured = capsys.readouterr()
     return code, captured.out, captured.err
@@ -68,7 +73,7 @@ def test_inspect_json_is_stable(cli_root: Path, capsys: pytest.CaptureFixture[st
     second = _run(["inspect", "TEST-PL-999", "--json"], cli_root, capsys)[1]
     assert first == second
     data = json.loads(first)
-    assert data["counts"]["variables"] == 3
+    assert data["counts"]["variables"] == EXPECTED_VARIABLE_COUNT
     assert data["validation"]["valid"] is True
 
 
@@ -268,7 +273,7 @@ def test_evaluate_refuses_invalid_package(
 def test_usage_error_exits_with_two(cli_root: Path) -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(["--protocols-root", str(cli_root), "no_such_command"])
-    assert excinfo.value.code == 2
+    assert excinfo.value.code == EXIT_USAGE
 
 
 def test_debug_reraises(cli_root: Path) -> None:

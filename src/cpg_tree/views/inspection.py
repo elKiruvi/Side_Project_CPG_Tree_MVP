@@ -111,7 +111,9 @@ def render_summary(summary: PackageSummary) -> str:
     total_rules = summary.rules_with_evidence + summary.rules_without_evidence
     lines.append(f"  rules with source evidence: {summary.rules_with_evidence}/{total_rules}")
     lines.append(f"  fragments with page info: {summary.fragments_with_page}")
-    lines.append("  derivation: " + ", ".join(f"{k}={v}" for k, v in summary.derivation_counts.items()))
+    lines.append(
+        "  derivation: " + ", ".join(f"{k}={v}" for k, v in summary.derivation_counts.items())
+    )
     lines.append(
         "  validation status: " + ", ".join(f"{k}={v}" for k, v in summary.status_counts.items())
     )

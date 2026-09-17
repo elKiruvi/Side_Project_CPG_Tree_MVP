@@ -3,23 +3,28 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from pathlib import Path
 
 from cpg_tree.knowledge import (
+    ComparisonOperator,
     Condition,
     ConditionKind,
-    ComparisonOperator,
     DerivationState,
     LogicalExpression,
     LogicalOperator,
     ProtocolVersion,
     Provenance,
     Rule,
+    load_package,
 )
 from cpg_tree.views.tree import (
     build_projection,
     projection_to_json,
     render_projection,
 )
+
+SHARED_USES = 3
+_MIN_REAL_SHARED_USES = 2
 
 FLAG_TRUE = Condition(kind=ConditionKind.FLAG, variable_ref="flag_y", expected=True)
 FLAG_FALSE = Condition(kind=ConditionKind.FLAG, variable_ref="flag_y", expected=False)
@@ -102,11 +107,11 @@ def test_shared_condition_merged_once_with_stable_id(
     assert len(projection.shared_expressions) == 1
     shared = projection.shared_expressions[0]
     assert shared.id == "shared-01"
-    assert shared.usage_count == 3
+    assert shared.usage_count == SHARED_USES
     assert shared.first_rule_id == "rule_zzz_extra"
     assert shared.first_position == "condition"
     text = render_projection(projection, package)
-    assert "shared-01 — used 3 time(s)" in text
+    assert f"shared-01 — used {SHARED_USES} time(s)" in text
     assert "span_t >= 1" in text
 
 
@@ -199,10 +204,6 @@ def test_json_schema_is_stable(synthetic_package: ProtocolVersion) -> None:
 
 
 def test_projection_on_real_packages_yields_shared_groups() -> None:
-    from pathlib import Path
-
-    from cpg_tree.knowledge import load_package
-
     for relative in (
         "protocols/CT-PL-193/v09/package.yaml",
         "protocols/CT-PL-197/v06/package.yaml",
@@ -212,5 +213,5 @@ def test_projection_on_real_packages_yields_shared_groups() -> None:
         assert projection.protocol_id == package.protocol.id
         assert [rule.rule_id for rule in projection.rules] == sorted(package.rules)
         for entry in projection.shared_expressions:
-            assert entry.usage_count >= 2
+            assert entry.usage_count >= _MIN_REAL_SHARED_USES
             assert entry.id == f"shared-{int(entry.id.split('-')[1]):02d}"

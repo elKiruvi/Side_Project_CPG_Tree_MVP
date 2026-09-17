@@ -185,20 +185,14 @@ def _render_actions(rule_result: RuleEvaluation, version: ProtocolVersion) -> li
     ]
     alternatives = len(prescribe) > 1
     if alternatives:
-        lines = [
-            "    declared actions (multiple PRESCRIBE = alternatives declared by the source):"
-        ]
+        lines = ["    declared actions (multiple PRESCRIBE = alternatives declared by the source):"]
     else:
         lines = ["    declared actions:"]
     for ref, action in resolved:
         if action is None:
             lines.append(f"        {ref} (unresolved)")
             continue
-        marker = (
-            "   [alternative]"
-            if alternatives and action.type is ActionType.PRESCRIBE
-            else ""
-        )
+        marker = "   [alternative]" if alternatives and action.type is ActionType.PRESCRIBE else ""
         label = action.label or "(no label)"
         lines.append(f"        {ref}: {action.type.value} — {label}{marker}")
     if alternatives:

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-import pytest
-
 from cpg_tree.engine import Case, evaluate_package
 from cpg_tree.knowledge import (
+    Action,
+    ActionType,
     Condition,
     ConditionKind,
     DerivationState,
@@ -24,7 +24,11 @@ def _evaluate(package: ProtocolVersion, inputs: dict[str, object]) -> object:
 
 def test_matched_rule_renders_declared_action(synthetic_package: ProtocolVersion) -> None:
     result = _evaluate(synthetic_package, {"count_x": 101, "flag_y": True, "category_z": "gamma"})
-    text = render_evaluation(result, synthetic_package, Case.from_inputs({"count_x": 101, "flag_y": True, "category_z": "gamma"}))
+    text = render_evaluation(
+        result,
+        synthetic_package,
+        Case.from_inputs({"count_x": 101, "flag_y": True, "category_z": "gamma"}),
+    )
     assert "rule_composite" in text and "MATCHED" in text
     assert "act_request: REQUEST_TEST" in text
     assert "prescribe" not in text.split("alternatives")[0].lower() or "declared actions" in text
@@ -40,7 +44,9 @@ def test_not_matched_rule_renders_outcome(synthetic_package: ProtocolVersion) ->
 
 def test_not_applicable_rule_explains_scope(synthetic_package: ProtocolVersion) -> None:
     result = _evaluate(synthetic_package, {"count_x": 1, "flag_y": True})
-    text = render_evaluation(result, synthetic_package, Case.from_inputs({"count_x": 1, "flag_y": True}))
+    text = render_evaluation(
+        result, synthetic_package, Case.from_inputs({"count_x": 1, "flag_y": True})
+    )
     assert "NOT_APPLICABLE" in text
     assert "applies_to evaluated FALSE" in text
 
@@ -48,7 +54,9 @@ def test_not_applicable_rule_explains_scope(synthetic_package: ProtocolVersion) 
 def test_excepted_rule_explains_exception(synthetic_package: ProtocolVersion) -> None:
     result = _evaluate(synthetic_package, {"count_x": 101, "flag_y": True, "category_z": "alpha"})
     text = render_evaluation(
-        result, synthetic_package, Case.from_inputs({"count_x": 101, "flag_y": True, "category_z": "alpha"})
+        result,
+        synthetic_package,
+        Case.from_inputs({"count_x": 101, "flag_y": True, "category_z": "alpha"}),
     )
     assert "EXCEPTED" in text
     assert "condition TRUE but an exception evaluated TRUE" in text
@@ -63,7 +71,9 @@ def test_indeterminate_rule_preserves_unknown(synthetic_package: ProtocolVersion
 
 def test_indeterminate_via_exception_unknown(synthetic_package: ProtocolVersion) -> None:
     result = _evaluate(synthetic_package, {"count_x": 101, "flag_y": True})
-    text = render_evaluation(result, synthetic_package, Case.from_inputs({"count_x": 101, "flag_y": True}))
+    text = render_evaluation(
+        result, synthetic_package, Case.from_inputs({"count_x": 101, "flag_y": True})
+    )
     assert "rule_composite" in text and "INDETERMINATE" in text
     assert "an exception evaluated UNKNOWN" in text
 
@@ -92,8 +102,6 @@ def test_alternatives_are_marked_in_json(synthetic_package: ProtocolVersion) -> 
 def test_single_prescribe_is_not_an_alternative_group(
     synthetic_package: ProtocolVersion,
 ) -> None:
-    from cpg_tree.knowledge import Action, ActionType
-
     package = replace(
         synthetic_package,
         actions={

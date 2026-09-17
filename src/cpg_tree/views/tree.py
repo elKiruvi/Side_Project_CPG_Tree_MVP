@@ -25,6 +25,7 @@ from cpg_tree.views.expression import expression_fingerprint, render_operand
 
 _POSITION_APPLIES_TO = "applies_to"
 _POSITION_CONDITION = "condition"
+_MIN_SHARED_USES = 2
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,7 +91,7 @@ def build_projection(version: ProtocolVersion) -> DecisionProjection:
     shared_by_fingerprint: dict[str, SharedExpression] = {}
     counter = 0
     for fingerprint, (rule_id, position) in first_seen.items():
-        if counts[fingerprint] < 2:
+        if counts[fingerprint] < _MIN_SHARED_USES:
             continue
         counter += 1
         shared_by_fingerprint[fingerprint] = SharedExpression(
@@ -114,13 +115,10 @@ def build_projection(version: ProtocolVersion) -> DecisionProjection:
                 exceptions=rule.exceptions,
                 action_refs=rule.action_refs,
                 fragment_refs=rule.provenance.fragment_refs,
-                applies_to_shared_id=_shared_id(
-                    shared_by_fingerprint, rule.applies_to
-                ),
+                applies_to_shared_id=_shared_id(shared_by_fingerprint, rule.applies_to),
                 condition_shared_id=_shared_id(shared_by_fingerprint, rule.condition),
                 exception_shared_ids=tuple(
-                    _shared_id(shared_by_fingerprint, exception)
-                    for exception in rule.exceptions
+                    _shared_id(shared_by_fingerprint, exception) for exception in rule.exceptions
                 ),
             )
         )
@@ -187,9 +185,7 @@ def _rule_children(
                 _position_text(exception, f"exception:{index}", rule, entry),
             )
         )
-    actions = ", ".join(
-        f"{ref} ({_action_kind(version, ref)})" for ref in rule.action_refs
-    )
+    actions = ", ".join(f"{ref} ({_action_kind(version, ref)})" for ref in rule.action_refs)
     children.append(("actions", actions or "(none declared)"))
     return children
 
@@ -206,10 +202,10 @@ def _position_text(
     entry: SharedExpression | None,
 ) -> str:
     if entry is None:
-        return render_operand(operand)
+        return str(render_operand(operand))
     if entry.first_rule_id == rule.rule_id and entry.first_position == position:
         marker = f" [{entry.id} — used {entry.usage_count} time(s)]"
-        return render_operand(operand) + marker
+        return str(render_operand(operand)) + marker
     return f"@{entry.id} (first seen in {entry.first_rule_id})"
 
 
