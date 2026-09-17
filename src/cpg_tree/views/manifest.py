@@ -1,3 +1,4 @@
+# ruff: noqa: TRY004
 """Presentation metadata model for protocol visualization manifests.
 
 A visualization manifest (``visualization.yaml`` next to ``package.yaml``)

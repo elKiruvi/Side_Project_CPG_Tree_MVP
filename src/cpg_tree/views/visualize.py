@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Deterministic HTML visualization of a knowledge package (derived view).
 
 TRY004 is disabled for this module on purpose: deserialization of malformed
@@ -35,7 +34,7 @@ from cpg_tree.views.expression import render_operand
 from cpg_tree.views.manifest import (
     VisualizationManifest,
     group_rules,
-    load_manifest,
+    load_manifest,  # noqa: F401  (re-exported for the established public API)
 )
 from cpg_tree.views.tree import build_projection
 

@@ -2,16 +2,29 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from cpg_tree.knowledge import ProtocolVersion
-from cpg_tree.views.clinical import build_clinical_graph
-from cpg_tree.views.manifest import load_manifest
+from cpg_tree.knowledge import (
+    DerivationState,
+    ProtocolVersion,
+    Provenance,
+    Rule,
+    dump_package,
+)
+from cpg_tree.views.clinical import (
+    build_clinical_graph,
+    render_clinical_svg,
+    render_clinical_view,
+)
+from cpg_tree.views.manifest import VisualizationManifest, load_manifest
+
+_EXPECTED_SHARED_USAGE = 2
 
 
-def _manifest(tmp_path: Path, text: str):
+def _manifest(tmp_path: Path, text: str) -> VisualizationManifest:
     path = tmp_path / "visualization.yaml"
     path.write_text(text, encoding="utf-8")
     loaded = load_manifest(path)
@@ -125,8 +138,6 @@ def test_valid_connectors_and_entry_points_preserved(
 def test_top_level_shared_expression_is_detected(
     synthetic_package: ProtocolVersion,
 ) -> None:
-    from dataclasses import replace
-
     shared_condition = synthetic_package.rules["rule_composite"].applies_to
     assert shared_condition is not None
     extra_rule = replace(
@@ -142,7 +153,7 @@ def test_top_level_shared_expression_is_detected(
     node = graph.nodes["rule_zzz_shared_user"]
     assert node.condition_shared_id is not None
     assert node.condition_shared_id in graph.shared_usage
-    assert graph.shared_usage[node.condition_shared_id] == 2
+    assert graph.shared_usage[node.condition_shared_id] == _EXPECTED_SHARED_USAGE
 
 
 def test_shared_ids_are_consistent_with_projection(
@@ -159,3 +170,188 @@ def test_shared_ids_are_consistent_with_projection(
             if shared_id is not None:
                 assert shared_id in graph.shared_usage
     assert graph.shared_usage == {}
+
+
+# ---------------------------------------------------------------------------
+# Renderer tests
+# ---------------------------------------------------------------------------
+
+
+def _svg_text(
+    package: ProtocolVersion,
+    manifest: VisualizationManifest | None = None,
+) -> str:
+    graph = build_clinical_graph(package, manifest)
+    # cpg_tree imports resolve as Any from test files under the current mypy
+    # configuration (pre-existing repo-wide condition); the runtime value is
+    # the deterministic SVG text asserted below.
+    return render_clinical_svg(package, graph)  # type: ignore[no-any-return]
+
+
+def _node_block(svg_text: str, rule_id: str) -> str:
+    start = svg_text.index(f'id="clinical_rule_{rule_id}"')
+    end = svg_text.index("</foreignObject>", start)
+    return svg_text[start:end]
+
+
+def test_render_clinical_view_fragment_is_deterministic(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    first = render_clinical_view(synthetic_package, None)
+    second = render_clinical_view(synthetic_package, None)
+    assert first == second
+    assert "Vista de conocimiento clínico" in first
+    assert "<svg" in first
+    assert "presentación" in first
+
+
+def test_svg_renders_every_rule_exactly_once(synthetic_package: ProtocolVersion) -> None:
+    svg_text = _svg_text(synthetic_package)
+    nodes = svg_text.count('class="cnode"')
+    assert nodes == len(synthetic_package.rules)
+    assert nodes == len(set(synthetic_package.rules))
+    for rule_id in synthetic_package.rules:
+        assert f'id="clinical_rule_{rule_id}"' in svg_text
+
+
+def test_every_node_links_to_its_technical_card(synthetic_package: ProtocolVersion) -> None:
+    svg_text = _svg_text(synthetic_package)
+    for rule_id in synthetic_package.rules:
+        block = _node_block(svg_text, rule_id)
+        assert f'href="#{rule_id}"' in block
+        assert "ver detalle técnico" in block
+
+
+def test_unknown_lane_is_present_and_distinct_from_false(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    for rule_id in synthetic_package.rules:
+        block = _node_block(svg_text, rule_id)
+        assert "UNKNOWN → INDETERMINATE (nunca FALSE)" in block
+        assert "FALSE → NOT_MATCHED" in block
+        assert "TRUE → MATCHED" in block
+
+
+def test_exception_lanes_only_for_rules_with_exceptions(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    composite = _node_block(svg_text, "rule_composite")
+    assert "EXCEPCIÓN 1" in composite
+    assert "excepción TRUE → EXCEPTED" in composite
+    alternatives = _node_block(svg_text, "rule_alternatives")
+    assert "EXCEPCIÓN" not in alternatives
+    assert "excepción TRUE → EXCEPTED" not in alternatives
+
+
+def test_compound_conditions_and_applies_to_are_rendered(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    composite = _node_block(svg_text, "rule_composite")
+    assert "APPLIES TO — alcance/población" in composite
+    assert "AND(" in composite
+    assert "count_x" in composite
+
+
+def test_prescribe_alternatives_are_never_selected(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    block = _node_block(svg_text, "rule_alternatives")
+    assert "act_prescribe_a" in block
+    assert "act_prescribe_b" in block
+    assert "[alternativa]" in block
+    assert "alternativas declaradas por la fuente; nunca seleccionadas" in block
+    assert "ACCIONES DECLARATIVAS — NUNCA EJECUTADAS" in block
+
+
+def test_provenance_line_keeps_fragment_page_and_derivation(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    block = _node_block(svg_text, "rule_composite")
+    assert "SOURCE_STATED" in block
+    assert "frag_1" in block
+    assert "pág 3" in block
+
+
+def test_escaping_applies_to_node_content(synthetic_package: ProtocolVersion) -> None:
+    sneaky_notes = '<script>alert("x")</script> & umbral > 5'
+    rule = Rule(
+        id="rule_zzz_sneaky",
+        condition=synthetic_package.rules["rule_alternatives"].condition,
+        action_refs=(),
+        provenance=Provenance(DerivationState.SOURCE_STATED, ("frag_1",)),
+        notes=sneaky_notes,
+    )
+    package = replace(synthetic_package, rules={**synthetic_package.rules, "rule_zzz_sneaky": rule})
+    svg_text = _svg_text(package)
+    assert "<script>alert" not in svg_text
+    assert "&lt;script&gt;alert" in svg_text
+
+
+def test_svg_has_no_scripts_and_no_external_resources(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    assert "<script" not in svg_text
+    assert 'href="http' not in svg_text
+    assert 'src="http' not in svg_text
+    assert "src=" not in svg_text
+
+
+def test_svg_is_byte_deterministic(synthetic_package: ProtocolVersion) -> None:
+    first = _svg_text(synthetic_package)
+    second = _svg_text(synthetic_package)
+    assert first == second
+
+
+def test_connectors_render_only_declared_edges(
+    tmp_path: Path,
+    synthetic_package: ProtocolVersion,
+) -> None:
+    manifest = _manifest(
+        tmp_path,
+        "sections:\n  - title: X\n    rules: [rule_alternatives, rule_composite]\n"
+        "graph:\n"
+        "  entry_points: [rule_composite]\n"
+        "  edges:\n    - from: rule_composite\n      to: rule_alternatives\n",
+    )
+    svg_text = _svg_text(synthetic_package, manifest)
+    assert svg_text.count('class="c-edge"') == 1
+    block = _node_block(svg_text, "rule_composite")
+    assert "punto de partida (presentación)" in block
+
+
+def test_no_edges_when_graph_absent(synthetic_package: ProtocolVersion) -> None:
+    svg_text = _svg_text(synthetic_package)
+    assert 'class="c-edge"' not in svg_text
+
+
+def test_shared_expression_badge_appears_in_node(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    shared_condition = synthetic_package.rules["rule_composite"].applies_to
+    assert shared_condition is not None
+    extra_rule = replace(
+        synthetic_package.rules["rule_alternatives"],
+        id="rule_zzz_shared_user",
+        condition=shared_condition,
+        action_refs=(),
+    )
+    package = replace(
+        synthetic_package, rules={**synthetic_package.rules, "rule_zzz_shared_user": extra_rule}
+    )
+    svg_text = _svg_text(package)
+    assert "@shared-" in svg_text
+    assert "usado 2 veces" in svg_text
+
+
+def test_render_clinical_view_does_not_mutate_package(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    before = dump_package(synthetic_package)
+    render_clinical_view(synthetic_package, None)
+    assert dump_package(synthetic_package) == before

@@ -57,12 +57,12 @@ def test_unknown_top_level_key_rejected(tmp_path: Path) -> None:
 
 
 def test_graph_must_be_mapping(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="graph entry .* must be a mapping"):
+    with pytest.raises(ValueError, match=r"graph entry .* must be a mapping"):
         _load(tmp_path, "sections:\n  - title: X\n    prefixes: [r]\ngraph: [1]\n")
 
 
 def test_graph_unknown_keys_rejected(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="graph entry .* unknown keys"):
+    with pytest.raises(ValueError, match=r"graph entry .* unknown keys"):
         _load(
             tmp_path,
             "sections:\n  - title: X\n    prefixes: [r]\n"
@@ -74,8 +74,7 @@ def test_entry_points_must_be_strings(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="list of non-empty strings"):
         _graph(
             tmp_path,
-            "sections:\n  - title: X\n    prefixes: [r]\n"
-            "graph:\n  entry_points: [3]\n",
+            "sections:\n  - title: X\n    prefixes: [r]\ngraph:\n  entry_points: [3]\n",
         )
 
 
@@ -89,7 +88,7 @@ def test_entry_points_must_not_repeat(tmp_path: Path) -> None:
 
 
 def test_edges_must_be_list(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="graph edges .* must be a list"):
+    with pytest.raises(ValueError, match=r"graph edges .* must be a list"):
         _graph(
             tmp_path,
             "sections:\n  - title: X\n    prefixes: [r]\ngraph:\n  edges: nope\n",
@@ -97,7 +96,7 @@ def test_edges_must_be_list(tmp_path: Path) -> None:
 
 
 def test_edge_must_be_mapping(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="graph edge 0 .* must be a mapping"):
+    with pytest.raises(ValueError, match=r"graph edge 0 .* must be a mapping"):
         _graph(
             tmp_path,
             "sections:\n  - title: X\n    prefixes: [r]\ngraph:\n  edges: [1]\n",
@@ -105,7 +104,7 @@ def test_edge_must_be_mapping(tmp_path: Path) -> None:
 
 
 def test_edge_unknown_keys_rejected(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="graph edge 0 .* unknown keys"):
+    with pytest.raises(ValueError, match=r"graph edge 0 .* unknown keys"):
         _graph(
             tmp_path,
             "sections:\n  - title: X\n    prefixes: [r]\n"
