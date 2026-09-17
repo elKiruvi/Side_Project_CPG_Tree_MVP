@@ -65,12 +65,14 @@ def build_summary(
     rules = sorted(version.rules.values(), key=lambda rule: rule.id)
     with_evidence = sum(1 for rule in rules if rule.provenance.fragment_refs)
     variables_with_evidence = sum(
-        1 for variable in version.variables.values() if variable.provenance is not None
-        and variable.provenance.fragment_refs
+        1
+        for variable in version.variables.values()
+        if variable.provenance is not None and variable.provenance.fragment_refs
     )
     actions_with_evidence = sum(
-        1 for action in version.actions.values() if action.provenance is not None
-        and action.provenance.fragment_refs
+        1
+        for action in version.actions.values()
+        if action.provenance is not None and action.provenance.fragment_refs
     )
     derivation_counts: dict[str, int] = {}
     status_counts: dict[str, int] = {}
@@ -113,8 +115,9 @@ def build_summary(
             1 for frag in version.fragments.values() if frag.document_id is not None
         ),
         fragments_with_text=sum(
-            1 for frag in version.fragments.values() if bool(frag.verbatim_text
-            and frag.verbatim_text.strip())
+            1
+            for frag in version.fragments.values()
+            if bool(frag.verbatim_text and frag.verbatim_text.strip())
         ),
         derivation_counts=dict(sorted(derivation_counts.items())),
         status_counts=dict(sorted(status_counts.items())),

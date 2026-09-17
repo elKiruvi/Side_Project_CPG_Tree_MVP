@@ -17,9 +17,7 @@ from cpg_tree.engine import RuleOutcome, evaluate_package
 from cpg_tree.protocols.nac_v09 import build_nac_package
 from cpg_tree.views.case_loader import load_case_text
 
-CASES_DIR = (
-    Path(__file__).resolve().parents[3] / "evaluation" / "cases" / "CT-PL-193" / "v09"
-)
+CASES_DIR = Path(__file__).resolve().parents[3] / "evaluation" / "cases" / "CT-PL-193" / "v09"
 
 DOCUMENTED_CASES = {
     "nac_matched.json": RuleOutcome.MATCHED,
@@ -47,8 +45,12 @@ def test_every_documented_case_produces_its_outcome() -> None:
 
 def test_nac_demonstrates_four_of_five_outcomes() -> None:
     demonstrated = {outcome for case_name in DOCUMENTED_CASES for outcome in _outcomes(case_name)}
-    assert {RuleOutcome.MATCHED, RuleOutcome.NOT_MATCHED, RuleOutcome.NOT_APPLICABLE,
-            RuleOutcome.INDETERMINATE} <= demonstrated
+    assert {
+        RuleOutcome.MATCHED,
+        RuleOutcome.NOT_MATCHED,
+        RuleOutcome.NOT_APPLICABLE,
+        RuleOutcome.INDETERMINATE,
+    } <= demonstrated
 
 
 def test_nac_has_no_exception_rule_so_excepted_is_not_demonstrable() -> None:

@@ -17,9 +17,7 @@ from cpg_tree.engine import RuleOutcome, evaluate_package
 from cpg_tree.protocols.itu_v06 import build_itu_package
 from cpg_tree.views.case_loader import load_case_text
 
-CASES_DIR = (
-    Path(__file__).resolve().parents[3] / "evaluation" / "cases" / "CT-PL-197" / "v06"
-)
+CASES_DIR = Path(__file__).resolve().parents[3] / "evaluation" / "cases" / "CT-PL-197" / "v06"
 
 DOCUMENTED_CASES = {
     "itu_matched.json": RuleOutcome.MATCHED,
