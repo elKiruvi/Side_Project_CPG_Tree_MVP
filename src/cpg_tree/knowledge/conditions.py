@@ -101,8 +101,8 @@ class Condition:
                 raise ValueError("MEMBERSHIP conditions require at least one value")
         elif self.kind is ConditionKind.TEMPORAL:
             self._require_number(self.duration_value, "TEMPORAL duration_value")
-            if self.duration_value is None or self.duration_value <= _MIN_DURATION:
-                raise ValueError("TEMPORAL duration_value must be positive")
+            if self.duration_value is None or self.duration_value < _MIN_DURATION:
+                raise ValueError("TEMPORAL duration_value must not be negative")
             if not self.duration_unit:
                 raise ValueError("TEMPORAL conditions require a non-empty duration_unit")
 

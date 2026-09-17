@@ -33,7 +33,8 @@ class Action:
 class Rule:
     """IF condition THEN actions, with applicability, exceptions, and provenance.
 
-    ``action_refs`` identify Action entries held by the owning ProtocolVersion.
+    ``action_refs`` identify Action entries held by the owning ProtocolVersion;
+    an empty tuple is legal and means the rule declares no actions.
     ``applies_to`` restricts the population the rule applies to; ``exceptions``
     suppress the rule when satisfied.
     """
@@ -49,7 +50,5 @@ class Rule:
 
     def __post_init__(self) -> None:
         validate_identifier(self.id, "Rule.id")
-        if not self.action_refs:
-            raise ValueError("Rule.action_refs must not be empty")
         for action_ref in self.action_refs:
             validate_identifier(action_ref, "Rule.action_refs entry")

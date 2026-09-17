@@ -288,6 +288,19 @@ def test_load_tolerates_missing_documents_key() -> None:
     assert loaded.documents == {}
 
 
+def test_zero_action_rule_survives_round_trip() -> None:
+    text = (
+        _RULE_PACKAGE_HEADER + "rules:\n"
+        "  rule_x:\n"
+        "    id: rule_x\n"
+        "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
+        "    provenance: {derivation: SOURCE_STATED}\n"
+    )
+    loaded = load_package(text)
+    assert loaded.rules["rule_x"].action_refs == ()
+    assert load_package(dump_package(loaded)) == loaded
+
+
 def test_dump_contains_documents_block(synthetic_package: ProtocolVersion) -> None:
     data = yaml.safe_load(dump_package(synthetic_package))
     assert data["documents"]["doc_1"]["document_id"] == "doc_1"

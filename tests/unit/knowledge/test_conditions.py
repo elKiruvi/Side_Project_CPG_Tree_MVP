@@ -160,13 +160,24 @@ def test_temporal_requires_operator_and_duration(duration_variable: Variable) ->
         )
 
 
-def test_temporal_rejects_non_positive_duration(duration_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="must be positive"):
+def test_temporal_allows_zero_duration(duration_variable: Variable) -> None:
+    condition = Condition(
+        kind=ConditionKind.TEMPORAL,
+        variable_ref=duration_variable.id,
+        temporal_operator=TemporalOperator.WITHIN_LAST,
+        duration_value=0,
+        duration_unit="days",
+    )
+    assert condition.duration_value == 0
+
+
+def test_temporal_rejects_negative_duration(duration_variable: Variable) -> None:
+    with pytest.raises(ValueError, match="must not be negative"):
         Condition(
             kind=ConditionKind.TEMPORAL,
             variable_ref=duration_variable.id,
             temporal_operator=TemporalOperator.WITHIN_LAST,
-            duration_value=0,
+            duration_value=-1,
             duration_unit="days",
         )
 

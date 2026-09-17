@@ -88,14 +88,14 @@ def test_rule_requires_provenance(numeric_variable: Variable) -> None:
         )
 
 
-def test_rule_rejects_empty_action_refs(numeric_variable: Variable) -> None:
-    with pytest.raises(ValueError, match="must not be empty"):
-        Rule(
-            id="rule_x",
-            condition=_condition(numeric_variable.id),
-            action_refs=(),
-            provenance=_provenance(),
-        )
+def test_rule_allows_empty_action_refs(numeric_variable: Variable) -> None:
+    rule = Rule(
+        id="rule_x",
+        condition=_condition(numeric_variable.id),
+        action_refs=(),
+        provenance=_provenance(),
+    )
+    assert rule.action_refs == ()
 
 
 def test_rule_rejects_invalid_action_ref(numeric_variable: Variable) -> None:
