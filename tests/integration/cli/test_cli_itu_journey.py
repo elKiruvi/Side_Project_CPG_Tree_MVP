@@ -119,3 +119,21 @@ def test_evaluate_empty_case_is_indeterminate(
     assert code == EXIT_OK
     assert "INDETERMINATE" in out
     assert "required information is UNKNOWN" in out
+
+
+def test_evaluate_committed_demo_case_reproduces_excepted(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    case_path = (
+        Path(__file__).resolve().parents[3]
+        / "evaluation"
+        / "cases"
+        / "CT-PL-197"
+        / "v06"
+        / "itu_excepted.json"
+    )
+    code, out, _ = _run(["evaluate", "CT-PL-197", str(case_path)], capsys)
+    assert code == EXIT_OK
+    assert "rule_t1_alta_hosp_con_fr_amikacina" in out
+    assert "EXCEPTED" in out
+    assert "condition TRUE but an exception evaluated TRUE" in out

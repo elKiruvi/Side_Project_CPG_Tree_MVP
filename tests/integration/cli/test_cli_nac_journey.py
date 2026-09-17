@@ -171,3 +171,21 @@ def test_evaluate_json_is_deterministic(
     assert data["version"] == "v09"
     rule_ids = [entry["rule_id"] for entry in data["rule_results"]]
     assert rule_ids == sorted(rule_ids)
+
+
+def test_evaluate_committed_demo_case_reproduces_documented_outcome(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    case_path = (
+        Path(__file__).resolve().parents[3]
+        / "evaluation"
+        / "cases"
+        / "CT-PL-193"
+        / "v09"
+        / "nac_matched.json"
+    )
+    code, out, _ = _run(["evaluate", "CT-PL-193", str(case_path)], capsys)
+    assert code == EXIT_OK
+    assert "MATCHED" in out
+    assert "rule_hosp_criterio_curb65" in out
+    assert "mechanically evaluated; UNRESOLVED derivation" in out
