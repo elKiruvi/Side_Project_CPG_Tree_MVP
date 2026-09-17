@@ -11,8 +11,14 @@ structured, traceable, versioned, and executable computational knowledge.
 
 ## Status
 
-Early MVP foundation phase. This is a research prototype, not a production clinical
-decision-support system, and does not replace clinical judgment.
+MVP closed (Phases 0–8). The MVP demonstrates **technical completeness** and
+**source traceability** for two institutional protocols. It does **not**
+establish **clinical/source fidelity**: every encoded rule remains
+`EXTRACTED` pending clinical review, and provenance coverage is not a
+clinical accuracy metric. See [docs/mvp-closure.md](docs/mvp-closure.md).
+
+This is a research prototype, not a production clinical decision-support
+system, and does not replace clinical judgment.
 
 ## About
 
@@ -72,6 +78,19 @@ browser). Rules are grouped into presentation sections by an optional sidecar
 manifest (`protocols/<id>/<version>/visualization.yaml`); sections are display
 groupings only — they do not represent clinical workflow or execution order.
 `package.yaml` remains the single source of truth for all clinical content.
+
+## Evaluation evidence
+
+- `docs/mvp-closure.md` — MVP closure report: acceptance criteria, evidence
+  matrix (reproducible via `inspect --json`), five engine outcomes, fidelity
+  accounting (extracted / normalized / inferred / unresolved), limitations.
+- `evaluation/cases/` — committed synthetic demonstration cases (non-patient
+  data), one per engine outcome where reachable:
+
+```bash
+uv run python -m cpg_tree evaluate CT-PL-193 evaluation/cases/CT-PL-193/v09/nac_matched.json
+uv run python -m cpg_tree evaluate CT-PL-197 evaluation/cases/CT-PL-197/v06/itu_excepted.json
+```
 
 ## Credits
 
