@@ -3,11 +3,20 @@
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from cpg_tree.knowledge import ProtocolVersion, dump_package, load_package
+from cpg_tree.knowledge import (
+    DerivationState,
+    ProtocolVersion,
+    Provenance,
+    Rule,
+    dump_package,
+    load_package,
+)
+from cpg_tree.views.tree import build_projection
 from cpg_tree.views.visualize import (
     VisualizationManifest,
     build_visual_document,
@@ -123,10 +132,6 @@ def test_duplicate_assignment_fails(
 def test_html_escaping_of_special_characters(
     synthetic_package: ProtocolVersion,
 ) -> None:
-    from dataclasses import replace
-
-    from cpg_tree.knowledge import DerivationState, Provenance, Rule
-
     sneaky_notes = '<script>alert("x")</script> & umbral > 5'
     rule = Rule(
         id="rule_zzz_sneaky",
@@ -162,8 +167,6 @@ def test_visualize_package_writes_deterministic_file(
 def test_shared_expression_badges_reuse_tree_projection(
     synthetic_package: ProtocolVersion,
 ) -> None:
-    from cpg_tree.views.tree import build_projection
-
     projection = build_projection(synthetic_package)
     html_text = build_visual_document(synthetic_package, None)
     for entry in projection.shared_expressions:
