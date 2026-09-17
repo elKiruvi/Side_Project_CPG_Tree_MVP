@@ -554,7 +554,7 @@ wheels = [
 [[package]]
 name = "side-project-cpg-tree-mvp"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pyyaml" },
 ]

@@ -25,11 +25,14 @@ dev = [
 #
 
 [tool.uv]
-package = false
+package = true
 default-groups = [
     "dev",
 #
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cpg_tree"]
 
 [build-system]
 requires = ["hatchling"]
