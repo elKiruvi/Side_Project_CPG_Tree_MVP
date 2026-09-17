@@ -152,3 +152,13 @@ def test_unsupported_kind_rejected(tmp_path: Path) -> None:
             "sections:\n  - title: X\n    prefixes: [r]\n"
             "graph:\n  edges:\n    - from: rule_a\n      to: rule_b\n      kind: next\n",
         )
+
+
+def test_empty_graph_key_is_valid(tmp_path: Path) -> None:
+    graph = _graph(
+        tmp_path,
+        "sections:\n  - title: X\n    prefixes: [rule_]\ngraph: {}\n",
+    )
+    assert graph is not None
+    assert graph.entry_points == ()
+    assert graph.edges == ()

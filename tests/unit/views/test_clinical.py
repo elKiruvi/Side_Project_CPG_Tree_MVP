@@ -355,3 +355,45 @@ def test_render_clinical_view_does_not_mutate_package(
     before = dump_package(synthetic_package)
     render_clinical_view(synthetic_package, None)
     assert dump_package(synthetic_package) == before
+
+
+def test_membership_and_temporal_conditions_are_rendered(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    svg_text = _svg_text(synthetic_package)
+    block = _node_block(svg_text, "rule_composite")
+    assert "category_z IN {alpha, beta}" in block
+    assert "AT_LEAST_FOR_LAST" in block
+    assert "span_t" in block
+
+
+def test_not_and_at_least_n_expressions_are_rendered(
+    synthetic_package: ProtocolVersion,
+) -> None:
+    from cpg_tree.knowledge import (
+        Condition,
+        ConditionKind,
+        LogicalExpression,
+        LogicalOperator,
+    )
+
+    flag_false = Condition(kind=ConditionKind.FLAG, variable_ref="flag_y", expected=False)
+    not_expr = LogicalExpression(operator=LogicalOperator.NOT, operands=(flag_false,))
+    at_least = LogicalExpression(
+        operator=LogicalOperator.AT_LEAST_N,
+        operands=(flag_false, synthetic_package.rules["rule_alternatives"].condition),
+        threshold=1,
+    )
+    rule = replace(
+        synthetic_package.rules["rule_alternatives"],
+        id="rule_zzz_not_atleast",
+        condition=LogicalExpression(operator=LogicalOperator.AND, operands=(not_expr, at_least)),
+        action_refs=(),
+    )
+    package = replace(
+        synthetic_package, rules={**synthetic_package.rules, "rule_zzz_not_atleast": rule}
+    )
+    svg_text = _svg_text(package)
+    block = _node_block(svg_text, "rule_zzz_not_atleast")
+    assert "NOT(" in block
+    assert "AT_LEAST_N(" in block
