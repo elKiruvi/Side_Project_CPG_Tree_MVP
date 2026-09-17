@@ -14,7 +14,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Final
 
-from cpg_tree.knowledge.conditions import Condition, LogicalExpression, LogicalOperand
+from cpg_tree.knowledge.conditions import Condition, LogicalOperand
 from cpg_tree.knowledge.enums import DerivationState, ValidationStatus
 from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.knowledge.provenance import Provenance, SourceFragment

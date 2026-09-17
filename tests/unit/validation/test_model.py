@@ -16,6 +16,7 @@ from cpg_tree.validation import (
 
 PROTOCOL_ID = "TEST-PL-999"
 VERSION = "v01"
+EXPECTED_WARNING_COUNT = 2
 
 
 def _finding(
@@ -63,7 +64,7 @@ def test_report_construction_and_counts() -> None:
         ),
     )
     assert report.error_count == 1
-    assert report.warning_count == 2
+    assert report.warning_count == EXPECTED_WARNING_COUNT
     assert report.info_count == 1
     assert not report.is_valid()
 
@@ -146,7 +147,9 @@ def test_dump_emits_related_ids_and_path() -> None:
     report = ValidationReport(
         protocol_id=PROTOCOL_ID,
         version=VERSION,
-        findings=(_finding("A", FindingSeverity.ERROR, "rules.rule_x.provenance", ("frag_1", "frag_2")),),
+        findings=(
+            _finding("A", FindingSeverity.ERROR, "rules.rule_x.provenance", ("frag_1", "frag_2")),
+        ),
     )
     data = yaml.safe_load(dump_report(report))
     finding = data["findings"][0]
@@ -189,17 +192,13 @@ def test_load_rejects_non_mapping_finding() -> None:
 def test_load_rejects_finding_without_code() -> None:
     with pytest.raises(ValueError, match="code"):
         load_report(
-            "protocol_id: TEST-PL-999\nversion: v01\n"
-            "findings: [{severity: INFO, message: x}]\n"
+            "protocol_id: TEST-PL-999\nversion: v01\nfindings: [{severity: INFO, message: x}]\n"
         )
 
 
 def test_load_rejects_finding_without_severity() -> None:
     with pytest.raises(ValueError, match="severity"):
-        load_report(
-            "protocol_id: TEST-PL-999\nversion: v01\n"
-            "findings: [{code: A, message: x}]\n"
-        )
+        load_report("protocol_id: TEST-PL-999\nversion: v01\nfindings: [{code: A, message: x}]\n")
 
 
 def test_load_rejects_finding_with_invalid_severity() -> None:
@@ -213,8 +212,7 @@ def test_load_rejects_finding_with_invalid_severity() -> None:
 def test_load_rejects_finding_without_message() -> None:
     with pytest.raises(ValueError, match="message"):
         load_report(
-            "protocol_id: TEST-PL-999\nversion: v01\n"
-            "findings: [{code: A, severity: INFO}]\n"
+            "protocol_id: TEST-PL-999\nversion: v01\nfindings: [{code: A, severity: INFO}]\n"
         )
 
 

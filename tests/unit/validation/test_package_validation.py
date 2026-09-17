@@ -11,6 +11,14 @@ from dataclasses import replace
 from typing import Any
 
 import pytest
+from unit.validation.conftest import (
+    DOCUMENT_ID,
+    FRAGMENT_ID,
+    VALID_SHA256,
+    make_fragment,
+    make_rule,
+    make_validation_item,
+)
 
 from cpg_tree.knowledge import (
     Action,
@@ -37,15 +45,6 @@ from cpg_tree.validation import (
     validate_package,
 )
 from cpg_tree.validation.model import finding_sort_key
-
-from unit.validation.conftest import (
-    DOCUMENT_ID,
-    FRAGMENT_ID,
-    VALID_SHA256,
-    make_fragment,
-    make_rule,
-    make_validation_item,
-)
 
 ERROR = FindingSeverity.ERROR
 WARNING = FindingSeverity.WARNING

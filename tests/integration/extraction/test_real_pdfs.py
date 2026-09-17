@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from cpg_tree.extraction import ExtractionStatus, extract_pdf
+from cpg_tree.extraction import ExtractionResult, ExtractionStatus, extract_pdf
 
 RAW_DIR = Path(__file__).resolve().parents[3] / "data" / "01_raw"
 
@@ -31,7 +31,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def _result_for(path: Path):
+def _result_for(path: Path) -> ExtractionResult:
     return extract_pdf(path, extracted_at="2026-09-17T00:00:00+00:00")
 
 
