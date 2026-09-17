@@ -41,6 +41,7 @@ from cpg_tree.views.inspection import (
 from cpg_tree.views.provenance_view import provenance_to_json, render_provenance
 from cpg_tree.views.results import evaluation_to_json, render_evaluation
 from cpg_tree.views.tree import build_projection, projection_to_json, render_projection
+from cpg_tree.views.visualize import load_manifest, visualize_package
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -110,6 +111,17 @@ def build_parser() -> argparse.ArgumentParser:
     _add_protocol_arguments(validate_parser)
     _add_json_argument(validate_parser)
     validate_parser.set_defaults(handler=_cmd_validate)
+
+    visualize_parser = subparsers.add_parser(
+        "visualize", help="generate a static HTML visualization of a protocol"
+    )
+    _add_protocol_arguments(visualize_parser)
+    visualize_parser.add_argument(
+        "--out",
+        default="data/08_reporting",
+        help="output directory (default: data/08_reporting)",
+    )
+    visualize_parser.set_defaults(handler=_cmd_visualize)
 
     evaluate_parser = subparsers.add_parser(
         "evaluate", help="evaluate a runtime case with the deterministic engine"
@@ -312,6 +324,14 @@ def _cmd_validate(args: argparse.Namespace) -> int:
             location = f"  path: {finding.path}" if finding.path else ""
             print(f"    - [{finding.severity.value}] {finding.code}{location}{related}")
             print(f"        {finding.message}")
+    return EXIT_OK
+
+
+def _cmd_visualize(args: argparse.Namespace) -> int:
+    package, artifact_path = _load_package(args)
+    manifest = load_manifest(artifact_path.parent / "visualization.yaml")
+    out_path = visualize_package(package, manifest, Path(args.out))
+    print(out_path)
     return EXIT_OK
 
 
