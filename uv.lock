@@ -422,6 +422,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pypdf"
+version = "6.19.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/ac/63d71aaedb59acbcdef491e6ca6469165e3771c9c74358204818fd9bc5a6/pypdf-6.19.0.tar.gz", hash = "sha256:bbc43aca292369ccc6cbc8a921991ecf2538a3587ab5a116eff06c321d647155", size = 7033266, upload-time = "2026-09-16T09:32:05.946Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3c/2c/c43c03eaf630435f023f1dc61ec4a4a78951ad5530a62c71cc89bde307b7/pypdf-6.19.0-py3-none-any.whl", hash = "sha256:7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14", size = 395480, upload-time = "2026-09-16T09:32:04.087Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -552,6 +561,39 @@ wheels = [
 ]
 
 [[package]]
+name = "side-project-cpg-tree-mvp"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "pypdf" },
+    { name = "pyyaml" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "cruft", extra = ["pyproject"] },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-cookies" },
+    { name = "pytest-cov" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pypdf", specifier = ">=6.19.0" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "cruft", extras = ["pyproject"], specifier = ">=2.16.0" },
+    { name = "pre-commit", specifier = ">=4.6.2" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-cookies", specifier = ">=0.7.0" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -567,31 +609,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/44/cd/a040c4b3119bbe532e5b0732286f805445375489fceaec1f48306068ee3b/smmap-5.0.2.tar.gz", hash = "sha256:26ea65a03958fa0c8a1c7e8c7a58fdc77221b8910f6be2131affade476898ad5", size = 22329, upload-time = "2025-01-02T07:14:40.909Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/be/d09147ad1ec7934636ad912901c5fd7667e1c858e19d355237db0d0cd5e4/smmap-5.0.2-py3-none-any.whl", hash = "sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e", size = 24303, upload-time = "2025-01-02T07:14:38.724Z" },
-]
-
-[[package]]
-name = "template-data-science-container"
-version = "0.1.0"
-source = { virtual = "." }
-
-[package.dev-dependencies]
-dev = [
-    { name = "cruft", extra = ["pyproject"] },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-cookies" },
-    { name = "pytest-cov" },
-]
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "cruft", extras = ["pyproject"], specifier = ">=2.16.0" },
-    { name = "pre-commit", specifier = ">=4.6.2" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-cookies", specifier = ">=0.7.0" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
 
 [[package]]

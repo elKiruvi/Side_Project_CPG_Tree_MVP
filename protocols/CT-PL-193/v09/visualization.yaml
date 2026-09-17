@@ -1,0 +1,42 @@
+# Presentation metadata for the CT-PL-193 v09 visual representation.
+#
+# This file contains ONLY presentation groupings: which existing rule ids
+# appear in which visual section, in which display order.
+#
+# It contains no clinical content. Every clinical fact (conditions, thresholds,
+# actions, exceptions, provenance) comes exclusively from package.yaml, which
+# remains the canonical source of truth.
+#
+# Sections are presentation groupings only: they do NOT represent execution
+# order, clinical workflow, priority, or dependencies between rules.
+
+sections:
+  - title: Definición y diagnóstico
+    prefixes:
+      - rule_definicion_
+      - rule_diagnostico_
+
+  - title: Estudios diagnósticos
+    prefixes:
+      - rule_labs_
+      - rule_hemocultivos
+      - rule_gram_
+      - rule_esputo_
+      - rule_filmarray
+      - rule_rx_
+      - rule_tc_
+      - rule_toracentesis_
+
+  - title: Criterios de hospitalización
+    prefixes:
+      - rule_hosp_
+      - rule_hospitalizacion
+
+  - title: Ingreso a UCI/UCE
+    prefixes:
+      - rule_uci_
+      - rule_ingreso_
+
+  - title: Plan de egreso
+    prefixes:
+      - rule_plan_

@@ -1,0 +1,50 @@
+"""End-to-end ITU chain test: raw PDF -> extraction -> knowledge package
+-> validation -> engine evaluation -> test-case harness.
+
+Skipped when the raw clinical PDF is not available locally (raw PDFs are
+source data and are never committed to Git).
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from cpg_tree.engine import run_test_cases
+from cpg_tree.extraction import extract_pdf
+from cpg_tree.protocols.itu_v06 import DOCUMENT_ID, build_itu_package
+from cpg_tree.validation import validate_package
+
+RAW_DIR = Path(__file__).resolve().parents[3] / "data" / "01_raw"
+
+EXPECTED_TEST_CASES = 93
+
+pytestmark = pytest.mark.skipif(
+    not any(RAW_DIR.glob("CT-PL-197*.pdf")),
+    reason="the raw ITU PDF is not available locally",
+)
+
+
+def test_extraction_identity_matches_package_document() -> None:
+    pdf_path = next(RAW_DIR.glob("CT-PL-197*.pdf"))
+    result = extract_pdf(pdf_path, extracted_at="2026-09-17T00:00:00+00:00")
+    assert result.document.document_id == DOCUMENT_ID
+
+
+def test_full_itu_chain_validates_and_runs() -> None:
+    package = build_itu_package()
+    report = validate_package(package)
+    assert report.error_count == 0
+    assert report.warning_count == 0
+    assert report.info_count == 0
+    outcomes = run_test_cases(package)
+    assert len(outcomes) == EXPECTED_TEST_CASES
+    assert all(outcome.passed for outcome in outcomes)
+
+
+def test_chain_is_repeatable() -> None:
+    package = build_itu_package()
+    first = run_test_cases(package)
+    second = run_test_cases(package)
+    assert first == second

@@ -1,0 +1,52 @@
+# Presentation metadata for the CT-PL-197 v06 visual representation.
+#
+# This file contains ONLY presentation groupings: which existing rule ids
+# appear in which visual section, in which display order.
+#
+# It contains no clinical content. Every clinical fact (conditions, thresholds,
+# actions, exceptions, provenance) comes exclusively from package.yaml, which
+# remains the canonical source of truth.
+#
+# Sections are presentation groupings only: they do NOT represent execution
+# order, clinical workflow, priority, or dependencies between rules.
+
+sections:
+  - title: Definiciones y clasificación
+    prefixes:
+      - rule_def_
+
+  - title: Diagnóstico y estudios iniciales
+    prefixes:
+      - rule_citoquimico_
+      - rule_tirilla_
+      - rule_piuria_
+      - rule_urocultivo_
+      - rule_gram_
+      - rule_hemocultivos
+      - rule_analisis_
+
+  - title: Imágenes diagnósticas
+    rules:
+      - rule_ecografia_renal_gestante
+    prefixes:
+      - rule_imagen_
+      - rule_tc_
+
+  - title: Hospitalización y egreso
+    prefixes:
+      - rule_hosp_
+      - rule_hospitalizacion
+      - rule_egreso_
+      - rule_plan_egreso
+      - rule_reevaluar_
+
+  - title: Tratamiento
+    prefixes:
+      - rule_t1_
+      - rule_tto_
+      - rule_fr_bgn
+      - rule_fosfomicina
+
+  - title: Manejo de la gestante
+    prefixes:
+      - rule_t2_
