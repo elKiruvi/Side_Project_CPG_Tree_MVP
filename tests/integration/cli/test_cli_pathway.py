@@ -34,15 +34,14 @@ def test_visualize_renders_pathway_with_every_rule_once(
     version: str,
     expected_rules: int,
 ) -> None:
-    code, out, err = _run(["visualize", protocol_id, version, "--out", str(tmp_path)], capsys)
+    code, _out, err = _run(["visualize", protocol_id, version, "--out", str(tmp_path)], capsys)
     assert code == EXIT_OK, err
     html_path = tmp_path / f"{protocol_id}-{version}.html"
     assert html_path.is_file()
     document = html_path.read_text(encoding="utf-8")
     assert 'id="pathway"' in document
     assert "Vía clínica de decisión" in document
-    for index in range(1, expected_rules + 1):
-        assert f"pathway_rule_" in document
+    assert "pathway_rule_" in document
     node_count = document.count("pnode-box pnode-rule")
     assert node_count == expected_rules
     assert "Vista técnica" in document
@@ -53,7 +52,7 @@ def test_visualize_without_reconciliation_renders_explicit_notice(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
 ) -> None:
-    code, out, err = _run(
+    code, _out, err = _run(
         [
             "visualize",
             "CT-PL-197",

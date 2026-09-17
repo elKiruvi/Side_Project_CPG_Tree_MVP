@@ -20,16 +20,18 @@ from cpg_tree.reconciliation.model import (
     ConflictStatus,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceConflict,
     SourceEvidenceStatus,
     SourceRepresentation,
 )
 
-_TOP_KEYS = frozenset({"schema", "schema_version", "protocol", "version", "candidates", "conflicts"})
+_TOP_KEYS = frozenset(
+    {"schema", "schema_version", "protocol", "version", "candidates", "conflicts"}
+)
 _CANDIDATE_KEYS = frozenset(
     {
         "candidate_id",
@@ -52,7 +54,9 @@ _CANDIDATE_KEYS = frozenset(
         "reconciliation_notes",
     }
 )
-_CONFLICT_KEYS = frozenset({"conflict_id", "topic", "status", "resolution", "representations", "notes"})
+_CONFLICT_KEYS = frozenset(
+    {"conflict_id", "topic", "status", "resolution", "representations", "notes"}
+)
 _REPRESENTATION_KEYS = frozenset({"representation", "page", "statement", "verification"})
 
 _SCHEMA_NAME = "relationship-reconciliation"
@@ -69,13 +73,9 @@ def load_reconciliation(path: Path) -> ReconciliationInventory:
         raise ValueError(f"reconciliation document at {path} must be a mapping")
     unknown = set(data) - _TOP_KEYS
     if unknown:
-        raise ValueError(
-            f"reconciliation document at {path} has unknown keys: {sorted(unknown)}"
-        )
+        raise ValueError(f"reconciliation document at {path} has unknown keys: {sorted(unknown)}")
     if data.get("schema") != _SCHEMA_NAME:
-        raise ValueError(
-            f"reconciliation document at {path} must declare schema: {_SCHEMA_NAME}"
-        )
+        raise ValueError(f"reconciliation document at {path} must declare schema: {_SCHEMA_NAME}")
     if data.get("schema_version") != _SCHEMA_VERSION:
         raise ValueError(
             f"reconciliation document at {path} must declare schema_version: {_SCHEMA_VERSION}"
@@ -108,11 +108,13 @@ def dump_reconciliation(inventory: ReconciliationInventory) -> str:
         "candidates": [_candidate_to_dict(candidate) for candidate in inventory.candidates],
         "conflicts": [_conflict_to_dict(conflict) for conflict in inventory.conflicts],
     }
-    return yaml.safe_dump(
-        document,
-        sort_keys=False,
-        allow_unicode=True,
-        width=88,
+    return str(
+        yaml.safe_dump(
+            document,
+            sort_keys=False,
+            allow_unicode=True,
+            width=88,
+        )
     )
 
 
@@ -244,7 +246,9 @@ def _enum_value[T](
     if not isinstance(value, str):
         raise ValueError(f"{label} of {path}: '{key}' must be a string")
     try:
-        return enum_type(value)  # type: ignore[return-value]
+        # Dynamic StrEnum construction from a validated string (mirrors the
+        # enum constructor calls of the knowledge serialization layer).
+        return enum_type(value)  # type: ignore[call-arg]
     except ValueError as error:
         allowed = sorted(member.value for member in enum_type)  # type: ignore[attr-defined]
         raise ValueError(

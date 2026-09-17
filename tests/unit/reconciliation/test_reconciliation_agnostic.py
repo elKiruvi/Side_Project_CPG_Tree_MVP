@@ -42,6 +42,4 @@ def test_reconciliation_never_imports_protocol_packages() -> None:
 def test_reconciliation_never_imports_the_engine() -> None:
     for source_file in RECONCILIATION_PACKAGE.rglob("*.py"):
         content = source_file.read_text(encoding="utf-8")
-        assert "cpg_tree.engine" not in content, (
-            f"{source_file} imports the evaluation engine"
-        )
+        assert "cpg_tree.engine" not in content, f"{source_file} imports the evaluation engine"

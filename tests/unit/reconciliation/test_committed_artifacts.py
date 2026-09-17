@@ -12,6 +12,7 @@ from cpg_tree.reconciliation.io import dump_reconciliation, load_reconciliation
 from cpg_tree.reconciliation.model import (
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
     ReviewStatus,
@@ -19,6 +20,11 @@ from cpg_tree.reconciliation.model import (
 )
 
 _PATHWAY_DIR = Path(__file__).resolve().parents[3] / "evaluation" / "pathway"
+
+_NAC_CANDIDATES = 30
+_NAC_CONFLICTS = 4
+_ITU_CANDIDATES = 43
+_REPRESENTATIONS_PER_CONFLICT = 2
 
 _ARTIFACTS = (
     ("CT-PL-193-v09-reconciliation.yaml", build_nac_package()),
@@ -60,8 +66,8 @@ def test_nac_counts() -> None:
     inventory = _load("CT-PL-193-v09-reconciliation.yaml")
     assert inventory.protocol == "CT-PL-193"
     assert inventory.version == "v09"
-    assert len(inventory.candidates) == 30
-    assert len(inventory.conflicts) == 4
+    assert len(inventory.candidates) == _NAC_CANDIDATES
+    assert len(inventory.conflicts) == _NAC_CONFLICTS
     roles = Counter(c.presentation_role for c in inventory.candidates)
     assert roles == Counter(
         {
@@ -91,7 +97,7 @@ def test_itu_counts() -> None:
     inventory = _load("CT-PL-197-v06-reconciliation.yaml")
     assert inventory.protocol == "CT-PL-197"
     assert inventory.version == "v06"
-    assert len(inventory.candidates) == 43
+    assert len(inventory.candidates) == _ITU_CANDIDATES
     assert len(inventory.conflicts) == 0
     roles = Counter(c.presentation_role for c in inventory.candidates)
     assert roles == Counter(
@@ -150,7 +156,7 @@ def test_conflicts_preserve_both_sides_and_are_open() -> None:
         "SC-NAC-004",
     }
     for conflict in inventory.conflicts:
-        assert len(conflict.representations) == 2
+        assert len(conflict.representations) == _REPRESENTATIONS_PER_CONFLICT
         assert conflict.status.value == "OPEN"
         assert conflict.resolution.value == "UNRESOLVED"
         verifications = {r.verification for r in conflict.representations}
@@ -165,7 +171,7 @@ def test_conflicts_preserve_both_sides_and_are_open() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _by_id(inventory: ReconciliationInventory) -> dict[str, object]:
+def _by_id(inventory: ReconciliationInventory) -> dict[str, ReconciledCandidate]:
     return {c.candidate_id: c for c in inventory.candidates}
 
 

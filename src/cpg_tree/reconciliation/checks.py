@@ -1,4 +1,3 @@
-# ruff: noqa: TRY004
 """Deterministic checks for reconciliation inventories (Phase 10 D2.5).
 
 The checks enforce the reconciliation invariants only; they never evaluate
@@ -23,9 +22,9 @@ from cpg_tree.reconciliation.model import (
     FLOW_ALLOWED_EVIDENCE,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
 )
 
@@ -90,7 +89,9 @@ def validate_reconciliation(
     findings: list[ReconciliationFinding] = []
     _check_candidate_ids(inventory, findings)
     _check_conflict_ids(inventory, findings)
-    conflict_ids = {conflict.conflict_id for conflict in inventory.conflicts}
+    conflict_ids: frozenset[str] = frozenset(
+        conflict.conflict_id for conflict in inventory.conflicts
+    )
     known_ids: Mapping[str, frozenset[str]] = {}
     if package is not None:
         known_ids = {
@@ -251,6 +252,15 @@ def _check_status_role_coherence(
     path: str,
     findings: list[ReconciliationFinding],
 ) -> None:
+    _check_status_driven_rules(candidate, path, findings)
+    _check_role_driven_rules(candidate, path, findings)
+
+
+def _check_status_driven_rules(
+    candidate: ReconciledCandidate,
+    path: str,
+    findings: list[ReconciliationFinding],
+) -> None:
     status = candidate.reconciliation_status
     role = candidate.presentation_role
     if status is ReconciliationStatus.OMITTED and role is not PresentationRole.OMITTED:
@@ -269,21 +279,6 @@ def _check_status_role_coherence(
                 severity=FindingSeverity.ERROR,
                 path=path,
                 message=f"status GAP requires presentation_role GAP; got {role.value}",
-            )
-        )
-    if role is PresentationRole.OMITTED and status not in {
-        ReconciliationStatus.OMITTED,
-        ReconciliationStatus.REJECTED,
-    }:
-        findings.append(
-            ReconciliationFinding(
-                code="RECON.ROLE_OMITTED_STATUS_MISMATCH",
-                severity=FindingSeverity.ERROR,
-                path=path,
-                message=(
-                    "presentation_role OMITTED requires status OMITTED or REJECTED; "
-                    f"got {status.value}"
-                ),
             )
         )
     if status is ReconciliationStatus.REJECTED and role is not PresentationRole.OMITTED:
@@ -306,6 +301,51 @@ def _check_status_role_coherence(
                 severity=FindingSeverity.ERROR,
                 path=path,
                 message="READY_FOR_REVIEW candidates must keep review_status PROPOSED",
+            )
+        )
+    if status is ReconciliationStatus.CONFLICT and role not in _CONFLICT_STATUS_ROLES:
+        findings.append(
+            ReconciliationFinding(
+                code="RECON.CONFLICT_ROLE_MISMATCH",
+                severity=FindingSeverity.ERROR,
+                path=path,
+                message=(
+                    "status CONFLICT requires presentation_role COMPOSITION or REFERENCE; "
+                    f"got {role.value}"
+                ),
+            )
+        )
+    if status is ReconciliationStatus.CONFLICT and not candidate.source_conflict_ids:
+        findings.append(
+            ReconciliationFinding(
+                code="RECON.CONFLICT_WITHOUT_REF",
+                severity=FindingSeverity.ERROR,
+                path=path,
+                message="status CONFLICT requires at least one source_conflict_id",
+            )
+        )
+
+
+def _check_role_driven_rules(
+    candidate: ReconciledCandidate,
+    path: str,
+    findings: list[ReconciliationFinding],
+) -> None:
+    status = candidate.reconciliation_status
+    role = candidate.presentation_role
+    if role is PresentationRole.OMITTED and status not in {
+        ReconciliationStatus.OMITTED,
+        ReconciliationStatus.REJECTED,
+    }:
+        findings.append(
+            ReconciliationFinding(
+                code="RECON.ROLE_OMITTED_STATUS_MISMATCH",
+                severity=FindingSeverity.ERROR,
+                path=path,
+                message=(
+                    "presentation_role OMITTED requires status OMITTED or REJECTED; "
+                    f"got {status.value}"
+                ),
             )
         )
     if role in _PRESENTATION_SAFE_ROLES and status is not ReconciliationStatus.READY_FOR_REVIEW:
@@ -334,61 +374,24 @@ def _check_status_role_coherence(
                 ),
             )
         )
-    if role is PresentationRole.FLOW and (
+    if role in _ACTIVE_ROLES and (
         candidate.from_ref.startswith(_BRANCH_CONTEXT_PREFIX)
         or any(ref.startswith(_BRANCH_CONTEXT_PREFIX) for ref in candidate.to_refs)
     ):
-        findings.append(
-            ReconciliationFinding(
-                code="RECON.BRANCH_ANCHOR_IN_FLOW",
-                severity=FindingSeverity.ERROR,
-                path=path,
-                message=(
-                    "FLOW rows must not use presentation-only branch anchors; "
-                    "use BRANCH_CONTEXT role for condition-based alternatives"
-                ),
-            )
+        code = (
+            "RECON.BRANCH_ANCHOR_IN_FLOW"
+            if role is PresentationRole.FLOW
+            else "RECON.BRANCH_ANCHOR_IN_ACTIVE_ROLE"
         )
-    if role in {PresentationRole.REFERENCE, PresentationRole.COMPOSITION} and (
-        candidate.from_ref.startswith(_BRANCH_CONTEXT_PREFIX)
-        or any(ref.startswith(_BRANCH_CONTEXT_PREFIX) for ref in candidate.to_refs)
-    ):
         findings.append(
             ReconciliationFinding(
-                code="RECON.BRANCH_ANCHOR_IN_ACTIVE_ROLE",
+                code=code,
                 severity=FindingSeverity.ERROR,
                 path=path,
                 message=(
                     f"{role.value} rows must not use presentation-only branch anchors; "
                     "use BRANCH_CONTEXT role for condition-based alternatives"
                 ),
-            )
-        )
-    if (
-        status is ReconciliationStatus.CONFLICT
-        and role not in _CONFLICT_STATUS_ROLES
-    ):
-        findings.append(
-            ReconciliationFinding(
-                code="RECON.CONFLICT_ROLE_MISMATCH",
-                severity=FindingSeverity.ERROR,
-                path=path,
-                message=(
-                    "status CONFLICT requires presentation_role COMPOSITION or REFERENCE; "
-                    f"got {role.value}"
-                ),
-            )
-        )
-    if (
-        status is ReconciliationStatus.CONFLICT
-        and not candidate.source_conflict_ids
-    ):
-        findings.append(
-            ReconciliationFinding(
-                code="RECON.CONFLICT_WITHOUT_REF",
-                severity=FindingSeverity.ERROR,
-                path=path,
-                message="status CONFLICT requires at least one source_conflict_id",
             )
         )
 
@@ -478,8 +481,7 @@ def _check_internal_refs(
                 severity=FindingSeverity.ERROR,
                 path=path,
                 message=(
-                    f"INTERNAL rows require a canonical rule as 'from'; "
-                    f"got {candidate.from_ref!r}"
+                    f"INTERNAL rows require a canonical rule as 'from'; got {candidate.from_ref!r}"
                 ),
             )
         )
@@ -490,9 +492,7 @@ def _check_internal_refs(
                     code="RECON.INTERNAL_TO_NOT_ACTION",
                     severity=FindingSeverity.ERROR,
                     path=path,
-                    message=(
-                        f"INTERNAL rows require a canonical action as 'to'; got {ref!r}"
-                    ),
+                    message=(f"INTERNAL rows require a canonical action as 'to'; got {ref!r}"),
                 )
             )
 

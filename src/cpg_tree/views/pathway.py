@@ -35,9 +35,9 @@ from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.reconciliation.checks import validate_reconciliation
 from cpg_tree.reconciliation.model import (
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
 )
 from cpg_tree.views.manifest import VisualizationManifest, group_rules
 
@@ -137,6 +137,17 @@ class PathwayGraph:
     notices: tuple[PathwayNotice, ...]
 
 
+@dataclass(slots=True)
+class _PathwayAccumulator:
+    """Mutable staging containers used while building the presentation graph."""
+
+    branch_contexts: dict[str, BranchContextNode]
+    terminals: dict[str, TerminalNode]
+    edges: list[PathwayEdge]
+    badges: dict[str, list[str]]
+    notices: list[PathwayNotice]
+
+
 def build_pathway_graph(
     package: ProtocolVersion,
     reconciliation: ReconciliationInventory,
@@ -158,7 +169,48 @@ def build_pathway_graph(
             f"reconciliation validation failed for {reconciliation.protocol} "
             f"{reconciliation.version} [{', '.join(codes)}]; refusing to render the pathway"
         )
+    rule_nodes, badges = _build_rule_nodes_and_badges(package, manifest)
+    accumulator = _PathwayAccumulator(
+        branch_contexts={},
+        terminals={},
+        edges=[],
+        badges=badges,
+        notices=[],
+    )
+    for candidate in reconciliation.candidates:
+        _dispatch_candidate(candidate, package, accumulator)
+    for conflict in reconciliation.conflicts:
+        accumulator.notices.append(
+            PathwayNotice(
+                kind=PathwayNoticeKind.SOURCE_CONFLICT,
+                text=(
+                    f"{conflict.conflict_id}: {conflict.topic} — estado {conflict.status.value}, "
+                    f"resolución {conflict.resolution.value}; la presentación no elige un ganador"
+                ),
+            )
+        )
+    _validate_topology(
+        accumulator.edges,
+        rule_nodes,
+        accumulator.branch_contexts,
+        accumulator.terminals,
+    )
+    return PathwayGraph(
+        protocol_id=package.protocol.id,
+        version=package.version,
+        rule_nodes=rule_nodes,
+        branch_contexts=accumulator.branch_contexts,
+        terminals=accumulator.terminals,
+        edges=tuple(accumulator.edges),
+        badges={rule_id: tuple(sorted(set(texts))) for rule_id, texts in sorted(badges.items())},
+        notices=tuple(accumulator.notices),
+    )
 
+
+def _build_rule_nodes_and_badges(
+    package: ProtocolVersion,
+    manifest: VisualizationManifest | None,
+) -> tuple[dict[str, RuleNode], dict[str, list[str]]]:
     grouped = group_rules(package, manifest)
     rule_nodes: dict[str, RuleNode] = {}
     for section_title, rule_ids in grouped:
@@ -169,7 +221,6 @@ def build_pathway_graph(
             f"pathway rule-node invariant violated: {len(rule_nodes)} nodes for "
             f"{len(package.rules)} canonical rules"
         )
-
     badges: dict[str, list[str]] = defaultdict(list)
     for rule_id, rule in package.rules.items():
         if rule.provenance.derivation is DerivationState.UNRESOLVED:
@@ -178,64 +229,26 @@ def build_pathway_graph(
             badges[rule_id].append(_BADGE_DERIVATION_INFERRED)
         if rule.validation_status is ValidationStatus.UNRESOLVED:
             badges[rule_id].append(_BADGE_VALIDATION_UNRESOLVED)
-
-    branch_contexts: dict[str, BranchContextNode] = {}
-    terminals: dict[str, TerminalNode] = {}
-    edges: list[PathwayEdge] = []
-    notices: list[PathwayNotice] = []
-
-    for candidate in reconciliation.candidates:
-        _dispatch_candidate(
-            candidate,
-            package,
-            branch_contexts,
-            terminals,
-            edges,
-            badges,
-            notices,
-        )
-
-    for conflict in reconciliation.conflicts:
-        notices.append(
-            PathwayNotice(
-                kind=PathwayNoticeKind.SOURCE_CONFLICT,
-                text=(
-                    f"{conflict.conflict_id}: {conflict.topic} — estado {conflict.status.value}, "
-                    f"resolución {conflict.resolution.value}; la presentación no elige un ganador"
-                ),
-            )
-        )
-
-    _validate_topology(edges, rule_nodes, branch_contexts, terminals)
-
-    return PathwayGraph(
-        protocol_id=package.protocol.id,
-        version=package.version,
-        rule_nodes=rule_nodes,
-        branch_contexts=branch_contexts,
-        terminals=terminals,
-        edges=tuple(edges),
-        badges={rule_id: tuple(sorted(set(texts))) for rule_id, texts in sorted(badges.items())},
-        notices=tuple(notices),
-    )
+    return rule_nodes, badges
 
 
 def _dispatch_candidate(
     candidate: ReconciledCandidate,
     package: ProtocolVersion,
-    branch_contexts: dict[str, BranchContextNode],
-    terminals: dict[str, TerminalNode],
-    edges: list[PathwayEdge],
-    badges: dict[str, list[str]],
-    notices: list[PathwayNotice],
+    accumulator: _PathwayAccumulator,
 ) -> None:
     role = candidate.presentation_role
     if role is PresentationRole.FLOW:
-        _add_flow_edges(candidate, package, terminals, edges)
+        _add_flow_edges(candidate, package, accumulator.terminals, accumulator.edges)
     elif role is PresentationRole.BRANCH_CONTEXT:
-        _add_branch_edges(candidate, package, branch_contexts, edges)
+        _add_branch_edges(
+            candidate,
+            package,
+            accumulator.branch_contexts,
+            accumulator.edges,
+        )
     # INTERNAL, EXCEPTION_CONTEXT, REFERENCE, COMPOSITION: never topology.
-    _record_badges(candidate, badges, notices)
+    _record_badges(candidate, accumulator.badges, accumulator.notices)
 
 
 def _add_flow_edges(
@@ -386,7 +399,7 @@ def _validate_topology(
     terminals: Mapping[str, TerminalNode],
 ) -> None:
     known_keys = set(rule_nodes) | set(branch_contexts) | set(terminals)
-    seen: set[tuple[str, str, str]] = set()
+    seen: set[tuple[str, str, str, str]] = set()
     for edge in edges:
         if edge.source not in known_keys:
             raise ValueError(f"edge {edge.candidate_id!r} has unknown source {edge.source!r}")

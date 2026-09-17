@@ -25,9 +25,9 @@ from dataclasses import dataclass
 from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.reconciliation.model import ReconciliationInventory
 from cpg_tree.views.clinical import (
-    _Line,
     _action_lines,
     _expression_lines,
+    _Line,
     _provenance_line,
     _wrap,
 )
@@ -37,7 +37,6 @@ from cpg_tree.views.pathway import (
     PathwayEdge,
     PathwayEdgeKind,
     PathwayGraph,
-    RuleNode,
     TerminalNode,
     build_pathway_graph,
 )
@@ -119,8 +118,7 @@ def render_pathway_view(
 
 def _render_legend() -> str:
     items = (
-        "Regla: rectángulo con borde continuo — una regla canónica; enlaza a su "
-        "tarjeta técnica.",
+        "Regla: rectángulo con borde continuo — una regla canónica; enlaza a su tarjeta técnica.",
         "Contexto de rama: rectángulo con borde discontinuo — nodo de presentación; "
         "no es una regla.",
         "Terminal: cápsula — terminal de presentación; no es una regla.",
@@ -128,8 +126,7 @@ def _render_legend() -> str:
         "no son flujo clínico inferido. Aristas de rama: alternativas condicionales.",
         "Semántica del motor: TRUE → MATCHED · FALSE → NOT_MATCHED · UNKNOWN → "
         "INDETERMINATE (UNKNOWN nunca es FALSE).",
-        "Acciones declarativas: nunca ejecutadas; las alternativas nunca se "
-        "seleccionan.",
+        "Acciones declarativas: nunca ejecutadas; las alternativas nunca se seleccionan.",
     )
     rows = "".join(f"<li>{_esc(item)}</li>" for item in items)
     return f'<section class="pathway-legend"><strong>Cómo leer la vía</strong><ul>{rows}</ul></section>'
@@ -139,10 +136,12 @@ def _render_notices(graph: PathwayGraph) -> str:
     rows: list[str] = []
     for notice in graph.notices:
         kind = notice.kind.value
-        rows.append(f'<li class="notice-{kind.lower()}"><code>{kind}</code> {_esc(notice.text)}</li>')
+        rows.append(
+            f'<li class="notice-{kind.lower()}"><code>{kind}</code> {_esc(notice.text)}</li>'
+        )
     return (
         '<section class="pathway-notices"><h3>Conflictos y brechas de fuente '
-        '(sin resolver en la presentación)</h3><ul>' + "".join(rows) + "</ul></section>"
+        "(sin resolver en la presentación)</h3><ul>" + "".join(rows) + "</ul></section>"
     )
 
 
@@ -213,9 +212,7 @@ def _rule_lines(package: ProtocolVersion, graph: PathwayGraph, rule_id: str) -> 
     lines.append(_Line("FALSE → NOT_MATCHED", "lane"))
     lines.append(_Line("UNKNOWN → INDETERMINATE (nunca FALSE)", "lane"))
     if rule.exceptions:
-        lines.append(
-            _Line("excepción TRUE → EXCEPTED · excepción UNKNOWN → INDETERMINATE", "lane")
-        )
+        lines.append(_Line("excepción TRUE → EXCEPTED · excepción UNKNOWN → INDETERMINATE", "lane"))
         for index, exception in enumerate(rule.exceptions):
             lines.append(_Line(f"EXCEPCIÓN {index + 1}", "label"))
             lines.extend(_expression_lines(exception))
@@ -254,12 +251,40 @@ def _compute_layout(
 ) -> tuple[dict[str, tuple[int, int]], int, int, bool]:
     node_height = max(box.height for box in boxes)
     keys = [box.key for box in boxes]
+    layers, cyclic = _layer_nodes(keys, graph.edges)
+    nodes_by_component = _group_components(keys, graph.edges)
+    ordered_components = sorted(
+        nodes_by_component, key=lambda component: min(nodes_by_component[component])
+    )
+    component_bounds = {
+        component: _component_size(nodes_by_component[component], layers, node_height)
+        for component in ordered_components
+    }
+    column_components, column_widths, column_heights = _pack_columns(
+        ordered_components, component_bounds
+    )
+    data = _LayoutData(
+        nodes_by_component=nodes_by_component,
+        component_bounds=component_bounds,
+        column_components=column_components,
+        column_widths=column_widths,
+        column_heights=column_heights,
+        layers=layers,
+        node_height=node_height,
+    )
+    positions, width, height = _place_nodes(data)
+    return positions, width, height, cyclic
+
+
+def _layer_nodes(
+    keys: list[str],
+    edges: tuple[PathwayEdge, ...],
+) -> tuple[dict[str, int], bool]:
     adjacency: dict[str, set[str]] = defaultdict(set)
     predecessors: dict[str, set[str]] = defaultdict(set)
-    for edge in graph.edges:
+    for edge in edges:
         adjacency[edge.source].add(edge.target)
         predecessors[edge.target].add(edge.source)
-
     indegree = {key: len(predecessors.get(key, ())) for key in keys}
     layers: dict[str, int] = {}
     ready = sorted(key for key in keys if indegree[key] == 0)
@@ -276,29 +301,40 @@ def _compute_layout(
         ready = sorted(promoted)
         layer_index += 1
     leftover = sorted(key for key in keys if key not in layers)
-    if leftover:
-        for key in leftover:
-            layers[key] = layer_index
-        layer_index += 1
-    cyclic = bool(leftover)
+    for key in leftover:
+        layers[key] = layer_index
+    return layers, bool(leftover)
 
-    components = _components(keys, graph.edges)
-    component_bounds: dict[str, tuple[int, int]] = {}
+
+def _group_components(
+    keys: list[str],
+    edges: tuple[PathwayEdge, ...],
+) -> dict[str, list[str]]:
+    components = _components(keys, edges)
     nodes_by_component: dict[str, list[str]] = defaultdict(list)
     for key in keys:
-        component = components[key]
-        nodes_by_component[component].append(key)
-    ordered_components = sorted(nodes_by_component, key=lambda component: min(nodes_by_component[component]))
-    for component in ordered_components:
-        nodes = nodes_by_component[component]
-        component_layers = {layers[key] for key in nodes}
-        layer_count = max(component_layers) - min(component_layers) + 1
-        widest = max(len([key for key in nodes if layers[key] == level]) for level in component_layers)
-        component_bounds[component] = (
-            layer_count * node_height + (layer_count - 1) * _NODE_GAP_Y,
-            widest * _NODE_WIDTH + (widest - 1) * _NODE_GAP_X,
-        )
+        nodes_by_component[components[key]].append(key)
+    return dict(nodes_by_component)
 
+
+def _component_size(
+    nodes: list[str],
+    layers: dict[str, int],
+    node_height: int,
+) -> tuple[int, int]:
+    component_layers = {layers[key] for key in nodes}
+    layer_count = max(component_layers) - min(component_layers) + 1
+    widest = max(len([key for key in nodes if layers[key] == level]) for level in component_layers)
+    return (
+        layer_count * node_height + (layer_count - 1) * _NODE_GAP_Y,
+        widest * _NODE_WIDTH + (widest - 1) * _NODE_GAP_X,
+    )
+
+
+def _pack_columns(
+    ordered_components: list[str],
+    component_bounds: Mapping[str, tuple[int, int]],
+) -> tuple[list[list[str]], list[int], list[int]]:
     column_count = max(1, min(_MAX_COLUMNS, math.ceil(math.sqrt(len(ordered_components)))))
     column_heights = [0] * column_count
     column_components: list[list[str]] = [[] for _ in range(column_count)]
@@ -310,36 +346,53 @@ def _compute_layout(
         max((component_bounds[component][1] for component in components_list), default=_NODE_WIDTH)
         for components_list in column_components
     ]
+    return column_components, column_widths, column_heights
+
+
+@dataclass(frozen=True, slots=True)
+class _LayoutData:
+    """Immutable inputs of the deterministic placement step."""
+
+    nodes_by_component: Mapping[str, list[str]]
+    component_bounds: Mapping[str, tuple[int, int]]
+    column_components: list[list[str]]
+    column_widths: list[int]
+    column_heights: list[int]
+    layers: dict[str, int]
+    node_height: int
+
+
+def _place_nodes(
+    data: _LayoutData,
+) -> tuple[dict[str, tuple[int, int]], int, int]:
     column_x: list[int] = []
     cursor = _MARGIN
-    for width in column_widths:
+    for width in data.column_widths:
         column_x.append(cursor)
         cursor += width + _COLUMN_GAP
-
     positions: dict[str, tuple[int, int]] = {}
-    column_y = [_MARGIN] * column_count
-    for column_index, components_list in enumerate(column_components):
+    column_y = [_MARGIN] * len(data.column_components)
+    for column_index, components_list in enumerate(data.column_components):
         for component in components_list:
-            nodes = sorted(nodes_by_component[component])
-            min_layer = min(layers[key] for key in nodes)
+            nodes = sorted(data.nodes_by_component[component])
+            min_layer = min(data.layers[key] for key in nodes)
             block_top = column_y[column_index]
             by_layer: dict[int, list[str]] = defaultdict(list)
             for key in nodes:
-                by_layer[layers[key]].append(key)
-            component_width = component_bounds[component][1]
+                by_layer[data.layers[key]].append(key)
+            component_width = data.component_bounds[component][1]
             for level in sorted(by_layer):
                 layer_nodes = sorted(by_layer[level])
                 layer_width = len(layer_nodes) * _NODE_WIDTH + (len(layer_nodes) - 1) * _NODE_GAP_X
                 offset_x = (component_width - layer_width) // 2
-                y = block_top + (level - min_layer) * (node_height + _NODE_GAP_Y)
+                y = block_top + (level - min_layer) * (data.node_height + _NODE_GAP_Y)
                 for slot, key in enumerate(layer_nodes):
                     x = column_x[column_index] + offset_x + slot * (_NODE_WIDTH + _NODE_GAP_X)
                     positions[key] = (x, y)
-            column_y[column_index] += component_bounds[component][0] + _COLUMN_GAP
-
+            column_y[column_index] += data.component_bounds[component][0] + _COLUMN_GAP
     width = cursor - _COLUMN_GAP + _MARGIN
-    height = max(column_heights, default=_MARGIN) + _MARGIN
-    return positions, width, height, cyclic
+    height = max(data.column_heights, default=_MARGIN) + _MARGIN
+    return positions, width, height
 
 
 def _components(keys: list[str], edges: tuple[PathwayEdge, ...]) -> Mapping[str, str]:
@@ -404,9 +457,7 @@ def _render_node(box: _NodeBox, x: int, y: int, height: int) -> str:
         f'<rect class="{border_class}" x="{x}" y="{y}" width="{_NODE_WIDTH}" '
         f'height="{height}" rx="8"/>'
     )
-    parts.append(
-        f"<title>{_esc(box.key)} — {box.kind}</title>"
-    )
+    parts.append(f"<title>{_esc(box.key)} — {box.kind}</title>")
     cursor = y + _CARD_PAD
     for line in box.lines:
         line_y = cursor + _LINE_HEIGHTS[line.style]

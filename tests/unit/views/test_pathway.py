@@ -11,9 +11,9 @@ from cpg_tree.reconciliation.model import (
     ConflictStatus,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceConflict,
     SourceEvidenceStatus,
@@ -26,8 +26,10 @@ from cpg_tree.views.pathway import (
     build_pathway_graph,
 )
 
+_TWO_EDGES = 2
 
-def _candidate(
+
+def _candidate(  # noqa: PLR0913, PLR0917 (test factory with optional field defaults)
     candidate_id: str,
     role: PresentationRole,
     from_ref: str,
@@ -200,7 +202,7 @@ def test_two_branch_candidates_share_one_context_node(
         ),
     )
     assert len(graph.branch_contexts) == 1
-    assert len(graph.edges) == 2
+    assert len(graph.edges) == _TWO_EDGES
 
 
 def test_reference_creates_no_topology(
@@ -448,7 +450,7 @@ def test_cyclic_reconciliation_builds_without_crash(
             ),
         ),
     )
-    assert len(graph.edges) == 2
+    assert len(graph.edges) == _TWO_EDGES
 
 
 def test_disconnected_rule_still_appears(

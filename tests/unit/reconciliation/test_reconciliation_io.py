@@ -17,9 +17,9 @@ from cpg_tree.reconciliation.model import (
     ConflictStatus,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceConflict,
     SourceEvidenceStatus,
@@ -194,16 +194,15 @@ def test_load_normalizes_single_to_tuple(tmp_path: Path) -> None:
     assert inventory.candidates[0].to_refs == ("rule_b",)
 
 
-def test_load_accepts_to_list() -> None:
+def test_load_accepts_to_list(tmp_path: Path) -> None:
     document = _VALID_DOCUMENT.replace(
         "  to: rule_b",
         "  to:\n  - rule_b\n  - rule_c",
     )
-    path = Path("/tmp/opencode") / "recon_to_list.yaml"
+    path = tmp_path / "recon_to_list.yaml"
     path.write_text(document, encoding="utf-8")
     inventory = load_reconciliation(path)
     assert inventory.candidates[0].to_refs == ("rule_b", "rule_c")
-    path.unlink()
 
 
 def test_dump_is_deterministic_and_round_trips(tmp_path: Path) -> None:

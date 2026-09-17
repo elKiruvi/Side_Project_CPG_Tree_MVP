@@ -27,9 +27,9 @@ from cpg_tree.reconciliation.model import (
     ConflictStatus,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceConflict,
     SourceEvidenceStatus,
@@ -102,9 +102,7 @@ def _report(
 
 def _error_codes(report: ReconciliationReport) -> set[str]:
     return {
-        finding.code
-        for finding in report.findings
-        if finding.severity is FindingSeverity.ERROR
+        finding.code for finding in report.findings if finding.severity is FindingSeverity.ERROR
     }
 
 
@@ -381,7 +379,11 @@ def test_terminal_pseudo_ref_is_accepted() -> None:
 def test_description_ref_is_rejected_for_active_candidates() -> None:
     package = _tiny_package()
     report = _report(
-        (_candidate(from_ref="(contexto de tratamiento)",),),
+        (
+            _candidate(
+                from_ref="(contexto de tratamiento)",
+            ),
+        ),
         package=package,
     )
     assert "RECON.UNRESOLVED_REF" in _error_codes(report)
@@ -568,7 +570,9 @@ def test_presentation_safe_roles_require_ready_for_review() -> None:
         report = _report(
             (
                 _candidate(
-                    from_ref="BRANCH_CONTEXT: x" if role is PresentationRole.BRANCH_CONTEXT else "rule_a",
+                    from_ref="BRANCH_CONTEXT: x"
+                    if role is PresentationRole.BRANCH_CONTEXT
+                    else "rule_a",
                     presentation_role=role,
                     reconciliation_status=ReconciliationStatus.REJECTED,
                 ),

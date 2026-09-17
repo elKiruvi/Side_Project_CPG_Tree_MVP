@@ -127,6 +127,8 @@ FLOW_ALLOWED_EVIDENCE = frozenset(
     {EvidenceClass.SOURCE_STATED, EvidenceClass.EXTRACTED, EvidenceClass.NORMALIZED}
 )
 
+_MIN_CONFLICT_REPRESENTATIONS = 2
+
 _TERMINAL_PREFIX = "TERMINAL:"
 _EXCEPTED_PREFIX = "EXCEPTED:"
 _BRANCH_CONTEXT_PREFIX = "BRANCH_CONTEXT:"
@@ -170,9 +172,7 @@ class ReconciledCandidate:
         if not self.candidate_id or not self.candidate_id.strip():
             raise ValueError("ReconciledCandidate.candidate_id must not be empty")
         if "*" in self.from_ref or any("*" in ref for ref in self.to_refs):
-            raise ValueError(
-                f"candidate {self.candidate_id!r} must not use wildcard references"
-            )
+            raise ValueError(f"candidate {self.candidate_id!r} must not use wildcard references")
         if not self.page or not self.page.strip():
             raise ValueError(f"candidate {self.candidate_id!r} requires a non-empty page")
 
@@ -211,9 +211,10 @@ class SourceConflict:
             raise ValueError("SourceConflict.conflict_id must not be empty")
         if not self.topic or not self.topic.strip():
             raise ValueError(f"conflict {self.conflict_id!r} requires a non-empty topic")
-        if len(self.representations) < 2:
+        if len(self.representations) < _MIN_CONFLICT_REPRESENTATIONS:
             raise ValueError(
-                f"conflict {self.conflict_id!r} requires at least two source representations"
+                f"conflict {self.conflict_id!r} requires at least "
+                f"{_MIN_CONFLICT_REPRESENTATIONS} source representations"
             )
         if not self.notes or not self.notes.strip():
             raise ValueError(f"conflict {self.conflict_id!r} requires non-empty notes")

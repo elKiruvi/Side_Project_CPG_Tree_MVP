@@ -4,17 +4,16 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from dataclasses import replace
 
-import pytest
-
+from cpg_tree.knowledge import Provenance
 from cpg_tree.knowledge.protocol import ProtocolVersion
 from cpg_tree.reconciliation.model import (
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceEvidenceStatus,
     SourceRepresentation,
@@ -23,8 +22,10 @@ from cpg_tree.views.pathway import build_pathway_graph
 from cpg_tree.views.pathway_render import render_pathway_svg, render_pathway_view
 from cpg_tree.views.visualize import build_visual_document
 
+_EXPECTED_BOX_COUNT = 3
 
-def _candidate(
+
+def _candidate(  # noqa: PLR0913, PLR0917 (test factory with optional field defaults)
     candidate_id: str,
     role: PresentationRole,
     from_ref: str,
@@ -70,7 +71,7 @@ def _svg_text(
     candidates: tuple[ReconciledCandidate, ...],
 ) -> str:
     graph = build_pathway_graph(synthetic_package, _inventory(candidates))
-    return render_pathway_svg(synthetic_package, graph)
+    return render_pathway_svg(synthetic_package, graph)  # type: ignore[no-any-return]
 
 
 def test_svg_is_deterministic(synthetic_package: ProtocolVersion) -> None:
@@ -100,7 +101,7 @@ def test_svg_is_well_formed_xml(synthetic_package: ProtocolVersion) -> None:
             ),
         ),
     )
-    root = ET.fromstring(svg)  # raises on malformed XML
+    root = ET.fromstring(svg)  # noqa: S314 (parsing locally generated SVG, not untrusted input)
     assert root.tag.endswith("svg")
 
 
@@ -117,9 +118,7 @@ def test_unknown_lane_is_present_and_distinct_from_false(
     synthetic_package: ProtocolVersion,
 ) -> None:
     svg = _svg_text(synthetic_package, ())
-    assert svg.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == len(
-        synthetic_package.rules
-    )
+    assert svg.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == len(synthetic_package.rules)
     assert "FALSE → NOT_MATCHED" in svg
     assert "TRUE → MATCHED" in svg
 
@@ -179,10 +178,6 @@ def test_branch_context_and_terminal_are_visually_distinct(
 
 
 def test_escaping_applies_to_node_content(synthetic_package: ProtocolVersion) -> None:
-    from dataclasses import replace
-
-    from cpg_tree.knowledge import Provenance, Rule
-
     sneaky_notes = '<script>alert("x")</script> & umbral > 5'
     rule = replace(
         synthetic_package.rules["rule_alternatives"],
@@ -226,7 +221,7 @@ def test_boxes_never_overlap(synthetic_package: ProtocolVersion) -> None:
         svg,
     )
     rects = [(int(x), int(y), int(w), int(h)) for x, y, w, h in boxes]
-    assert len(rects) == 3
+    assert len(rects) == _EXPECTED_BOX_COUNT
     for index, (x_a, y_a, w_a, h_a) in enumerate(rects):
         for x_b, y_b, w_b, h_b in rects[index + 1 :]:
             overlap = x_a < x_b + w_b and x_b < x_a + w_a and y_a < y_b + h_b and y_b < y_a + h_a

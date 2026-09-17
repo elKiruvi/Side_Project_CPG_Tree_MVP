@@ -14,10 +14,14 @@ from cpg_tree.protocols.itu_v06 import build_itu_package
 from cpg_tree.protocols.nac_v09 import build_nac_package
 from cpg_tree.reconciliation.io import load_reconciliation
 from cpg_tree.reconciliation.model import ReconciliationInventory
-from cpg_tree.views.manifest import load_manifest
+from cpg_tree.views.manifest import VisualizationManifest, load_manifest
 from cpg_tree.views.pathway import PathwayEdgeKind, PathwayGraph, build_pathway_graph
 from cpg_tree.views.pathway_render import render_pathway_svg
 from cpg_tree.views.visualize import build_visual_document
+
+_NAC_RULE_COUNT = 42
+_ITU_RULE_COUNT = 60
+_ITU_EXCEPTION_RULE_COUNT = 3
 
 _ROOT = Path(__file__).resolve().parents[3]
 
@@ -28,7 +32,7 @@ def _reconciliation(protocol_id: str, version: str) -> ReconciliationInventory:
     )
 
 
-def _manifest(protocol_id: str, version: str):
+def _manifest(protocol_id: str, version: str) -> VisualizationManifest | None:
     return load_manifest(_ROOT / "protocols" / protocol_id / version / "visualization.yaml")
 
 
@@ -45,7 +49,9 @@ def _graph(
 
 
 def _svg(package: ProtocolVersion, protocol_id: str, version: str) -> str:
-    return render_pathway_svg(package, _graph(package, protocol_id, version))
+    return render_pathway_svg(  # type: ignore[no-any-return]
+        package, _graph(package, protocol_id, version)
+    )
 
 
 def _node_block(svg: str, rule_id: str) -> str:
@@ -74,16 +80,14 @@ NAC_FLOW_PAIRS = {
 def test_nac_has_42_rule_nodes_exactly_once() -> None:
     package = build_nac_package()
     graph = _graph(package, "CT-PL-193", "v09")
-    assert len(graph.rule_nodes) == 42 == len(package.rules)
+    assert len(graph.rule_nodes) == _NAC_RULE_COUNT == len(package.rules)
     assert set(graph.rule_nodes) == set(package.rules)
 
 
 def test_nac_flow_topology_is_exactly_the_reconciled_set() -> None:
     graph = _graph(build_nac_package(), "CT-PL-193", "v09")
     flow_pairs = {
-        (edge.source, edge.target)
-        for edge in graph.edges
-        if edge.kind is PathwayEdgeKind.FLOW
+        (edge.source, edge.target) for edge in graph.edges if edge.kind is PathwayEdgeKind.FLOW
     }
     assert flow_pairs == NAC_FLOW_PAIRS
     assert len(graph.terminals) == 0
@@ -151,16 +155,14 @@ FORBIDDEN_MEDICATION_PAIRS = {
 def test_itu_has_60_rule_nodes_exactly_once() -> None:
     package = build_itu_package()
     graph = _graph(package, "CT-PL-197", "v06")
-    assert len(graph.rule_nodes) == 60 == len(package.rules)
+    assert len(graph.rule_nodes) == _ITU_RULE_COUNT == len(package.rules)
     assert set(graph.rule_nodes) == set(package.rules)
 
 
 def test_itu_flow_topology_is_exactly_the_reconciled_set() -> None:
     graph = _graph(build_itu_package(), "CT-PL-197", "v06")
     flow_pairs = {
-        (edge.source, edge.target)
-        for edge in graph.edges
-        if edge.kind is PathwayEdgeKind.FLOW
+        (edge.source, edge.target) for edge in graph.edges if edge.kind is PathwayEdgeKind.FLOW
     }
     assert flow_pairs == ITU_FLOW_PAIRS
 
@@ -194,7 +196,8 @@ def test_no_medication_sequence_edges_exist() -> None:
             f"medication sequence {pair} rendered as an edge"
         )
     assert not any(
-        edge.kind is PathwayEdgeKind.FLOW and (edge.source, edge.target) in FORBIDDEN_MEDICATION_PAIRS
+        edge.kind is PathwayEdgeKind.FLOW
+        and (edge.source, edge.target) in FORBIDDEN_MEDICATION_PAIRS
         for edge in graph.edges
     )
 
@@ -202,21 +205,19 @@ def test_no_medication_sequence_edges_exist() -> None:
 def test_itu_exception_semantics_inside_rule_nodes() -> None:
     package = build_itu_package()
     svg = _svg(package, "CT-PL-197", "v06")
-    exception_rules = {
-        rule_id for rule_id, rule in package.rules.items() if rule.exceptions
-    }
-    assert len(exception_rules) == 3
+    exception_rules = {rule_id for rule_id, rule in package.rules.items() if rule.exceptions}
+    assert len(exception_rules) == _ITU_EXCEPTION_RULE_COUNT
     for rule_id in exception_rules:
         block = _node_block(svg, rule_id)
         assert "EXCEPCIÓN 1" in block
         assert "excepción TRUE → EXCEPTED" in block
-    assert svg.count("EXCEPCIÓN 1") == 3
+    assert svg.count("EXCEPCIÓN 1") == _ITU_EXCEPTION_RULE_COUNT
 
 
 def test_unknown_semantics_preserved_everywhere() -> None:
     package = build_itu_package()
     svg = _svg(package, "CT-PL-197", "v06")
-    assert svg.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == 60
+    assert svg.count("UNKNOWN → INDETERMINATE (nunca FALSE)") == _ITU_RULE_COUNT
     assert "UNKNOWN → FALSE" not in svg
 
 
@@ -266,9 +267,9 @@ def test_full_html_and_svg_are_byte_deterministic() -> None:
         manifest = _manifest(protocol_id, version)
         graph = _graph(package, protocol_id, version)
         assert render_pathway_svg(package, graph) == render_pathway_svg(package, graph)
-        assert build_visual_document(
+        assert build_visual_document(package, manifest, reconciliation) == build_visual_document(
             package, manifest, reconciliation
-        ) == build_visual_document(package, manifest, reconciliation)
+        )
 
 
 def test_reconciliation_artifacts_were_consumed_without_semantic_change() -> None:

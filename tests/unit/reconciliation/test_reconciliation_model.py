@@ -10,9 +10,9 @@ from cpg_tree.reconciliation.model import (
     ConflictStatus,
     EvidenceClass,
     PresentationRole,
+    ReconciledCandidate,
     ReconciliationInventory,
     ReconciliationStatus,
-    ReconciledCandidate,
     ReviewStatus,
     SourceConflict,
     SourceEvidenceStatus,
@@ -87,7 +87,7 @@ def test_candidate_rejects_wildcard_in_to() -> None:
 
 
 def test_conflict_requires_two_representations() -> None:
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(ValueError, match="at least 2 source representations"):
         SourceConflict(
             conflict_id="SC-X",
             topic="topic",
