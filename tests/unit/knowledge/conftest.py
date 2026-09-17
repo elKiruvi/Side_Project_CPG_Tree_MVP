@@ -17,6 +17,7 @@ from cpg_tree.knowledge import (
     ProtocolVersion,
     Provenance,
     Rule,
+    SourceDocument,
     SourceFragment,
     TemporalOperator,
     TestCase,
@@ -33,6 +34,8 @@ OPERAND_HIGH = 100
 OPERAND_VERY_HIGH = 1000
 THRESHOLD_TWO = 2
 DURATION_HOURS = 48
+
+SYNTHETIC_SHA256 = "3a1654757801b7b618661f846f8335ced6fb9e388891d6bca96f1cd81d6f5882"
 
 
 @pytest.fixture
@@ -284,4 +287,13 @@ def _build_synthetic_package() -> ProtocolVersion:
         test_cases=test_cases,
         validation_items=validation_items,
         fragments=fragments,
+        documents={
+            "doc_1": SourceDocument(
+                document_id="doc_1",
+                filename="synthetic_protocol.pdf",
+                sha256=SYNTHETIC_SHA256,
+                file_format="pdf",
+                byte_size=1024,
+            )
+        },
     )

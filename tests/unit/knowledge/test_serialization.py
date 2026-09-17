@@ -20,6 +20,7 @@ from cpg_tree.knowledge import (
 )
 
 OPERAND_HIGH = 100
+SYNTHETIC_BYTE_SIZE = 1024
 
 
 def test_to_dict_omits_none_fields() -> None:
@@ -260,3 +261,33 @@ def test_round_trip_preserves_variable_types(synthetic_package: ProtocolVersion)
         loaded.variables["category_z"].allowed_values
         == synthetic_package.variables["category_z"].allowed_values
     )
+
+
+def test_documents_survive_round_trip(synthetic_package: ProtocolVersion) -> None:
+    assert synthetic_package.documents
+    loaded = load_package(dump_package(synthetic_package))
+    assert loaded.documents == synthetic_package.documents
+    document = loaded.documents["doc_1"]
+    assert document.sha256 == synthetic_package.documents["doc_1"].sha256
+    assert document.file_format == "pdf"
+    assert document.byte_size == SYNTHETIC_BYTE_SIZE
+
+
+def test_load_tolerates_missing_documents_key() -> None:
+    text = (
+        _RULE_PACKAGE_HEADER + "rules:\n"
+        "  rule_x:\n"
+        "    id: rule_x\n"
+        "    condition: {kind: FLAG, variable_ref: flag_y, expected: true}\n"
+        "    action_refs: [act_decide]\n"
+        "    provenance: {derivation: SOURCE_STATED, fragment_refs: [frag_1]}\n"
+        "actions:\n"
+        "  act_decide: {id: act_decide, type: DECISION}\n"
+    )
+    loaded = load_package(text)
+    assert loaded.documents == {}
+
+
+def test_dump_contains_documents_block(synthetic_package: ProtocolVersion) -> None:
+    data = yaml.safe_load(dump_package(synthetic_package))
+    assert data["documents"]["doc_1"]["document_id"] == "doc_1"

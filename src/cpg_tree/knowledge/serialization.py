@@ -21,6 +21,7 @@ from typing import Any
 import yaml
 
 from cpg_tree.knowledge.conditions import Condition, LogicalExpression
+from cpg_tree.knowledge.documents import SourceDocument
 from cpg_tree.knowledge.enums import (
     ActionType,
     ComparisonOperator,
@@ -91,6 +92,7 @@ def load_package(text: str) -> ProtocolVersion:
             data.get("validation_items"), _validation_item_from_dict
         ),
         fragments=_entity_map_from_dict(data.get("fragments"), _fragment_from_dict),
+        documents=_entity_map_from_dict(data.get("documents"), _source_document_from_dict),
     )
 
 
@@ -131,6 +133,7 @@ def _package_to_dict(version: ProtocolVersion) -> dict[str, Any]:
         "test_cases": _entity_map_to_dict(version.test_cases),
         "validation_items": _entity_map_to_dict(version.validation_items),
         "fragments": _entity_map_to_dict(version.fragments),
+        "documents": _entity_map_to_dict(version.documents),
     }
 
 
@@ -312,4 +315,14 @@ def _fragment_from_dict(data: Mapping[str, Any]) -> SourceFragment:
         page=data.get("page"),
         section=data.get("section"),
         verbatim_text=data.get("verbatim_text"),
+    )
+
+
+def _source_document_from_dict(data: Mapping[str, Any]) -> SourceDocument:
+    return SourceDocument(
+        document_id=data.get("document_id"),
+        filename=data.get("filename"),
+        sha256=data.get("sha256"),
+        file_format=data.get("file_format", "pdf"),
+        byte_size=data.get("byte_size"),
     )

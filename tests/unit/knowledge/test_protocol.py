@@ -15,6 +15,7 @@ from cpg_tree.knowledge import (
     ProtocolVersion,
     Provenance,
     Rule,
+    SourceDocument,
     SourceFragment,
     TestCase,
     ValidationItem,
@@ -23,6 +24,7 @@ from cpg_tree.knowledge import (
 )
 
 OPERAND_HIGH = 100
+VALID_SHA256 = "3a1654757801b7b618661f846f8335ced6fb9e388891d6bca96f1cd81d6f5882"
 
 
 def test_protocol_construction() -> None:
@@ -135,3 +137,28 @@ def test_protocol_version_accepts_all_collection_types() -> None:
     assert set(version.test_cases) == {"tc_1"}
     assert set(version.validation_items) == {"vi_1"}
     assert set(version.fragments) == {"frag_1"}
+
+
+def _source_document(document_id: str) -> SourceDocument:
+    return SourceDocument(document_id=document_id, filename="x.pdf", sha256=VALID_SHA256)
+
+
+def test_protocol_version_defaults_to_empty_documents() -> None:
+    protocol = Protocol(id="TEST-PL-999", name="Synthetic Protocol")
+    version = ProtocolVersion(protocol=protocol, version="v01")
+    assert version.documents == {}
+
+
+def test_protocol_version_accepts_documents_collection() -> None:
+    protocol = Protocol(id="TEST-PL-999", name="Synthetic Protocol")
+    document = _source_document("doc_1")
+    version = ProtocolVersion(protocol=protocol, version="v01", documents={"doc_1": document})
+    assert set(version.documents) == {"doc_1"}
+    assert version.documents["doc_1"] is document
+
+
+def test_protocol_version_validates_document_keys() -> None:
+    protocol = Protocol(id="TEST-PL-999", name="Synthetic Protocol")
+    mismatched = {"wrong_key": _source_document("doc_1")}
+    with pytest.raises(ValueError, match="does not match document_id"):
+        ProtocolVersion(protocol=protocol, version="v01", documents=mismatched)
